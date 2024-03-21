@@ -26,7 +26,7 @@
 
 ! print *,ntopo
 
-  do i=1,ntopo
+  do i = 1,ntopo
 
       xpoint = dble(i-1)*xmax/dble(ntopo - 1)
 

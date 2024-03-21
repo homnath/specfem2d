@@ -25,12 +25,12 @@
   implicit none
 
 ! max size of the model in elements
-  integer, parameter :: mnx=7,mnz=7
+  integer, parameter :: mnx = 7,mnz = 7
 
-  double precision, parameter :: pi=3.141592653589793d0
+  double precision, parameter :: pi = 3.141592653589793d0
 
 ! seuil pour considerer deux points comme confondus
-  double precision, parameter :: rseuil=1.d-2
+  double precision, parameter :: rseuil = 1.d-2
 
 ! declare variables
   integer imaxabs,n2ana,itimetype,isource_type,nump1,nump2,nump3,nump4
@@ -63,7 +63,7 @@
   double precision x1b(0:2*mnx,0:mnz)
   double precision z1b(0:2*mnx,0:mnz)
 
-  integer, parameter :: npoinz2b=(mnx+1)*(2*mnz+1), nelemz2b=mnx*(2*mnz)
+  integer, parameter :: npoinz2b=(mnx+1)*(2*mnz+1), nelemz2b = mnx*(2*mnz)
   double precision x2b(0:mnx,0:2*mnz)
   double precision z2b(0:mnx,0:2*mnz)
 
@@ -124,7 +124,7 @@
 ! generer les points de base de l'interpolation lineaire (zone 1)
   theta_init = 3 * pi / 2.
   delta_theta = pi / 2.
-  do i=0,4*nx
+  do i = 0,4*nx
 
 ! --- point de depart
   if (i < 2*nx) then
@@ -141,7 +141,7 @@
       z1(i,nz) = sin(theta_i)
 
 ! --- points intermediaires par interpolation lineaire
-      do j=1,nz-1
+      do j = 1,nz-1
         eta_j = dble(j) / dble(nz)
         x1(i,j) = (1.-eta_j)*x1(i,0) + eta_j*x1(i,nz)
         z1(i,j) = (1.-eta_j)*z1(i,0) + eta_j*z1(i,nz)
@@ -149,8 +149,8 @@
   enddo
 
 ! generer zone de gauche (zone 3)
-  do i=0,2*nx
-    do j=0,4*nz
+  do i = 0,2*nx
+    do j = 0,4*nz
       x3(i,j) = 5. * dble(i) / dble(2*nx) + 2.
       if (j <= 2*nz) then
         z3(i,j) = 7. * dble(j) / dble(2*nz) - 9.
@@ -161,8 +161,8 @@
   enddo
 
 ! generer zone du bas (zone 4)
-  do i=0,2*nx
-    do j=0,2*nz
+  do i = 0,2*nx
+    do j = 0,2*nz
       x4(i,j) = 2. * dble(i) / dble(2*nx)
       z4(i,j) = 7. * dble(j) / dble(2*nz) - 9.
     enddo
@@ -176,7 +176,7 @@
   theta_init = pi / 4.
   delta_theta = pi / 4.
 
-  do i=0,2*nx
+  do i = 0,2*nx
 ! --- point de depart
       x1b(i,0) = 2.*R * (dble(i) / dble(2*nx) - 1.)
       z1b(i,0) = - 2.*R
@@ -187,7 +187,7 @@
       z1b(i,nz) = - sin(theta_i)
 
 ! --- points intermediaires par interpolation lineaire
-      do j=1,nz-1
+      do j = 1,nz-1
         eta_j = dble(j) / dble(nz)
         x1b(i,j) = (1.-eta_j)*x1b(i,0) + eta_j*x1b(i,nz)
         z1b(i,j) = (1.-eta_j)*z1b(i,0) + eta_j*z1b(i,nz)
@@ -197,7 +197,7 @@
 ! generer les points de base de l'interpolation lineaire (zone 2)
   theta_init = pi / 4.
 
-  do j=0,2*nz
+  do j = 0,2*nz
 ! --- point de depart
       x2b(0,j) = - 2.*R
       z2b(0,j) = 2.*R * (dble(j) / dble(2*nz) - 1.)
@@ -208,7 +208,7 @@
       z2b(nx,j) = - sin(theta_i)
 
 ! --- points intermediaires par interpolation lineaire
-      do i=1,nx-1
+      do i = 1,nx-1
             eta_j = dble(i) / dble(nx)
             x2b(i,j) = (1.-eta_j)*x2b(0,j) + eta_j*x2b(nx,j)
             z2b(i,j) = (1.-eta_j)*z2b(0,j) + eta_j*z2b(nx,j)
@@ -217,8 +217,8 @@
   enddo
 
 ! generer zone de gauche (zone 3)
-  do i=0,4*nx
-    do j=0,4*nz
+  do i = 0,4*nx
+    do j = 0,4*nz
       x3b(i,j) = 10. * dble(i) / dble(4*nx) - 12.
       if (j <= 2*nz) then
         z3b(i,j) = 7. * dble(j) / dble(2*nz) - 9.
@@ -229,8 +229,8 @@
   enddo
 
 ! generer zone du bas (zone 4)
-  do i=0,2*nx
-    do j=0,2*nz
+  do i = 0,2*nx
+    do j = 0,2*nz
       x4b(i,j) = 2. * dble(i) / dble(2*nx) - 2.
       z4b(i,j) = 7. * dble(j) / dble(2*nz) - 9.
     enddo
@@ -246,16 +246,16 @@
   open(unit=20,file='grid.gnu',status='unknown')
 
 ! *** dessiner la zone 1
-  do j=0,nz
-    do i=0,4*nx-1
+  do j = 0,nz
+    do i = 0,4*nx-1
       write(20,*) sngl(x1(i,j)),sngl(z1(i,j))
       write(20,*) sngl(x1(i+1,j)),sngl(z1(i+1,j))
       write(20,100)
     enddo
   enddo
 
-  do i=0,4*nx
-    do j=0,nz-1
+  do i = 0,4*nx
+    do j = 0,nz-1
       write(20,*) sngl(x1(i,j)),sngl(z1(i,j))
       write(20,*) sngl(x1(i,j+1)),sngl(z1(i,j+1))
       write(20,100)
@@ -263,16 +263,16 @@
   enddo
 
 ! *** dessiner la zone 3
-  do j=0,4*nz
-    do i=0,2*nx-1
+  do j = 0,4*nz
+    do i = 0,2*nx-1
       write(20,*) sngl(x3(i,j)),sngl(z3(i,j))
       write(20,*) sngl(x3(i+1,j)),sngl(z3(i+1,j))
       write(20,100)
     enddo
   enddo
 
-  do i=0,2*nx
-    do j=0,4*nz-1
+  do i = 0,2*nx
+    do j = 0,4*nz-1
       write(20,*) sngl(x3(i,j)),sngl(z3(i,j))
       write(20,*) sngl(x3(i,j+1)),sngl(z3(i,j+1))
       write(20,100)
@@ -280,16 +280,16 @@
   enddo
 
 ! *** dessiner la zone 4
-  do j=0,2*nz
-    do i=0,2*nx-1
+  do j = 0,2*nz
+    do i = 0,2*nx-1
       write(20,*) sngl(x4(i,j)),sngl(z4(i,j))
       write(20,*) sngl(x4(i+1,j)),sngl(z4(i+1,j))
       write(20,100)
     enddo
   enddo
 
-  do i=0,2*nx
-    do j=0,2*nz-1
+  do i = 0,2*nx
+    do j = 0,2*nz-1
       write(20,*) sngl(x4(i,j)),sngl(z4(i,j))
       write(20,*) sngl(x4(i,j+1)),sngl(z4(i,j+1))
       write(20,100)
@@ -297,16 +297,16 @@
   enddo
 
 ! *** dessiner la zone 1
-  do j=0,nz
-    do i=0,2*nx-1
+  do j = 0,nz
+    do i = 0,2*nx-1
       write(20,*) sngl(x1b(i,j)),sngl(z1b(i,j))
       write(20,*) sngl(x1b(i+1,j)),sngl(z1b(i+1,j))
       write(20,100)
     enddo
   enddo
 
-  do i=0,2*nx
-    do j=0,nz-1
+  do i = 0,2*nx
+    do j = 0,nz-1
       write(20,*) sngl(x1b(i,j)),sngl(z1b(i,j))
       write(20,*) sngl(x1b(i,j+1)),sngl(z1b(i,j+1))
       write(20,100)
@@ -314,16 +314,16 @@
   enddo
 
 ! *** dessiner la zone 2
-  do j=0,2*nz
-    do i=0,nx-1
+  do j = 0,2*nz
+    do i = 0,nx-1
       write(20,*) sngl(x2b(i,j)),sngl(z2b(i,j))
       write(20,*) sngl(x2b(i+1,j)),sngl(z2b(i+1,j))
       write(20,100)
     enddo
   enddo
 
-  do i=0,nx
-    do j=0,2*nz-1
+  do i = 0,nx
+    do j = 0,2*nz-1
       write(20,*) sngl(x2b(i,j)),sngl(z2b(i,j))
       write(20,*) sngl(x2b(i,j+1)),sngl(z2b(i,j+1))
       write(20,100)
@@ -331,16 +331,16 @@
   enddo
 
 ! *** dessiner la zone 3
-  do j=0,4*nz
-    do i=0,4*nx-1
+  do j = 0,4*nz
+    do i = 0,4*nx-1
       write(20,*) sngl(x3b(i,j)),sngl(z3b(i,j))
       write(20,*) sngl(x3b(i+1,j)),sngl(z3b(i+1,j))
       write(20,100)
     enddo
   enddo
 
-  do i=0,4*nx
-    do j=0,4*nz-1
+  do i = 0,4*nx
+    do j = 0,4*nz-1
       write(20,*) sngl(x3b(i,j)),sngl(z3b(i,j))
       write(20,*) sngl(x3b(i,j+1)),sngl(z3b(i,j+1))
       write(20,100)
@@ -348,16 +348,16 @@
   enddo
 
 ! *** dessiner la zone 4
-  do j=0,2*nz
-    do i=0,2*nx-1
+  do j = 0,2*nz
+    do i = 0,2*nx-1
       write(20,*) sngl(x4b(i,j)),sngl(z4b(i,j))
       write(20,*) sngl(x4b(i+1,j)),sngl(z4b(i+1,j))
       write(20,100)
     enddo
   enddo
 
-  do i=0,2*nx
-    do j=0,2*nz-1
+  do i = 0,2*nx
+    do j = 0,2*nz-1
       write(20,*) sngl(x4b(i,j)),sngl(z4b(i,j))
       write(20,*) sngl(x4b(i,j+1)),sngl(z4b(i,j+1))
       write(20,100)
@@ -378,8 +378,8 @@
   numerocourant = 1
 
 ! *** zone 1
-  do j=0,nz
-    do i=0,4*nx
+  do j = 0,nz
+    do i = 0,4*nx
       xpoint(numerocourant) = x1(i,j)
       zpoint(numerocourant) = z1(i,j)
       numerocourant = numerocourant + 1
@@ -387,8 +387,8 @@
   enddo
 
 ! *** zone 3
-  do j=0,4*nz
-    do i=0,2*nx
+  do j = 0,4*nz
+    do i = 0,2*nx
       xpoint(numerocourant) = x3(i,j)
       zpoint(numerocourant) = z3(i,j)
       numerocourant = numerocourant + 1
@@ -396,8 +396,8 @@
   enddo
 
 ! *** zone 4
-  do j=0,2*nz
-    do i=0,2*nx
+  do j = 0,2*nz
+    do i = 0,2*nx
       xpoint(numerocourant) = x4(i,j)
       zpoint(numerocourant) = z4(i,j)
       numerocourant = numerocourant + 1
@@ -405,8 +405,8 @@
   enddo
 
 ! *** zone 1
-  do j=0,nz
-    do i=0,2*nx
+  do j = 0,nz
+    do i = 0,2*nx
       xpoint(numerocourant) = x1b(i,j)
       zpoint(numerocourant) = z1b(i,j)
       numerocourant = numerocourant + 1
@@ -414,8 +414,8 @@
   enddo
 
 ! *** zone 2
-  do j=0,2*nz
-    do i=0,nx
+  do j = 0,2*nz
+    do i = 0,nx
       xpoint(numerocourant) = x2b(i,j)
       zpoint(numerocourant) = z2b(i,j)
       numerocourant = numerocourant + 1
@@ -423,8 +423,8 @@
   enddo
 
 ! *** zone 3
-  do j=0,4*nz
-    do i=0,4*nx
+  do j = 0,4*nz
+    do i = 0,4*nx
       xpoint(numerocourant) = x3b(i,j)
       zpoint(numerocourant) = z3b(i,j)
       numerocourant = numerocourant + 1
@@ -432,8 +432,8 @@
   enddo
 
 ! *** zone 4
-  do j=0,2*nz
-    do i=0,2*nx
+  do j = 0,2*nz
+    do i = 0,2*nx
       xpoint(numerocourant) = x4b(i,j)
       zpoint(numerocourant) = z4b(i,j)
       numerocourant = numerocourant + 1
@@ -450,8 +450,8 @@
   imaxabs = 0
 
 ! *** zone 1
-  do j=0,nz-1
-    do i=0,4*nx-1
+  do j = 0,nz-1
+    do i = 0,4*nx-1
       x1e(numerocourant) = x1(i,j)
       z1e(numerocourant) = z1(i,j)
       x2e(numerocourant) = x1(i+1,j)
@@ -465,8 +465,8 @@
   enddo
 
 ! *** zone 3
-  do j=0,4*nz-1
-    do i=0,2*nx-1
+  do j = 0,4*nz-1
+    do i = 0,2*nx-1
       x1e(numerocourant) = x3(i,j)
       z1e(numerocourant) = z3(i,j)
       x2e(numerocourant) = x3(i+1,j)
@@ -480,8 +480,8 @@
   enddo
 
 ! *** zone 4
-  do j=0,2*nz-1
-    do i=0,2*nx-1
+  do j = 0,2*nz-1
+    do i = 0,2*nx-1
       x1e(numerocourant) = x4(i,j)
       z1e(numerocourant) = z4(i,j)
       x2e(numerocourant) = x4(i+1,j)
@@ -495,8 +495,8 @@
   enddo
 
 ! *** zone 1
-  do j=0,nz-1
-    do i=0,2*nx-1
+  do j = 0,nz-1
+    do i = 0,2*nx-1
       x1e(numerocourant) = x1b(i,j)
       z1e(numerocourant) = z1b(i,j)
       x2e(numerocourant) = x1b(i+1,j)
@@ -510,8 +510,8 @@
   enddo
 
 ! *** zone 2
-  do j=0,2*nz-1
-    do i=0,nx-1
+  do j = 0,2*nz-1
+    do i = 0,nx-1
       x1e(numerocourant) = x2b(i,j)
       z1e(numerocourant) = z2b(i,j)
       x2e(numerocourant) = x2b(i+1,j)
@@ -525,8 +525,8 @@
   enddo
 
 ! *** zone 3
-  do j=0,4*nz-1
-    do i=0,4*nx-1
+  do j = 0,4*nz-1
+    do i = 0,4*nx-1
       x1e(numerocourant) = x3b(i,j)
       z1e(numerocourant) = z3b(i,j)
       x2e(numerocourant) = x3b(i+1,j)
@@ -540,8 +540,8 @@
   enddo
 
 ! *** zone 4
-  do j=0,2*nz-1
-    do i=0,2*nx-1
+  do j = 0,2*nz-1
+    do i = 0,2*nx-1
       x1e(numerocourant) = x4b(i,j)
       z1e(numerocourant) = z4b(i,j)
       x2e(numerocourant) = x4b(i+1,j)
@@ -563,10 +563,10 @@
   write(*,*)
   write(*,*) 'Creation de la topologie des elements...'
 
-  do i=1,nelem
+  do i = 1,nelem
 
 ! recherche point 1
-      do j=1,npoin
+      do j = 1,npoin
         dist = sqrt((x1e(i)-xpoint(j))**2 + (z1e(i)-zpoint(j))**2)
         if (dist <= rseuil) then
             nump1 = j
@@ -577,7 +577,7 @@
  401 continue
 
 ! recherche point 2
-      do j=1,npoin
+      do j = 1,npoin
         dist = sqrt((x2e(i)-xpoint(j))**2 + (z2e(i)-zpoint(j))**2)
         if (dist <= rseuil) then
             nump2 = j
@@ -588,7 +588,7 @@
  402 continue
 
 ! recherche point 3
-      do j=1,npoin
+      do j = 1,npoin
         dist = sqrt((x3e(i)-xpoint(j))**2 + (z3e(i)-zpoint(j))**2)
         if (dist <= rseuil) then
             nump3 = j
@@ -599,7 +599,7 @@
  403 continue
 
 ! recherche point 4
-      do j=1,npoin
+      do j = 1,npoin
         dist = sqrt((x4e(i)-xpoint(j))**2 + (z4e(i)-zpoint(j))**2)
         if (dist <= rseuil) then
             nump4 = j
@@ -776,7 +776,7 @@
   write(15,*) itimetype,isource_type,xs+xoffs,zs+zoffs,f0,t0,factor,angle,0
 
   write(15,*) 'Receivers (number, angle, position in meters)'
-  do irec=1,nrec
+  do irec = 1,nrec
   if (irec <= nrecsur3) then
     xrec = 2.*dble(irec-1)/dble(nrecsur3-1) + 9.
     zrec = 9.
@@ -792,7 +792,7 @@
   enddo
 
   write(15,*) 'Coordinates of spectral control points'
-  do i=1,npoin
+  do i = 1,npoin
     write(15,*) i,xpoint(i)+xoffs,zpoint(i)+zoffs
   enddo
 
@@ -814,7 +814,7 @@
 
   imatnum = 1
 
-  do i=1,nspel
+  do i = 1,nspel
     write(15,*) i,imatnum,numpoin1(i),numpoin2(i),numpoin3(i),numpoin4(i)
   enddo
 

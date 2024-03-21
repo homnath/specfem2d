@@ -343,7 +343,7 @@
   integer :: ier
   character(len=512) :: junk,sep_header_file_complete
 
-  sep_header_file_complete=trim(adjustl(sep_directory))//trim(adjustl(sep_header_file))
+  sep_header_file_complete = trim(adjustl(sep_directory))//trim(adjustl(sep_header_file))
 
   open(unit=13,file=trim(adjustl(sep_header_file_complete)),status='old',iostat=ier)
   print *
@@ -365,8 +365,8 @@
   read(13,'(a6i10)')     junk, esize
   read(13,'(a13a)')    junk, data_format
   close(13)
-  sep_file=trim(adjustl(sep_directory))//trim(adjustl(sep_file))
-  data_format=data_format(1:len_trim(adjustl(data_format))-1)
+  sep_file = trim(adjustl(sep_directory))//trim(adjustl(sep_file))
+  data_format = data_format(1:len_trim(adjustl(data_format))-1)
 
   print *
   print *, 'sep file specified in the header file is: ', trim(adjustl(sep_file))

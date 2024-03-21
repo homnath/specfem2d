@@ -68,8 +68,8 @@
   else
     istepz = 2
   endif
-  do ili=0,nz,istepz
-    do icol=0,nx-istepx,istepx
+  do ili = 0,nz,istepz
+    do icol = 0,nx-istepx,istepx
        write(IOUT_VIS,*) sngl(x(icol,ili)),sngl(z(icol,ili))
        write(IOUT_VIS,*) sngl(x(icol+istepx,ili)),sngl(z(icol+istepx,ili))
        write(IOUT_VIS,10)
@@ -84,8 +84,8 @@
     istepx = 2
   endif
   istepz = 1
-  do icol=0,nx,istepx
-    do ili=0,nz-istepz,istepz
+  do icol = 0,nx,istepx
+    do ili = 0,nz-istepz,istepz
        write(IOUT_VIS,*) sngl(x(icol,ili)),sngl(z(icol,ili))
        write(IOUT_VIS,*) sngl(x(icol,ili+istepz)),sngl(z(icol,ili+istepz))
        write(IOUT_VIS,10)

@@ -332,7 +332,7 @@
   write(24,*) number_of_CPML_elements
 
 ! write the CPML flag for each CPML element
-  do ispec=1,nspec
+  do ispec = 1,nspec
     if (is_X_CPML(ispec) .and. is_Z_CPML(ispec)) then
       write(24,*) ispec,CPML_XZ
 

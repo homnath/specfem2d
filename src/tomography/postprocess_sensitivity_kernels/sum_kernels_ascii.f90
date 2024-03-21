@@ -100,7 +100,7 @@ program sum_kernels_ascii
   read(arg(2),'(a)') output_dir
 
   ! parse paths from INPUT_FILE
-  npath=0
+  npath = 0
   open(unit = IIN, file = trim(input_file), status = 'old',iostat = ier)
   if (ier /= 0) then
      print *,'Error opening ',trim(input_file)
@@ -200,7 +200,7 @@ end program sum_kernels_ascii
   do j = 1,MAX_LINES
      read(3,*,iostat=ios) dummy1, dummy2, dummy3, dummy4, dummy5
      if (ios /= 0) exit
-     nlines=nlines+1
+     nlines = nlines+1
   enddo
   close(3)
 

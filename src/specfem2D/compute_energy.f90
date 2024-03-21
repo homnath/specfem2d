@@ -663,8 +663,8 @@
   endif
 
   ! We save the value at the GLL point:
-  i=2
-  j=2
+  i = 2
+  j = 2
 
   ! loop over spectral elements
   do ispec = 1,nspec

@@ -449,9 +449,9 @@ module moving_sources_par
                                       ispec_selected_source_local,islice_selected_source(i_source), &
                                       NPROC,myrank,xi_source(i_source),gamma_source(i_source),is_force_source, &
                                       source_belonged_to_this_rank=source_belonged_to_this_rank_all(i_source), &
-                                      ispec_first_guess=ispec_source_first_guess, &
+                                      ispec_first_guess = ispec_source_first_guess, &
                                       pt_first_guess=pt_first_guess(i_source), &
-                                      reset=any_reset_source(i_source))
+                                      reset = any_reset_source(i_source))
 
             ispec_first_guess_vec(i_source) = ispec_selected_source_local
 

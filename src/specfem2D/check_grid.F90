@@ -1043,7 +1043,7 @@
 
     ! draw straight lines if elements have 4 nodes
 
-    ir=pointsdisp
+    ir = pointsdisp
     x2 = (xinterp(ir,is)-xmin)*ratio_page + ORIG_X
     z2 = (zinterp(ir,is)-zmin)*ratio_page + ORIG_Z
     x2 = x2 * CENTIM
@@ -1055,8 +1055,8 @@
       coorg_send(2,(ispec-1)*5+2) = z2
     endif
 
-    ir=pointsdisp
-    is=pointsdisp
+    ir = pointsdisp
+    is = pointsdisp
     x2 = (xinterp(ir,is)-xmin)*ratio_page + ORIG_X
     z2 = (zinterp(ir,is)-zmin)*ratio_page + ORIG_Z
     x2 = x2 * CENTIM
@@ -1068,8 +1068,8 @@
       coorg_send(2,(ispec-1)*5+3) = z2
     endif
 
-    is=pointsdisp
-    ir=1
+    is = pointsdisp
+    ir = 1
     x2 = (xinterp(ir,is)-xmin)*ratio_page + ORIG_X
     z2 = (zinterp(ir,is)-zmin)*ratio_page + ORIG_Z
     x2 = x2 * CENTIM
@@ -1081,8 +1081,8 @@
       coorg_send(2,(ispec-1)*5+4) = z2
     endif
 
-    ir=1
-    is=2
+    ir = 1
+    is = 2
     x2 = (xinterp(ir,is)-xmin)*ratio_page + ORIG_X
     z2 = (zinterp(ir,is)-zmin)*ratio_page + ORIG_Z
     x2 = x2 * CENTIM
@@ -1356,7 +1356,7 @@
 
 ! draw straight lines if elements have 4 nodes
 
-    ir=pointsdisp
+    ir = pointsdisp
     x2 = (xinterp(ir,is)-xmin)*ratio_page + ORIG_X
     z2 = (zinterp(ir,is)-zmin)*ratio_page + ORIG_Z
     x2 = x2 * CENTIM
@@ -1368,8 +1368,8 @@
        coorg_send(2,(ispec-1)*5+2) = z2
     endif
 
-    ir=pointsdisp
-    is=pointsdisp
+    ir = pointsdisp
+    is = pointsdisp
     x2 = (xinterp(ir,is)-xmin)*ratio_page + ORIG_X
     z2 = (zinterp(ir,is)-zmin)*ratio_page + ORIG_Z
     x2 = x2 * CENTIM
@@ -1381,8 +1381,8 @@
        coorg_send(2,(ispec-1)*5+3) = z2
     endif
 
-    is=pointsdisp
-    ir=1
+    is = pointsdisp
+    ir = 1
     x2 = (xinterp(ir,is)-xmin)*ratio_page + ORIG_X
     z2 = (zinterp(ir,is)-zmin)*ratio_page + ORIG_Z
     x2 = x2 * CENTIM
@@ -1394,8 +1394,8 @@
        coorg_send(2,(ispec-1)*5+4) = z2
     endif
 
-    ir=1
-    is=2
+    ir = 1
+    is = 2
     x2 = (xinterp(ir,is)-xmin)*ratio_page + ORIG_X
     z2 = (zinterp(ir,is)-zmin)*ratio_page + ORIG_Z
     x2 = x2 * CENTIM
@@ -1714,7 +1714,7 @@
 
 ! draw straight lines if elements have 4 nodes
 
-    ir=pointsdisp
+    ir = pointsdisp
     x2 = (xinterp(ir,is)-xmin)*ratio_page + ORIG_X
     z2 = (zinterp(ir,is)-zmin)*ratio_page + ORIG_Z
     x2 = x2 * CENTIM
@@ -1726,8 +1726,8 @@
        coorg_send(2,(ispec-1)*5+2) = z2
     endif
 
-    ir=pointsdisp
-    is=pointsdisp
+    ir = pointsdisp
+    is = pointsdisp
     x2 = (xinterp(ir,is)-xmin)*ratio_page + ORIG_X
     z2 = (zinterp(ir,is)-zmin)*ratio_page + ORIG_Z
     x2 = x2 * CENTIM
@@ -1739,8 +1739,8 @@
        coorg_send(2,(ispec-1)*5+3) = z2
     endif
 
-    is=pointsdisp
-    ir=1
+    is = pointsdisp
+    ir = 1
     x2 = (xinterp(ir,is)-xmin)*ratio_page + ORIG_X
     z2 = (zinterp(ir,is)-zmin)*ratio_page + ORIG_Z
     x2 = x2 * CENTIM
@@ -1752,8 +1752,8 @@
        coorg_send(2,(ispec-1)*5+4) = z2
     endif
 
-    ir=1
-    is=2
+    ir = 1
+    is = 2
     x2 = (xinterp(ir,is)-xmin)*ratio_page + ORIG_X
     z2 = (zinterp(ir,is)-zmin)*ratio_page + ORIG_Z
     x2 = x2 * CENTIM
@@ -1983,7 +1983,7 @@
 
 ! draw straight lines if elements have 4 nodes
 
-    ir=pointsdisp
+    ir = pointsdisp
     x2 = (xinterp(ir,is)-xmin)*ratio_page + ORIG_X
     z2 = (zinterp(ir,is)-zmin)*ratio_page + ORIG_Z
     x2 = x2 * CENTIM
@@ -1995,8 +1995,8 @@
        coorg_send(2,(ispec-1)*5+2) = z2
     endif
 
-    ir=pointsdisp
-    is=pointsdisp
+    ir = pointsdisp
+    is = pointsdisp
     x2 = (xinterp(ir,is)-xmin)*ratio_page + ORIG_X
     z2 = (zinterp(ir,is)-zmin)*ratio_page + ORIG_Z
     x2 = x2 * CENTIM
@@ -2008,8 +2008,8 @@
        coorg_send(2,(ispec-1)*5+3) = z2
     endif
 
-    is=pointsdisp
-    ir=1
+    is = pointsdisp
+    ir = 1
     x2 = (xinterp(ir,is)-xmin)*ratio_page + ORIG_X
     z2 = (zinterp(ir,is)-zmin)*ratio_page + ORIG_Z
     x2 = x2 * CENTIM
@@ -2021,8 +2021,8 @@
        coorg_send(2,(ispec-1)*5+4) = z2
     endif
 
-    ir=1
-    is=2
+    ir = 1
+    is = 2
     x2 = (xinterp(ir,is)-xmin)*ratio_page + ORIG_X
     z2 = (zinterp(ir,is)-zmin)*ratio_page + ORIG_Z
     x2 = x2 * CENTIM

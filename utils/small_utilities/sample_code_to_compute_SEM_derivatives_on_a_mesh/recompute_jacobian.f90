@@ -68,7 +68,7 @@
   xgamma = ZERO
   zgamma = ZERO
 
-  do ia=1,ngnod
+  do ia = 1,ngnod
     xelm = coord_of_anchor_points(1,ia,ispec)
     zelm = coord_of_anchor_points(2,ia,ispec)
 

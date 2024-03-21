@@ -124,7 +124,7 @@
               do num2 = 1,numelem-1
 
 ! ne rechercher que sur les 4 premiers points de controle et non sur ngnod
-                do ngnodother=1,4
+                do ngnodother = 1,4
 
 ! voir si ce coin a deja ete genere
                   if (knods(ngnodother,num2) == knods(ngnodloc,numelem)) then

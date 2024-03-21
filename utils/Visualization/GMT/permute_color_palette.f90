@@ -17,7 +17,7 @@ real random_val
 
 done(:) = -1
 
-do i=1,N
+do i = 1,N
 
 777 continue
   call random_number(random_val)
@@ -36,14 +36,14 @@ enddo
 !write(*,*) perm(i)
 !enddo
 
-do i=1,N
+do i = 1,N
 read(*,*) nom(perm(i))
 read(*,*) r(perm(i))
 read(*,*) g(perm(i))
 read(*,*) b(perm(i))
 enddo
 
-do i=1,N
+do i = 1,N
 write(*,*) '!#',nom(i)
 write(*,*) '##red(',i,')#=#',r(i)
 write(*,*) '##green(',i,')#=#',g(i)

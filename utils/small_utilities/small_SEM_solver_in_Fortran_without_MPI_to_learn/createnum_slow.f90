@@ -83,8 +83,8 @@
   ibool(:,:,:) = 0
 
   do numelem = 1,nspec
-  do i=1,NGLLX
-    do j=1,NGLLZ
+  do i = 1,NGLLX
+    do j = 1,NGLLZ
 
 ! verifier que le point n'a pas deja ete genere
 
@@ -121,10 +121,10 @@
 
   if (numelem > 1) then
 
-  do num2=1,numelem-1
+  do num2 = 1,numelem-1
 
 ! ne rechercher que sur les 4 premiers points de controle et non sur ngnod
-    do ngnodother=1,4
+    do ngnodother = 1,4
 
 ! voir si ce coin a deja ete genere
       if (knods(ngnodother,num2) == knods(ngnodloc,numelem)) then
@@ -190,10 +190,10 @@
 
   if (numelem > 1) then
 
-  do num2=1,numelem-1
+  do num2 = 1,numelem-1
 
 ! rechercher sur les 4 aretes
-    do nedgeother=1,4
+    do nedgeother = 1,4
 
 !--- detecter un eventuel defaut dans la structure topologique du maillage
 

@@ -223,8 +223,8 @@
 
 ! create the knods array
   k = 0
-  do j=0,nz-1
-    do i=0,nx-1
+  do j = 0,nz-1
+    do i = 0,nx-1
       k = k + 1
       knods(1,k) = num(i,j,nx)
       knods(2,k) = num(i+1,j,nx)

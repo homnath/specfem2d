@@ -221,7 +221,7 @@ program adj_seismogram
            ft_bar(:) = 0.d0
         endif
 
-        do itime =1,NSTEP
+        do itime = 1,NSTEP
            if (icomp == adj_comp) then
               write(11,*) (itime-1)*deltat - t0, ft_bar(itime)
            else

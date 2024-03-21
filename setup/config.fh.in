@@ -22,9 +22,9 @@
 
 ! switches do-loops between: do j=1,NGLLZ; do i=1,NGLLX <-> do ij=1,NGLLSQUARE
 #ifdef FORCE_VECTORIZATION
-#  define DO_LOOP_IJ  do ij=1,NGLLSQUARE
+#  define DO_LOOP_IJ  do ij = 1,NGLLSQUARE
 #else
-#  define DO_LOOP_IJ  do j=1,NGLLZ; do i=1,NGLLX
+#  define DO_LOOP_IJ  do j = 1,NGLLZ; do i = 1,NGLLX
 #endif
 
 ! switches enddo-loops between: enddo; enddo ! NGLLZ,NGLLX <-> enddo ! NGLLSQUARE

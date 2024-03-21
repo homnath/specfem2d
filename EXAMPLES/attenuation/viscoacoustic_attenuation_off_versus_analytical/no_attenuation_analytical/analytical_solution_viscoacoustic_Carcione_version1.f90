@@ -141,7 +141,7 @@
   deltat = 1.d0 / (freqmax*dble(iratio))
 
 ! define the spectrum of the source
-  do ifreq=0,nfreq
+  do ifreq = 0,nfreq
       freq = deltafreq * dble(ifreq)
       omega = 2.d0 * pi * freq
 
@@ -176,7 +176,7 @@
 ! ************** calcul solution analytique ****************
 
 ! d'apres Carcione GJI vol 95 p 611 (1988)
-  do ifreq=0,nfreq
+  do ifreq = 0,nfreq
       freq = deltafreq * dble(ifreq)
       omega = 2.d0 * pi * freq
 
@@ -248,7 +248,7 @@
 
 ! use the Fourier values for pressure
   c(1) = cmplx(phi1(0))
-  do ifreq=1,nfreq-2
+  do ifreq = 1,nfreq-2
       c(ifreq+1) = cmplx(phi1(ifreq))
       c(nt+1-ifreq) = conjg(cmplx(phi1(ifreq)))
   enddo
@@ -304,7 +304,7 @@
       endif
     endif
 
-  do it=1,nt
+  do it = 1,nt
 ! DK DK Dec 2011: subtract t0 to be consistent with the SPECFEM2D code
         time = dble(it-1)*deltat - t0
 ! the seismograms are very long due to the very large number of FFT points used,
@@ -404,7 +404,7 @@
   NA = 0
   L1 = 1
   IW = 1
-  DO 116 K1=1,NF
+  DO 116 K1 = 1,NF
    IP = IFAC(K1+2)
    L2 = IP*L1
    IDO = N/L2
@@ -454,7 +454,7 @@
   116 continue
   if (NA == 0) return
   N2 = N+N
-  DO 117 I=1,N2
+  DO 117 I = 1,N2
    C(I) = CH(I)
   117 continue
   END
@@ -470,66 +470,66 @@
   IDP = IP*IDO
 
   if (IDO < L1) goto 106
-  DO 103 J=2,IPPH
+  DO 103 J = 2,IPPH
    JC = IPP2-J
-   DO 102 K=1,L1
-      DO 101 I=1,IDO
+   DO 102 K = 1,L1
+      DO 101 I = 1,IDO
          CH(I,K,J) = CC(I,J,K)+CC(I,JC,K)
          CH(I,K,JC) = CC(I,J,K)-CC(I,JC,K)
   101       continue
   102    continue
   103 continue
-  DO 105 K=1,L1
-   DO 104 I=1,IDO
+  DO 105 K = 1,L1
+   DO 104 I = 1,IDO
       CH(I,K,1) = CC(I,1,K)
   104    continue
   105 continue
   goto 112
-  106 DO 109 J=2,IPPH
+  106 DO 109 J = 2,IPPH
    JC = IPP2-J
-   DO 108 I=1,IDO
-      DO 107 K=1,L1
+   DO 108 I = 1,IDO
+      DO 107 K = 1,L1
          CH(I,K,J) = CC(I,J,K)+CC(I,JC,K)
          CH(I,K,JC) = CC(I,J,K)-CC(I,JC,K)
   107       continue
   108    continue
   109 continue
-  DO 111 I=1,IDO
-   DO 110 K=1,L1
+  DO 111 I = 1,IDO
+   DO 110 K = 1,L1
       CH(I,K,1) = CC(I,1,K)
   110    continue
   111 continue
   112 IDL = 2-IDO
   INC = 0
-  DO 116 L=2,IPPH
+  DO 116 L = 2,IPPH
    LC = IPP2-L
    IDL = IDL+IDO
-   DO 113 IK=1,IDL1
+   DO 113 IK = 1,IDL1
       C2(IK,L) = CH2(IK,1)+WA(IDL-1)*CH2(IK,2)
       C2(IK,LC) = WA(IDL)*CH2(IK,IP)
   113    continue
    IDLJ = IDL
    INC = INC+IDO
-   DO 115 J=3,IPPH
+   DO 115 J = 3,IPPH
       JC = IPP2-J
       IDLJ = IDLJ+INC
       if (IDLJ > IDP) IDLJ = IDLJ-IDP
       WAR = WA(IDLJ-1)
       WAI = WA(IDLJ)
-      DO 114 IK=1,IDL1
+      DO 114 IK = 1,IDL1
          C2(IK,L) = C2(IK,L)+WAR*CH2(IK,J)
          C2(IK,LC) = C2(IK,LC)+WAI*CH2(IK,JC)
   114       continue
   115    continue
   116 continue
-  DO 118 J=2,IPPH
-   DO 117 IK=1,IDL1
+  DO 118 J = 2,IPPH
+   DO 117 IK = 1,IDL1
       CH2(IK,1) = CH2(IK,1)+CH2(IK,J)
   117    continue
   118 continue
-  DO 120 J=2,IPPH
+  DO 120 J = 2,IPPH
    JC = IPP2-J
-   DO 119 IK=2,IDL1,2
+   DO 119 IK = 2,IDL1,2
       CH2(IK-1,J) = C2(IK-1,J)-C2(IK,JC)
       CH2(IK-1,JC) = C2(IK-1,J)+C2(IK,JC)
       CH2(IK,J) = C2(IK,J)+C2(IK-1,JC)
@@ -539,22 +539,22 @@
   NAC = 1
   if (IDO == 2) return
   NAC = 0
-  DO 121 IK=1,IDL1
+  DO 121 IK = 1,IDL1
    C2(IK,1) = CH2(IK,1)
   121 continue
-  DO 123 J=2,IP
-   DO 122 K=1,L1
+  DO 123 J = 2,IP
+   DO 122 K = 1,L1
       C1(1,K,J) = CH(1,K,J)
       C1(2,K,J) = CH(2,K,J)
   122    continue
   123 continue
   if (IDOT > L1) goto 127
   IDIJ = 0
-  DO 126 J=2,IP
+  DO 126 J = 2,IP
    IDIJ = IDIJ+2
-   DO 125 I=4,IDO,2
+   DO 125 I = 4,IDO,2
       IDIJ = IDIJ+2
-      DO 124 K=1,L1
+      DO 124 K = 1,L1
          C1(I-1,K,J) = WA(IDIJ-1)*CH(I-1,K,J)-WA(IDIJ)*CH(I,K,J)
          C1(I,K,J) = WA(IDIJ-1)*CH(I,K,J)+WA(IDIJ)*CH(I-1,K,J)
   124       continue
@@ -562,11 +562,11 @@
   126 continue
   return
   127 IDJ = 2-IDO
-  DO 130 J=2,IP
+  DO 130 J = 2,IP
    IDJ = IDJ+IDO
-   DO 129 K=1,L1
+   DO 129 K = 1,L1
       IDIJ = IDJ
-      DO 128 I=4,IDO,2
+      DO 128 I = 4,IDO,2
          IDIJ = IDIJ+2
          C1(I-1,K,J) = WA(IDIJ-1)*CH(I-1,K,J)-WA(IDIJ)*CH(I,K,J)
          C1(I,K,J) = WA(IDIJ-1)*CH(I,K,J)+WA(IDIJ)*CH(I-1,K,J)
@@ -579,15 +579,15 @@
   DIMENSION       CC(IDO,2,L1)           ,CH(IDO,L1,2), &
                   WA1(1)
   if (IDO > 2) goto 102
-  DO 101 K=1,L1
+  DO 101 K = 1,L1
    CH(1,K,1) = CC(1,1,K)+CC(1,2,K)
    CH(1,K,2) = CC(1,1,K)-CC(1,2,K)
    CH(2,K,1) = CC(2,1,K)+CC(2,2,K)
    CH(2,K,2) = CC(2,1,K)-CC(2,2,K)
   101 continue
   return
-  102 DO 104 K=1,L1
-   DO 103 I=2,IDO,2
+  102 DO 104 K = 1,L1
+   DO 103 I = 2,IDO,2
       CH(I-1,K,1) = CC(I-1,1,K)+CC(I-1,2,K)
       TR2 = CC(I-1,1,K)-CC(I-1,2,K)
       CH(I,K,1) = CC(I,1,K)+CC(I,2,K)
@@ -603,7 +603,7 @@
                   WA1(1)     ,WA2(1)
   DATA TAUR,TAUI /-.5,.866025403784439/
   if (IDO /= 2) goto 102
-  DO 101 K=1,L1
+  DO 101 K = 1,L1
    TR2 = CC(1,2,K)+CC(1,3,K)
    CR2 = CC(1,1,K)+TAUR*TR2
    CH(1,K,1) = CC(1,1,K)+TR2
@@ -618,8 +618,8 @@
    CH(2,K,3) = CI2-CR3
   101 continue
   return
-  102 DO 104 K=1,L1
-   DO 103 I=2,IDO,2
+  102 DO 104 K = 1,L1
+   DO 103 I = 2,IDO,2
       TR2 = CC(I-1,2,K)+CC(I-1,3,K)
       CR2 = CC(I-1,1,K)+TAUR*TR2
       CH(I-1,K,1) = CC(I-1,1,K)+TR2
@@ -644,7 +644,7 @@
   DIMENSION       CC(IDO,4,L1)           ,CH(IDO,L1,4), &
                   WA1(1)     ,WA2(1)     ,WA3(1)
   if (IDO /= 2) goto 102
-  DO 101 K=1,L1
+  DO 101 K = 1,L1
    TI1 = CC(2,1,K)-CC(2,3,K)
    TI2 = CC(2,1,K)+CC(2,3,K)
    TR4 = CC(2,4,K)-CC(2,2,K)
@@ -663,8 +663,8 @@
    CH(2,K,4) = TI1-TI4
   101 continue
   return
-  102 DO 104 K=1,L1
-   DO 103 I=2,IDO,2
+  102 DO 104 K = 1,L1
+   DO 103 I = 2,IDO,2
       TI1 = CC(I,1,K)-CC(I,3,K)
       TI2 = CC(I,1,K)+CC(I,3,K)
       TI3 = CC(I,2,K)+CC(I,4,K)
@@ -697,7 +697,7 @@
   DATA TR11,TI11,TR12,TI12 /.309016994374947,.951056516295154, &
   -.809016994374947,.587785252292473/
   if (IDO /= 2) goto 102
-  DO 101 K=1,L1
+  DO 101 K = 1,L1
    TI5 = CC(2,2,K)-CC(2,5,K)
    TI2 = CC(2,2,K)+CC(2,5,K)
    TI4 = CC(2,3,K)-CC(2,4,K)
@@ -726,8 +726,8 @@
    CH(2,K,5) = CI2-CR5
   101 continue
   return
-  102 DO 104 K=1,L1
-   DO 103 I=2,IDO,2
+  102 DO 104 K = 1,L1
+   DO 103 I = 2,IDO,2
       TI5 = CC(I,2,K)-CC(I,5,K)
       TI2 = CC(I,2,K)+CC(I,5,K)
       TI4 = CC(I,3,K)-CC(I,4,K)
@@ -793,7 +793,7 @@
   NL = NQ
   if (NTRY /= 2) goto 107
   if (NF == 1) goto 107
-  DO 106 I=2,NF
+  DO 106 I = 2,NF
    IB = NF-I+2
    IFAC(IB+2) = IFAC(IB+1)
   106 continue
@@ -805,21 +805,21 @@
   ARGH = TPI/FLOAT(N)
   I = 2
   L1 = 1
-  DO 110 K1=1,NF
+  DO 110 K1 = 1,NF
    IP = IFAC(K1+2)
    LD = 0
    L2 = L1*IP
    IDO = N/L2
    IDOT = IDO+IDO+2
    IPM = IP-1
-   DO 109 J=1,IPM
+   DO 109 J = 1,IPM
       I1 = I
       WA(I-1) = 1.
       WA(I) = 0.
       LD = LD+L1
       FI = 0.
       ARGLD = FLOAT(LD)*ARGH
-      DO 108 II=4,IDOT,2
+      DO 108 II = 4,IDOT,2
          I = I+2
          FI = FI+1.
          ARG = FI*ARGLD
@@ -848,7 +848,7 @@
   NA = 0
   L1 = 1
   IW = 1
-  DO 116 K1=1,NF
+  DO 116 K1 = 1,NF
    IP = IFAC(K1+2)
    L2 = IP*L1
    IDO = N/L2
@@ -898,7 +898,7 @@
   116 continue
   if (NA == 0) return
   N2 = N+N
-  DO 117 I=1,N2
+  DO 117 I = 1,N2
    C(I) = CH(I)
   117 continue
   END
@@ -914,66 +914,66 @@
   IDP = IP*IDO
 
   if (IDO < L1) goto 106
-  DO 103 J=2,IPPH
+  DO 103 J = 2,IPPH
    JC = IPP2-J
-   DO 102 K=1,L1
-      DO 101 I=1,IDO
+   DO 102 K = 1,L1
+      DO 101 I = 1,IDO
          CH(I,K,J) = CC(I,J,K)+CC(I,JC,K)
          CH(I,K,JC) = CC(I,J,K)-CC(I,JC,K)
   101       continue
   102    continue
   103 continue
-  DO 105 K=1,L1
-   DO 104 I=1,IDO
+  DO 105 K = 1,L1
+   DO 104 I = 1,IDO
       CH(I,K,1) = CC(I,1,K)
   104    continue
   105 continue
   goto 112
-  106 DO 109 J=2,IPPH
+  106 DO 109 J = 2,IPPH
    JC = IPP2-J
-   DO 108 I=1,IDO
-      DO 107 K=1,L1
+   DO 108 I = 1,IDO
+      DO 107 K = 1,L1
          CH(I,K,J) = CC(I,J,K)+CC(I,JC,K)
          CH(I,K,JC) = CC(I,J,K)-CC(I,JC,K)
   107       continue
   108    continue
   109 continue
-  DO 111 I=1,IDO
-   DO 110 K=1,L1
+  DO 111 I = 1,IDO
+   DO 110 K = 1,L1
       CH(I,K,1) = CC(I,1,K)
   110    continue
   111 continue
   112 IDL = 2-IDO
   INC = 0
-  DO 116 L=2,IPPH
+  DO 116 L = 2,IPPH
    LC = IPP2-L
    IDL = IDL+IDO
-   DO 113 IK=1,IDL1
+   DO 113 IK = 1,IDL1
       C2(IK,L) = CH2(IK,1)+WA(IDL-1)*CH2(IK,2)
       C2(IK,LC) = -WA(IDL)*CH2(IK,IP)
   113    continue
    IDLJ = IDL
    INC = INC+IDO
-   DO 115 J=3,IPPH
+   DO 115 J = 3,IPPH
       JC = IPP2-J
       IDLJ = IDLJ+INC
       if (IDLJ > IDP) IDLJ = IDLJ-IDP
       WAR = WA(IDLJ-1)
       WAI = WA(IDLJ)
-      DO 114 IK=1,IDL1
+      DO 114 IK = 1,IDL1
          C2(IK,L) = C2(IK,L)+WAR*CH2(IK,J)
          C2(IK,LC) = C2(IK,LC)-WAI*CH2(IK,JC)
   114       continue
   115    continue
   116 continue
-  DO 118 J=2,IPPH
-   DO 117 IK=1,IDL1
+  DO 118 J = 2,IPPH
+   DO 117 IK = 1,IDL1
       CH2(IK,1) = CH2(IK,1)+CH2(IK,J)
   117    continue
   118 continue
-  DO 120 J=2,IPPH
+  DO 120 J = 2,IPPH
    JC = IPP2-J
-   DO 119 IK=2,IDL1,2
+   DO 119 IK = 2,IDL1,2
       CH2(IK-1,J) = C2(IK-1,J)-C2(IK,JC)
       CH2(IK-1,JC) = C2(IK-1,J)+C2(IK,JC)
       CH2(IK,J) = C2(IK,J)+C2(IK-1,JC)
@@ -983,22 +983,22 @@
   NAC = 1
   if (IDO == 2) return
   NAC = 0
-  DO 121 IK=1,IDL1
+  DO 121 IK = 1,IDL1
    C2(IK,1) = CH2(IK,1)
   121 continue
-  DO 123 J=2,IP
-   DO 122 K=1,L1
+  DO 123 J = 2,IP
+   DO 122 K = 1,L1
       C1(1,K,J) = CH(1,K,J)
       C1(2,K,J) = CH(2,K,J)
   122    continue
   123 continue
   if (IDOT > L1) goto 127
   IDIJ = 0
-  DO 126 J=2,IP
+  DO 126 J = 2,IP
    IDIJ = IDIJ+2
-   DO 125 I=4,IDO,2
+   DO 125 I = 4,IDO,2
       IDIJ = IDIJ+2
-      DO 124 K=1,L1
+      DO 124 K = 1,L1
          C1(I-1,K,J) = WA(IDIJ-1)*CH(I-1,K,J)+WA(IDIJ)*CH(I,K,J)
          C1(I,K,J) = WA(IDIJ-1)*CH(I,K,J)-WA(IDIJ)*CH(I-1,K,J)
   124       continue
@@ -1006,11 +1006,11 @@
   126 continue
   return
   127 IDJ = 2-IDO
-  DO 130 J=2,IP
+  DO 130 J = 2,IP
    IDJ = IDJ+IDO
-   DO 129 K=1,L1
+   DO 129 K = 1,L1
       IDIJ = IDJ
-      DO 128 I=4,IDO,2
+      DO 128 I = 4,IDO,2
          IDIJ = IDIJ+2
          C1(I-1,K,J) = WA(IDIJ-1)*CH(I-1,K,J)+WA(IDIJ)*CH(I,K,J)
          C1(I,K,J) = WA(IDIJ-1)*CH(I,K,J)-WA(IDIJ)*CH(I-1,K,J)
@@ -1023,15 +1023,15 @@
   DIMENSION       CC(IDO,2,L1)           ,CH(IDO,L1,2), &
                   WA1(1)
   if (IDO > 2) goto 102
-  DO 101 K=1,L1
+  DO 101 K = 1,L1
    CH(1,K,1) = CC(1,1,K)+CC(1,2,K)
    CH(1,K,2) = CC(1,1,K)-CC(1,2,K)
    CH(2,K,1) = CC(2,1,K)+CC(2,2,K)
    CH(2,K,2) = CC(2,1,K)-CC(2,2,K)
   101 continue
   return
-  102 DO 104 K=1,L1
-   DO 103 I=2,IDO,2
+  102 DO 104 K = 1,L1
+   DO 103 I = 2,IDO,2
       CH(I-1,K,1) = CC(I-1,1,K)+CC(I-1,2,K)
       TR2 = CC(I-1,1,K)-CC(I-1,2,K)
       CH(I,K,1) = CC(I,1,K)+CC(I,2,K)
@@ -1047,7 +1047,7 @@
                   WA1(1)     ,WA2(1)
   DATA TAUR,TAUI /-.5,-.866025403784439/
   if (IDO /= 2) goto 102
-  DO 101 K=1,L1
+  DO 101 K = 1,L1
    TR2 = CC(1,2,K)+CC(1,3,K)
    CR2 = CC(1,1,K)+TAUR*TR2
    CH(1,K,1) = CC(1,1,K)+TR2
@@ -1062,8 +1062,8 @@
    CH(2,K,3) = CI2-CR3
   101 continue
   return
-  102 DO 104 K=1,L1
-   DO 103 I=2,IDO,2
+  102 DO 104 K = 1,L1
+   DO 103 I = 2,IDO,2
       TR2 = CC(I-1,2,K)+CC(I-1,3,K)
       CR2 = CC(I-1,1,K)+TAUR*TR2
       CH(I-1,K,1) = CC(I-1,1,K)+TR2
@@ -1088,7 +1088,7 @@
   DIMENSION       CC(IDO,4,L1)           ,CH(IDO,L1,4), &
                   WA1(1)     ,WA2(1)     ,WA3(1)
   if (IDO /= 2) goto 102
-  DO 101 K=1,L1
+  DO 101 K = 1,L1
    TI1 = CC(2,1,K)-CC(2,3,K)
    TI2 = CC(2,1,K)+CC(2,3,K)
    TR4 = CC(2,2,K)-CC(2,4,K)
@@ -1107,8 +1107,8 @@
    CH(2,K,4) = TI1-TI4
   101 continue
   return
-  102 DO 104 K=1,L1
-   DO 103 I=2,IDO,2
+  102 DO 104 K = 1,L1
+   DO 103 I = 2,IDO,2
       TI1 = CC(I,1,K)-CC(I,3,K)
       TI2 = CC(I,1,K)+CC(I,3,K)
       TI3 = CC(I,2,K)+CC(I,4,K)
@@ -1141,7 +1141,7 @@
   DATA TR11,TI11,TR12,TI12 /.309016994374947,-.951056516295154, &
   -.809016994374947,-.587785252292473/
   if (IDO /= 2) goto 102
-  DO 101 K=1,L1
+  DO 101 K = 1,L1
    TI5 = CC(2,2,K)-CC(2,5,K)
    TI2 = CC(2,2,K)+CC(2,5,K)
    TI4 = CC(2,3,K)-CC(2,4,K)
@@ -1170,8 +1170,8 @@
    CH(2,K,5) = CI2-CR5
   101 continue
   return
-  102 DO 104 K=1,L1
-   DO 103 I=2,IDO,2
+  102 DO 104 K = 1,L1
+   DO 103 I = 2,IDO,2
       TI5 = CC(I,2,K)-CC(I,5,K)
       TI2 = CC(I,2,K)+CC(I,5,K)
       TI4 = CC(I,3,K)-CC(I,4,K)
@@ -7611,7 +7611,7 @@
       if (REC(I:I) /= ' ') goto 40
    20    continue
 !        Write record to external file
-   40    WRITE (NOUT,FMT=99999) REC(1:I)
+   40    WRITE (NOUT,FMT = 99999) REC(1:I)
   endif
   return
 !
