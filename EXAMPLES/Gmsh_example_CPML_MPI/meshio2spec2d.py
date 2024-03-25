@@ -4,9 +4,87 @@ import numba
 import time
 import os
 
+@numba.jit(nopython=True)
+def get_cpml_cells_except_damping(
+                PML_X_elms_orig,
+                PML_Y_elms_orig,
+                PML_XY_elms_orig,
+                cells_quad_total,
+                cells_line_total,
+                cells_line_inner_boundary,
+                elm_id_offset):
+    PML_X_elms = []
+    PML_Y_elms = []
+    PML_XY_elms = []
+
+    # create a node list of the inner boundary
+    inner_boundary_nodes = []
+    for _ielm in cells_line_inner_boundary:
+        inner_boundary_nodes.extend(cells_line_total[_ielm])
+
+    for _ielm in PML_X_elms_orig:
+        # offcet
+        ielm = int(_ielm - elm_id_offset)
+        # check if the element is not in the inner boundary
+        this_nodes_elm = cells_quad_total[ielm]
+
+        # check if the nodes are not in the inner boundary
+        if_this_element_touches_inner_boundary = False
+        for this_node in this_nodes_elm:
+            if this_node in inner_boundary_nodes:
+                if_this_element_touches_inner_boundary = True
+                break
+
+        if not if_this_element_touches_inner_boundary:
+            PML_X_elms.append(_ielm)
+
+    for _ielm in PML_Y_elms_orig:
+        # offcet
+        ielm = int(_ielm - elm_id_offset)
+        # check if the element is not in the inner boundary
+        this_nodes_elm = cells_quad_total[ielm]
+
+        # check if the nodes are not in the inner boundary
+        if_this_element_touches_inner_boundary = False
+        for this_node in this_nodes_elm:
+            if this_node in inner_boundary_nodes:
+                if_this_element_touches_inner_boundary
+                break
+
+        if not if_this_element_touches_inner_boundary:
+            PML_Y_elms.append(_ielm)
+
+    for _ielm in PML_XY_elms_orig:
+        # offcet
+        ielm = int(_ielm - elm_id_offset)
+        # check if the element is not in the inner boundary
+        this_nodes_elm = cells_quad_total[ielm]
+
+        # check if the nodes are not in the inner boundary
+        if_this_element_touches_inner_boundary = False
+        for this_node in this_nodes_elm:
+            if this_node in inner_boundary_nodes:
+                if_this_element_touches_inner_boundary = True
+                break
+
+        if not if_this_element_touches_inner_boundary:
+            PML_XY_elms.append(_ielm)
+
+    return PML_X_elms, PML_Y_elms, PML_XY_elms
+
 
 @numba.jit(nopython=True)
 def write_str_surface(str_lines, cells_line, cells_quad, bound_edges, bound_nodes, flag_abs):
+    """ Search element id from edge id and write to string list
+        This function may be a heavy bottleneck for large meshes, as
+        it is a double loop over the number of edges and elements.
+        Thus it is implemented in numba to speed up the process.
+
+        cells_line: list of all line cells
+        cells_quad: list of all quad cells (elements)
+        bound_edges: list of target line cells on one boundary (e.g. on top bound)
+        bound_nodes: list of node ids in one single element (node ordering rule)
+    """
 
     for line_elm in bound_edges:
         # get node ids from edge id
@@ -88,8 +166,8 @@ class Meshio2Specfem2D:
     n_cells = 0
     n_edges = 0
     if_second_order = False
-    key_line = "line"
-    key_quad = "quad"
+    key_line = "line" # line3 for second order
+    key_quad = "quad" # quad9 for second order
 
     # stacy boundary flags
     top_abs = False
@@ -99,6 +177,11 @@ class Meshio2Specfem2D:
 
     use_cpml = False
     cell_id_offset = 0
+
+    # number of elements for damping layers
+    # dampling layer is the structured elements between the PML and the main domain
+    # which helps to stabilize the simulation
+    n_damping_layers = 2
 
 
     def __init__(self, mesh, top_abs=False, bot_abs=True, left_abs=True, right_abs=True):
@@ -114,7 +197,7 @@ class Meshio2Specfem2D:
             os.makedirs(self.outdir)
 
         # check if PML_X is included in the physical groups
-        if "PML_X" in self.mesh.cell_sets:
+        if "PML_X" in self.mesh.cell_sets_dict:
             self.use_cpml = True
 
         # check if second order elements are included in the mesh
@@ -156,21 +239,21 @@ class Meshio2Specfem2D:
     def write_material(self):
 
         # find all keys starting with "M" from mesh.cell_sets
-        M_keys = [key for key in self.mesh.cell_sets if key[0] == "M"]
+        M_keys = [key for key in self.mesh.cell_sets_dict if key[0] == "M"]
         print("material keys: ", M_keys)
 
         # reconstruct material flag array
         arr_mflag = np.ones(self.n_cells, dtype=int) * -1
 
         # id offset for quad (subtract the number of lines)
-        self.cell_id_offset = int(np.min(self.mesh.cell_sets["M1"][1]))-1
+        self.cell_id_offset = int(np.min(self.mesh.cell_sets_dict["M1"][self.key_quad]))
 
         print("cell_id_offset: ", self.cell_id_offset)
 
         for key in M_keys:
-            for cell in self.mesh.cell_sets[key][1]:
+            for cell in self.mesh.cell_sets_dict[key][self.key_quad]:
                 try:
-                    icell = int(cell)-1-self.cell_id_offset
+                    icell = int(cell)-self.cell_id_offset
                     # skip the first character "M"
                     arr_mflag[icell] = int(key.lstrip("M"))
                 except:
@@ -195,7 +278,7 @@ class Meshio2Specfem2D:
         cells_line = self.mesh.cells_dict[self.key_line]
         cells_quad = self.mesh.cells_dict[self.key_quad]
 
-        return write_str_surface(str_lines, cells_line, cells_quad, bound_edges[0], bound_nodes, flag_abs)
+        return write_str_surface(str_lines, cells_line, cells_quad, bound_edges, bound_nodes, flag_abs)
 
 
     def write_surf_free_and_abs(self):
@@ -224,10 +307,10 @@ class Meshio2Specfem2D:
         left_nodes = np.array([3, 0, 7])
 
         # write number of free surface edges
-        elems_top = self.mesh.cell_sets["Top"]
-        elems_bot = self.mesh.cell_sets["Bottom"]
-        elems_left = self.mesh.cell_sets["Left"]
-        elems_right = self.mesh.cell_sets["Right"]
+        elems_top = self.mesh.cell_sets_dict["Top"][self.key_line]
+        elems_bot = self.mesh.cell_sets_dict["Bottom"][self.key_line]
+        elems_left = self.mesh.cell_sets_dict["Left"][self.key_line]
+        elems_right = self.mesh.cell_sets_dict["Right"][self.key_line]
 
         n_edges_free = 0
         n_edges_abs = 0
@@ -280,22 +363,61 @@ class Meshio2Specfem2D:
 
 
     def write_cpml(self):
+        """
+        Write cpml data to file.
+        In default, this function creates a layer of damping elements between
+        the PML and the main domain.
+        """
+
+        if self.n_damping_layers == 0:
+            cells_PML_X  = self.mesh.cell_sets_dict["PML_X"][self.key_quad]
+            cells_PML_Y  = self.mesh.cell_sets_dict["PML_Y"][self.key_quad]
+            cells_PML_XY = self.mesh.cell_sets_dict["PML_XY"][self.key_quad]
+        else:
+            # prepare list of cells for cpml excluding the damping layers
+            _cells_inner_boundary = []
+
+            # find keys which are _Top, _Bottom, _Left, _Right
+            for key in self.mesh.cell_sets_dict:
+                if key in ["_Top", "_Bottom", "_Left", "_Right"]:
+                    _cells_inner_boundary.append(self.mesh.cell_sets_dict[key][self.key_line])
+
+            # concatenate a list of numpy arrays to one numpy array
+            cells_line_inner_boundary = np.concatenate(_cells_inner_boundary)
+
+            cells_quad_total = self.mesh.cells_dict[self.key_quad]
+            cells_line_total = self.mesh.cells_dict[self.key_line]
+
+            cells_PML_X, cells_PML_Y, cells_PML_XY = get_cpml_cells_except_damping(
+                self.mesh.cell_sets_dict["PML_X"][self.key_quad],
+                self.mesh.cell_sets_dict["PML_Y"][self.key_quad],
+                self.mesh.cell_sets_dict["PML_XY"][self.key_quad],
+                cells_quad_total,
+                cells_line_total,
+                cells_line_inner_boundary,
+                self.cell_id_offset
+            )
+
         # n_elme pml
         # elm_id cpml_flag
-        str_lines = get_cpml_data(self.mesh.cell_sets["PML_X"][1]
-                                , self.mesh.cell_sets["PML_Y"][1]
-                                , self.mesh.cell_sets["PML_XY"][1]
+        str_lines = get_cpml_data(cells_PML_X
+                                , cells_PML_Y
+                                , cells_PML_XY
                                 , self.cell_id_offset)
 
         np.savetxt(self.fname_CPML, str_lines, fmt="%s")
 
 
-    def write(self, filename_out="TEST"):
+    def write(self, filename_out="TEST", n_damping_layers=1):
 
         # measure time
         start_time = time.time()
 
+        # set output file name
         self.filename_out = filename_out
+
+        # set number of damping layers
+        self.n_damping_layers = n_damping_layers
 
         # construct file names
         self.fname_Nodes = os.path.join(self.outdir, self.fhead_Nodes + "_" + self.filename_out)
