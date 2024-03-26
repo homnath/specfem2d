@@ -102,7 +102,7 @@ def write_str_surface(str_lines, cells_line, cells_quad, bound_edges, bound_node
             continue
 
         # specfem requires only 2 two edge nodes
-        out_str = f"{ielm} 2 {nodes[0]} {nodes[1]}"
+        out_str = f"{ielm} 2 {node_0} {node_1}"
 
         if flag_abs is not None:
             out_str += f" {flag_abs}"
@@ -122,17 +122,17 @@ def get_cpml_data(mesh_sets_x, mesh_sets_y, mesh_sets_xy, cell_id_offset):
     n_elm_pml += len(mesh_sets_x)
     if (len(mesh_sets_x) > 0):
         for elm in mesh_sets_x:
-            str_lines.append(str(int(elm-cell_id_offset)) + " " + str(1))
+            str_lines.append(str(int(elm-cell_id_offset+1)) + " " + str(1))
 
     n_elm_pml += len(mesh_sets_y)
     if (len(mesh_sets_y) > 0):
         for elm in mesh_sets_y:
-            str_lines.append(str(int(elm-cell_id_offset)) + " " + str(2))
+            str_lines.append(str(int(elm-cell_id_offset+1)) + " " + str(2))
 
     n_elm_pml += len(mesh_sets_xy)
     if (len(mesh_sets_xy) > 0):
         for elm in mesh_sets_xy:
-            str_lines.append(str(int(elm-cell_id_offset)) + " " + str(3))
+            str_lines.append(str(int(elm-cell_id_offset+1)) + " " + str(3))
 
     # add number of pml elements to the first line
     str_lines.insert(0, str(n_elm_pml))
@@ -178,10 +178,8 @@ class Meshio2Specfem2D:
     use_cpml = False
     cell_id_offset = 0
 
-    # number of elements for damping layers
-    # dampling layer is the structured elements between the PML and the main domain
-    # which helps to stabilize the simulation
-    n_damping_layers = 2
+    # pml transition layer
+    pml_transition_layer = True
 
 
     def __init__(self, mesh, top_abs=False, bot_abs=True, left_abs=True, right_abs=True):
@@ -227,7 +225,7 @@ class Meshio2Specfem2D:
         # node id1 id2 id3 id4 (id5 id6 id7 id8 id9 for second order elements)
 
         with open(self.fname_Mesh, "w") as f:
-            cell_data = self.mesh.cells_dict[self.key_quad]
+            cell_data = self.mesh.cells_dict[self.key_quad] # id starts from 1
             self.n_cells = len(cell_data)
             f.write(str(self.n_cells) + "\n")
             if self.if_second_order:
@@ -369,7 +367,7 @@ class Meshio2Specfem2D:
         the PML and the main domain.
         """
 
-        if self.n_damping_layers == 0:
+        if self.pml_transition_layer == False:
             cells_PML_X  = self.mesh.cell_sets_dict["PML_X"][self.key_quad]
             cells_PML_Y  = self.mesh.cell_sets_dict["PML_Y"][self.key_quad]
             cells_PML_XY = self.mesh.cell_sets_dict["PML_XY"][self.key_quad]
@@ -408,7 +406,7 @@ class Meshio2Specfem2D:
         np.savetxt(self.fname_CPML, str_lines, fmt="%s")
 
 
-    def write(self, filename_out="TEST", n_damping_layers=1):
+    def write(self, filename_out="TEST", pml_transition_layer=True):
 
         # measure time
         start_time = time.time()
@@ -416,8 +414,8 @@ class Meshio2Specfem2D:
         # set output file name
         self.filename_out = filename_out
 
-        # set number of damping layers
-        self.n_damping_layers = n_damping_layers
+        # set pml transition layer
+        self.pml_transition_layer = pml_transition_layer
 
         # construct file names
         self.fname_Nodes = os.path.join(self.outdir, self.fhead_Nodes + "_" + self.filename_out)
