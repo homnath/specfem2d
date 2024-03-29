@@ -48,7 +48,7 @@ def get_cpml_cells_except_damping(
         if_this_element_touches_inner_boundary = False
         for this_node in this_nodes_elm:
             if this_node in inner_boundary_nodes:
-                if_this_element_touches_inner_boundary
+                if_this_element_touches_inner_boundary = True
                 break
 
         if not if_this_element_touches_inner_boundary:
@@ -69,6 +69,15 @@ def get_cpml_cells_except_damping(
 
         if not if_this_element_touches_inner_boundary:
             PML_XY_elms.append(_ielm)
+
+    # check the changes in the number of elements
+    diff_x = len(PML_X_elms_orig) - len(PML_X_elms)
+    diff_y = len(PML_Y_elms_orig) - len(PML_Y_elms)
+    diff_xy = len(PML_XY_elms_orig) - len(PML_XY_elms)
+
+    print("Number of PML_X elements: ", len(PML_X_elms_orig), " -> ", len(PML_X_elms), " (", diff_x, " elements removed)")
+    print("Number of PML_Y elements: ", len(PML_Y_elms_orig), " -> ", len(PML_Y_elms), " (", diff_y, " elements removed)")
+    print("Number of PML_XY elements: ", len(PML_XY_elms_orig), " -> ", len(PML_XY_elms), " (", diff_xy, " elements removed)")
 
     return PML_X_elms, PML_Y_elms, PML_XY_elms
 
@@ -225,7 +234,7 @@ class Meshio2Specfem2D:
         # node id1 id2 id3 id4 (id5 id6 id7 id8 id9 for second order elements)
 
         with open(self.fname_Mesh, "w") as f:
-            cell_data = self.mesh.cells_dict[self.key_quad] # id starts from 1
+            cell_data = self.mesh.cells_dict[self.key_quad] # id starts from 0
             self.n_cells = len(cell_data)
             f.write(str(self.n_cells) + "\n")
             if self.if_second_order:
