@@ -83,7 +83,7 @@ def get_cpml_cells_except_damping(
 
 
 @numba.jit(nopython=True)
-def write_str_surface(str_lines, cells_line, cells_quad, bound_edges, bound_nodes, flag_abs):
+def write_str_surface(cells_line, cells_quad, bound_edges, _node_ids, flag_abs):
     """ Search element id from edge id and write to string list
         This function may be a heavy bottleneck for large meshes, as
         it is a double loop over the number of edges and elements.
@@ -95,16 +95,17 @@ def write_str_surface(str_lines, cells_line, cells_quad, bound_edges, bound_node
         bound_nodes: list of node ids in one single element (node ordering rule)
     """
 
+    str_lines = []
+
     for line_elm in bound_edges:
         # get node ids from edge id
         nodes_ids_edge = cells_line[line_elm]
-        node_0 = nodes_ids_edge[bound_nodes[0]]
-        node_1 = nodes_ids_edge[bound_nodes[1]]
+        node_0 = nodes_ids_edge[0]
+        node_1 = nodes_ids_edge[1]
 
         # get element id and node ids from edge id
         for ielm, _node_ids_elm in enumerate(cells_quad):
             if node_0 in _node_ids_elm and node_1 in _node_ids_elm:
-                nodes = _node_ids_elm
                 break
         else:
             # If no break occurred, continue to the next iteration
@@ -117,6 +118,7 @@ def write_str_surface(str_lines, cells_line, cells_quad, bound_edges, bound_node
             out_str += f" {flag_abs}"
 
         str_lines.append(out_str)
+
 
     return str_lines
 
@@ -279,13 +281,13 @@ class Meshio2Specfem2D:
             np.savetxt(f, arr_mflag, fmt="%d")
 
 
-    def _write_str_surface(self, str_lines, bound_edges, bound_nodes, flag_abs=None):
+    def _write_str_surface(self, bound_edges, _node_ids, flag_abs=None):
         # pipline function to avoid passing dict to numba (unsupported)
 
         cells_line = self.mesh.cells_dict[self.key_line]
         cells_quad = self.mesh.cells_dict[self.key_quad]
 
-        return write_str_surface(str_lines, cells_line, cells_quad, bound_edges, bound_nodes, flag_abs)
+        return write_str_surface(cells_line, cells_quad, bound_edges, _node_ids, flag_abs)
 
 
     def write_surf_free_and_abs(self):
@@ -314,57 +316,47 @@ class Meshio2Specfem2D:
         left_nodes = np.array([3, 0, 7])
 
         # write number of free surface edges
-        elems_top = self.mesh.cell_sets_dict["Top"][self.key_line]
-        elems_bot = self.mesh.cell_sets_dict["Bottom"][self.key_line]
-        elems_left = self.mesh.cell_sets_dict["Left"][self.key_line]
-        elems_right = self.mesh.cell_sets_dict["Right"][self.key_line]
+        edges_top = self.mesh.cell_sets_dict["Top"][self.key_line]
+        edges_bot = self.mesh.cell_sets_dict["Bottom"][self.key_line]
+        edges_left = self.mesh.cell_sets_dict["Left"][self.key_line]
+        edges_right = self.mesh.cell_sets_dict["Right"][self.key_line]
 
         n_edges_free = 0
         n_edges_abs = 0
 
-        if self.bot_abs != False:
-            n_edges_free += len(elems_bot)
-        else:
-            n_edges_abs += len(elems_bot)
-        if self.right_abs != False:
-            n_edges_free += len(elems_right)
-        else:
-            n_edges_abs += len(elems_right)
-        if self.top_abs != False:
-            n_edges_free += len(elems_top)
-        else:
-            n_edges_abs += len(elems_top)
-        if self.left_abs != False:
-            n_edges_free += len(elems_left)
-        else:
-            n_edges_abs += len(elems_left)
-
         str_lines = []
 
         # write number of free surface edges
-        str_lines.append(str(n_edges_free))
-        if self.bot_abs != False:
-            str_lines = self._write_str_surface(str_lines, elems_bot, bot_nodes)
-        if self.right_abs != False:
-            str_lines = self._write_str_surface(str_lines, elems_right, right_nodes)
-        if self.top_abs != False:
-            str_lines = self._write_str_surface(str_lines, elems_top, top_nodes)
-        if self.left_abs != False:
-            str_lines = self._write_str_surface(str_lines, elems_left, left_nodes)
+        if self.bot_abs != True:
+            str_lines.extend(self._write_str_surface(edges_bot, bot_nodes))
+        if self.right_abs != True:
+            str_lines.extend(self._write_str_surface(edges_right, right_nodes))
+        if self.top_abs != True:
+            str_lines.extend(self._write_str_surface(edges_top, top_nodes))
+        if self.left_abs != True:
+            str_lines.extend(self._write_str_surface(edges_left, left_nodes))
+
+        n_edges_free = len(str_lines)
+
+        # add number of free surface edges to the first line
+        str_lines.insert(0, str(n_edges_free))
 
         np.savetxt(self.fname_Surf_free, str_lines, fmt="%s")
 
         # write number of abs boundary edges
         str_lines = []
-        str_lines.append(str(n_edges_abs))
         if self.bot_abs:
-            str_lines = self._write_str_surface(str_lines, elems_bot, bot_nodes, 1)
+            str_lines.extend(self._write_str_surface(edges_bot, bot_nodes, 1))
         if self.right_abs:
-            str_lines = self._write_str_surface(str_lines, elems_right, right_nodes, 2)
+            str_lines.extend(self._write_str_surface(edges_right, right_nodes, 2))
         if self.top_abs:
-            str_lines = self._write_str_surface(str_lines, elems_top, top_nodes, 3)
+            str_lines.extend(self._write_str_surface(edges_top, top_nodes, 3))
         if self.left_abs:
-            str_lines = self._write_str_surface(str_lines, elems_left, left_nodes, 4)
+            str_lines.extend(self._write_str_surface(edges_left, left_nodes, 4))
+        n_edges_abs = len(str_lines)
+
+        # add number of abs boundary edges to the first line
+        str_lines.insert(0, str(n_edges_abs))
 
         np.savetxt(self.fname_Surf_abs, str_lines, fmt="%s")
 
