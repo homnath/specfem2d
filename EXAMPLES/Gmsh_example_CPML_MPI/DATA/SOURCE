@@ -39,7 +39,7 @@ time_function_type              = 1
 # IMPORTANT: do NOT put quote signs around the file name, just put the file name itself otherwise the run will stop
 name_of_source_file             = DUMMY
 burst_band_width                = 0.             # Only for option 9 : band width of the burst
-f0                              = 0.678
+f0                              = 1.0
 tshift                          = 0.0            # time shift when multi sources (if one source, must be zero)
 ## Force source
 # angle of the source (for a force only); for a plane wave, this is the incidence angle; for moment tensor sources this is unused
