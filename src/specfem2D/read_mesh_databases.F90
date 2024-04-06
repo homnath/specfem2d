@@ -1740,9 +1740,9 @@
       stop 'This function can not be used to strip spaces, use StripSpaces instead'
     endif
 
-    do while (index(string,char,back=.true.) > 0)
-      stringCopy1 = string(:index(string,char,back=.true.)-1)
-      stringCopy2 = string(index(string,char,back=.true.)+1:)
+    do while (index(string,char,back = .true.) > 0)
+      stringCopy1 = string(:index(string,char,back = .true.)-1)
+      stringCopy2 = string(index(string,char,back = .true.)+1:)
       string = trim(stringCopy1)//trim(stringCopy2)
     enddo
 
@@ -1799,7 +1799,7 @@
   if (allocated(list)) then
       isize = size(list)
       allocate(clist(isize+1))
-      do i=1,isize
+      do i = 1,isize
       clist(i) = list(i)
       enddo
       clist(isize+1) = element

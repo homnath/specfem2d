@@ -161,7 +161,7 @@
 !$OMP num_elements,ibool,ispec_is_elastic,ispec_is_anisotropic, &
 !$OMP phase_ispec_inner_elastic,iphase, &
 !$OMP displ_elastic,veloc_elastic,accel_elastic, &
-!$OMP xix,xiz,gammax,gammaz,jacobian, &
+!$OMP deriv_mapping,gammaz,jacobian, &
 !$OMP rho_vpstore,mustore,rhostore,qkappa_attenuation_store,qmu_attenuation_store, &
 !$OMP c11store,c12store,c13store,c15store,c22store,c23store,c25store,c33store,c35store,c55store, &
 !$OMP AXISYM,is_on_the_axis,coord,iglob_is_forced, &

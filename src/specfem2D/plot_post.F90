@@ -619,7 +619,7 @@
 
       ! draw straight lines if elements have 4 nodes
 
-      ir=pointsdisp
+      ir = pointsdisp
       x2 = (xinterp(ir,is)-xmin)*ratio_page + orig_x
       z2 = (zinterp(ir,is)-zmin)*ratio_page + orig_z
       x2 = x2 * centim
@@ -632,8 +632,8 @@
          coorg_send_ps_element_mesh(2,buffer_offset) = z2
       endif
 
-      ir=pointsdisp
-      is=pointsdisp
+      ir = pointsdisp
+      is = pointsdisp
       x2 = (xinterp(ir,is)-xmin)*ratio_page + orig_x
       z2 = (zinterp(ir,is)-zmin)*ratio_page + orig_z
       x2 = x2 * centim
@@ -646,8 +646,8 @@
          coorg_send_ps_element_mesh(2,buffer_offset) = z2
       endif
 
-      is=pointsdisp
-      ir=1
+      is = pointsdisp
+      ir = 1
       x2 = (xinterp(ir,is)-xmin)*ratio_page + orig_x
       z2 = (zinterp(ir,is)-zmin)*ratio_page + orig_z
       x2 = x2 * centim
@@ -660,8 +660,8 @@
          coorg_send_ps_element_mesh(2,buffer_offset) = z2
       endif
 
-      ir=1
-      is=2
+      ir = 1
+      is = 2
       x2 = (xinterp(ir,is)-xmin)*ratio_page + orig_x
       z2 = (zinterp(ir,is)-zmin)*ratio_page + orig_z
       x2 = x2 * centim
@@ -691,7 +691,7 @@
         endif
       enddo
 
-      ir=pointsdisp
+      ir = pointsdisp
       do is= 2,pointsdisp
         x2 = (xinterp(ir,is)-xmin)*ratio_page + orig_x
         z2 = (zinterp(ir,is)-zmin)*ratio_page + orig_z
@@ -706,7 +706,7 @@
         endif
       enddo
 
-      is=pointsdisp
+      is = pointsdisp
       do ir =pointsdisp-1,1,-1
         x2 = (xinterp(ir,is)-xmin)*ratio_page + orig_x
         z2 = (zinterp(ir,is)-zmin)*ratio_page + orig_z
@@ -721,8 +721,8 @@
         endif
       enddo
 
-      ir=1
-      do is=pointsdisp-1,2,-1
+      ir = 1
+      do is = pointsdisp-1,2,-1
         x2 = (xinterp(ir,is)-xmin)*ratio_page + orig_x
         z2 = (zinterp(ir,is)-zmin)*ratio_page + orig_z
         x2 = x2 * centim
@@ -873,7 +873,7 @@
               buffer_offset = buffer_offset + 1
               write(24,681) coorg_recv_ps_element_mesh(1,buffer_offset), coorg_recv_ps_element_mesh(2,buffer_offset)
             enddo
-            do is=pointsdisp-1,2,-1
+            do is = pointsdisp-1,2,-1
               buffer_offset = buffer_offset + 1
               write(24,681) coorg_recv_ps_element_mesh(1,buffer_offset), coorg_recv_ps_element_mesh(2,buffer_offset)
             enddo

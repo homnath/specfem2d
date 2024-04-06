@@ -31,7 +31,7 @@
        open(12,file=trim(file_synth))
        open(13,file=trim(file_adj))
        !count number of lines
-       nt=0
+       nt = 0
        do
           read(11,*,end=97) t,z
           nt = nt + 1
@@ -40,7 +40,7 @@
 
        allocate(time(nt), pressure_synth(nt), pressure_data(nt), adjoint_source(nt))
        open(11,file=trim(file_data))
-       do ii=1,nt
+       do ii = 1,nt
           read(11,*) t,z
           read(12,*) t,x
           time(i)=t
@@ -57,7 +57,7 @@
        adjoint_source(:)= pressure_synth(:)-pressure_data(:)
        dt_square = (time(2) - time(1))**2
        write(13,*) time(1),0.
-       do it=2,nt-1
+       do it = 2,nt-1
           write(13,*) time(it), adjoint_source(it-1) + adjoint_source(it+1) - 2.*adjoint_source(it) / dt_square
        enddo
        write(13,*) time(nt),0.

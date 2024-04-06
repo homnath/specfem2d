@@ -113,7 +113,7 @@
  4 format(a,l8)
 
 ! read the header
-  do i=1,10
+  do i = 1,10
   read(10,*)
   enddo
 
@@ -215,7 +215,7 @@
   allocate(angle(nbsources))
   allocate(factor(nbsources))
 
-  do i=1,nbsources
+  do i = 1,nbsources
       read(10,*)
       read(10,1)junk,xs(i)
       read(10,1)junk,zs(i)
@@ -289,7 +289,7 @@
   print *,'There are ',nrec,' receivers on a single line'
   xspacerec=(xfin-xdeb)/dble(nrec-1)
   zspacerec=(zfin-zdeb)/dble(nrec-1)
-  do i=1,nrec
+  do i = 1,nrec
      xrec(i) = xdeb + dble(i-1)*xspacerec
      zrec(i) = zdeb + dble(i-1)*zspacerec
   enddo
@@ -300,13 +300,13 @@
   print *,'Second line contains ',nrec2,' receivers'
   xspacerec=(xfin-xdeb)/dble(nrec1-1)
   zspacerec=(zfin-zdeb)/dble(nrec1-1)
-  do i=1,nrec1
+  do i = 1,nrec1
      xrec(i) = xdeb + dble(i-1)*xspacerec
      zrec(i) = zdeb + dble(i-1)*zspacerec
   enddo
   xspacerec=(xfin2-xdeb2)/dble(nrec2-1)
   zspacerec=(zfin2-zdeb2)/dble(nrec2-1)
-  do i=1,nrec2
+  do i = 1,nrec2
      xrec(i+nrec1) = xdeb2 + dble(i-1)*xspacerec
      zrec(i+nrec1) = zdeb2 + dble(i-1)*zspacerec
   enddo
@@ -367,7 +367,7 @@
   cp(:) = 0.d0
   cs(:) = 0.d0
 
-  do imodele=1,nbmodeles
+  do imodele = 1,nbmodeles
       read(10,*) i,icodematread,rhoread,cpread,csread,aniso3read,aniso4read
       if (i < 1 .or. i > nbmodeles) stop 'Wrong material set number'
       rho(i) = rhoread
@@ -380,7 +380,7 @@
   print *
   print *, 'Nb de modeles de roche = ',nbmodeles
   print *
-  do i=1,nbmodeles
+  do i = 1,nbmodeles
       print *,'Modele #',i,' isotrope'
       print *,'rho,cp,cs = ',rho(i),cp(i),cs(i)
   enddo
@@ -403,10 +403,10 @@
   allocate(top0(0:nx))
 
 ! calcul des points regulierement espaces
-  do i=0,nx
+  do i = 0,nx
         psi(i) = i/dble(nx)
   enddo
-  do j=0,nz
+  do j = 0,nz
         eta(j) = j/dble(nz)
   enddo
 
@@ -456,7 +456,7 @@
   allocate(ztopo(ntopo))
   allocate(coefs_topo(ntopo))
 
-  do i=1,ntopo
+  do i = 1,ntopo
        read(15,*) xtopo(i),ztopo(i)
   enddo
   close(15)
@@ -487,7 +487,7 @@
   print *
   print *, 'Position (x,z) des ',nbsources,' sources'
   print *
-  do i=1,nbsources
+  do i = 1,nbsources
 
 ! DK DK DK Elf : position source donnee en profondeur par rapport a la topo
    zs(i) = spl(xs(i),xtopo,ztopo,coefs_topo,ntopo) - zs(i)
@@ -500,7 +500,7 @@
   print *
   print *, 'Position (x,z) des ',nrec,' receivers'
   print *
-  do irec=1,nrec
+  do irec = 1,nrec
 
 ! DK DK DK Elf : distinguer les deux lignes de recepteurs
   if (irec <= nrec1) then
@@ -513,13 +513,13 @@
   enddo
 
 !--- definition du maillage suivant X
-  do ix=0,nx
+  do ix = 0,nx
           absx(ix) = dens(ix,psi,xmin,xmax,nx)
   enddo
 
 ! *** une seule zone
 
-  do iz=0,nz
+  do iz = 0,nz
 
 ! DK DK DK densification sinusoidale ici en vertical
   valeta(iz) = eta(iz) + ratio * sin(3.14159265 * eta(iz))
@@ -531,14 +531,14 @@
   a01(iz) = valeta(iz)
   enddo
 
-  do ix=0,nx
+  do ix = 0,nx
           bot0(ix) = bottom(absx(ix))
           top0(ix) = spl(absx(ix),xtopo,ztopo,coefs_topo,ntopo)
   enddo
 
 ! valeurs de x et y pour display domaine physique
-  do ix=0,nx
-  do iz=0,nz
+  do ix = 0,nx
+  do iz = 0,nz
   x(ix,iz) = absx(ix)
   z(ix,iz) = a00(iz)*bot0(ix) + a01(iz)*top0(ix)
   enddo
@@ -624,20 +624,20 @@
   write(15,*) nbsources
 
   write(15,*) 'Collocated forces and/or pressure sources:'
-  do i=1,nbsources
+  do i = 1,nbsources
       write(15,*) itimetype(i),isource_type(i), &
          xs(i)-xmin ,zs(i), &
         f0(i),tshift_src(i),factor(i),angle(i),0
   enddo
 
   write(15,*) 'Receivers positions:'
-  do irec=1,nrec
+  do irec = 1,nrec
       write(15,*) irec,xrec(irec)-xmin ,zrec(irec)
   enddo
 
   write(15,*) 'Coordinates of macroblocs mesh (coorg):'
-  do j=0,nz
-      do i=0,nx
+  do j = 0,nz
+      do i = 0,nx
       write(15,*) num(i,j,nx),x(i,j)-xmin,z(i,j)
       enddo
   enddo
@@ -650,7 +650,7 @@
                 nelemabs,nelemperio
 
   write(15,*) 'Material sets (num 0 rho vp vs 0 0)'
-  do i=1,nbmodeles
+  do i = 1,nbmodeles
        write(15,*) i,0,rho(i),cp(i),cs(i),0,0
   enddo
 
@@ -658,11 +658,11 @@
   write(15,*) 'Arrays kmato and knods for each bloc:'
 
   imatnum = 1
-  k=0
+  k = 0
 
 ! zone structuree dans le volume
-  do j=0,nz-8,4
-  do i=0,nx-4,4
+  do j = 0,nz-8,4
+  do i = 0,nx-4,4
       k = k + 1
       write(15,*) k,imatnum,num(i,j,nx),num(i+4,j,nx),num(i+4,j+4,nx), &
               num(i,j+4,nx),num(i+2,j,nx),num(i+4,j+2,nx), &
@@ -673,8 +673,8 @@
   if (k /= nspecvolume) stop 'number of elements is inconsistent in the volume'
 
 ! zone non structuree dans la couche Wz
-  j=nz-4
-  do i=0,nx-8,8
+  j = nz-4
+  do i = 0,nx-8,8
 
 ! element 1 du raccord
       k = k + 1
@@ -909,17 +909,17 @@
 
   y2(1)=-0.5
   u(1)=(3./(x(2)-x(1)))*((y(2)-y(1))/(x(2)-x(1))-yp1)
-  do i=2,n-1
+  do i = 2,n-1
       sig=(x(i)-x(i-1))/(x(i+1)-x(i-1))
       p=sig*y2(i-1)+2.
       y2(i)=(sig-1.)/p
       u(i)=(6.*((y(i+1)-y(i))/(x(i+1)-x(i))-(y(i)-y(i-1)) &
                     /(x(i)-x(i-1)))/(x(i+1)-x(i-1))-sig*u(i-1))/p
   enddo
-  qn=0.5
+  qn = 0.5
   un=(3./(x(n)-x(n-1)))*(ypn-(y(n)-y(n-1))/(x(n)-x(n-1)))
   y2(n)=(un-qn*u(n-1))/(qn*y2(n-1)+1.)
-  do k=n-1,1,-1
+  do k = n-1,1,-1
       y2(k)=y2(k)*y2(k+1)+u(k)
   enddo
 
@@ -940,22 +940,22 @@
   integer k,klo,khi
   double precision h,a,b
 
-  KLO=1
-  KHI=N
+  KLO = 1
+  KHI = N
   do while (KHI-KLO > 1)
       K=(KHI+KLO)/2
       if (XA(K) > X) then
-            KHI=K
+            KHI = K
       ELSE
-            KLO=K
+            KLO = K
       endif
   enddo
-  H=XA(KHI)-XA(KLO)
+  H = XA(KHI)-XA(KLO)
   if (H == 0.d0) stop 'Bad input in spline evaluation'
   A=(XA(KHI)-X)/H
   B=(X-XA(KLO))/H
 
-  Y=A*YA(KLO)+B*YA(KHI)+((A**3-A)*Y2A(KLO)+ &
+  Y = A*YA(KLO)+B*YA(KHI)+((A**3-A)*Y2A(KLO)+ &
               (B**3-B)*Y2A(KHI))*(H**2)/6.d0
 
   end subroutine SPLINT

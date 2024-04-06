@@ -1237,8 +1237,8 @@
     if (ispec_is_PML(ispec)) then
       ! loops over all GLL points
       ! (combines directions to speed up calculations)
-      do j=1,NGLLZ-1
-        do i=1,NGLLX-1
+      do j = 1,NGLLZ-1
+        do i = 1,NGLLX-1
           ! reference point
           iglob1 = ibool(i,j,ispec)
           x1 = coord(1,iglob1)

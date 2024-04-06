@@ -589,7 +589,7 @@
   double precision, dimension(N_PMLSF) ::gamma_de
 
   if (N_PMLSF < 0) then
-    write(*,*)'the number of PML Stretching function should be greater than 0'
+    write(*,*) 'the number of PML Stretching function should be greater than 0'
     call stop_the_code('error: stopping the code')
   endif
 

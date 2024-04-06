@@ -830,7 +830,7 @@
       xgamma = ZERO
       zgamma = ZERO
 
-      do ia=1,NGNOD
+      do ia = 1,NGNOD
         xxi = xxi + dershape2D(1,ia,i,k)*xelm(ia)
         zxi = zxi + dershape2D(1,ia,i,k)*zelm(ia)
         xgamma = xgamma + dershape2D(2,ia,i,k)*xelm(ia)

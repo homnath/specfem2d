@@ -160,36 +160,36 @@
 
   if (n == 1) return
 
-  L=n/2+1
-  ir=n
+  L = n/2+1
+  ir = n
   100 continue
    if (l > 1) then
-      l=l-1
+      l = l-1
       indx=IND(l)
       q=A(indx)
    ELSE
       indx=IND(ir)
       q=A(indx)
       IND(ir)=IND(1)
-      ir=ir-1
+      ir = ir-1
       if (ir == 1) then
          IND(1)=indx
          return
       endif
    endif
-   i=l
-   j=l+l
+   i = l
+   j = l+l
   200    continue
    if (j <= ir) then
       if (j < ir) then
-         if (A(IND(j)) < A(IND(j+1))) j=j+1
+         if (A(IND(j)) < A(IND(j+1))) j = j+1
       endif
       if (q < A(IND(j))) then
          IND(i)=IND(j)
-         i=j
-         j=j+j
+         i = j
+         j = j+j
       ELSE
-         j=ir+1
+         j = ir+1
       endif
    goto 200
    endif

@@ -270,7 +270,7 @@
         ! launches the transfer of the next wavefield
         call transfer_async_pot_ac_to_device(no_backward_acoustic_buffer(nglob*buffer_num_GPU_transfer+1),Mesh_pointer)
       else
-        ! we get the wavefield from the previous iteration, because this RAM = =>
+        ! we get the wavefield from the previous iteration, because this RAM ==>
         ! RAM copy is blocking
         b_potential_acoustic(:) = no_backward_acoustic_buffer(nglob*mod(no_backward_iframe,3)+1: &
                                                                 nglob*(mod(no_backward_iframe,3)+1))

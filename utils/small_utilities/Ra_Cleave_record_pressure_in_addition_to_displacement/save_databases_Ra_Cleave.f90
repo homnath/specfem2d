@@ -204,7 +204,7 @@
     write(15,*) 'NSOURCES'
     write(15,*) NSOURCES
 
-    do i_source=1,NSOURCES
+    do i_source = 1,NSOURCES
       write(15,*) 'source', i_source
       write(15,*) source_type(i_source),time_function_type(i_source), &
                   xs(i_source),zs(i_source),f0_source(i_source),tshift_src(i_source), &
@@ -251,7 +251,7 @@
     write(15,*) 'Material sets (num 1 rho vp vs 0 0 QKappa Qmu 0 0 0 0 0 0) or '
     write(15,*) '(num 2 rho c11 c13 c33 c44 QKappa Qmu 0 0 0 0 0 0) or '
     write(15,*) '(num 3 rhos rhof phi c k_xx k_xz k_zz Ks Kf Kfr etaf mufr Qmu)'
-    do i=1,nb_materials
+    do i = 1,nb_materials
       if (icodemat(i) == ISOTROPIC_MATERIAL) then
          write(15,*) i,icodemat(i),rho_s(i),cp(i),cs(i),0,0,QKappa(i),Qmu(i),0,0,0,0,0,0
       else if (icodemat(i) == POROELASTIC_MATERIAL) then

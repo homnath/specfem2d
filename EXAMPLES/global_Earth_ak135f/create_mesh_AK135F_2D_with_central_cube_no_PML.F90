@@ -267,7 +267,7 @@
 
 ! generation maillage de la surface
 
-  do ix=0,nspec_surf_whole_circle
+  do ix = 0,nspec_surf_whole_circle
 
   xicoord  = dble(ix)/dble(nspec_surf_whole_circle)
 
@@ -292,7 +292,7 @@
 
 !---- volume
 
-  do irad=0,nspec_rad_670_surf
+  do irad = 0,nspec_rad_670_surf
       radcoord  = dble(irad)/dble(nspec_rad_670_surf)
       x1vol(ix,irad) = x1surf(ix) * radcoord + x1bot(ix) * (one - radcoord)
       y1vol(ix,irad) = y1surf(ix) * radcoord + y1bot(ix) * (one - radcoord)
@@ -304,8 +304,8 @@
   ispec = 0
 
 ! %%% bloc d670 -> surface
-  do irad=0,nspec_rad_670_surf-2,2
-  do ix=0,nspec_surf_whole_circle/factor_divide_mesh-2,2
+  do irad = 0,nspec_rad_670_surf-2,2
+  do ix = 0,nspec_surf_whole_circle/factor_divide_mesh-2,2
 
       ispec = ispec + 1
 
@@ -337,7 +337,7 @@
 
 ! generation maillage de la surface
 
-  do ix=0,nspec_surf_whole_circle
+  do ix = 0,nspec_surf_whole_circle
 
   xicoord  = dble(ix)/dble(nspec_surf_whole_circle)
 
@@ -362,7 +362,7 @@
 
 !---- volume
 
-  do irad=0,nspec_rad_CMB_670
+  do irad = 0,nspec_rad_CMB_670
       radcoord  = dble(irad)/dble(nspec_rad_CMB_670)
       x2vol(ix,irad) = x2surf(ix) * radcoord + x2bot(ix) * (one - radcoord)
       y2vol(ix,irad) = y2surf(ix) * radcoord + y2bot(ix) * (one - radcoord)
@@ -371,8 +371,8 @@
   enddo
 
 ! --- bloc principal
-  do irad=0,nspec_rad_CMB_670-8,4
-  do ix=0,nspec_surf_whole_circle/factor_divide_mesh-4,4
+  do irad = 0,nspec_rad_CMB_670-8,4
+  do ix = 0,nspec_surf_whole_circle/factor_divide_mesh-4,4
 
       ispec = ispec + 1
 
@@ -401,8 +401,8 @@
   enddo
 
 ! --- zone de raccord geometrique conforme
-  irad=nspec_rad_CMB_670-4
-  do ix=0,nspec_surf_whole_circle/factor_divide_mesh-8,8
+  irad = nspec_rad_CMB_670-4
+  do ix = 0,nspec_surf_whole_circle/factor_divide_mesh-8,8
 
       ispec = ispec + 1
 
@@ -479,8 +479,8 @@
   enddo
 
 ! --- zone de raccord geometrique conforme inverse
-  irad=nspec_rad_CMB_670-4
-  do ix=4,nspec_surf_whole_circle/factor_divide_mesh-4,8
+  irad = nspec_rad_CMB_670-4
+  do ix = 4,nspec_surf_whole_circle/factor_divide_mesh-4,8
 
       ispec = ispec + 1
 
@@ -560,7 +560,7 @@
 
 ! generation maillage de la surface
 
-  do ix=0,nspec_surf_whole_circle
+  do ix = 0,nspec_surf_whole_circle
 
   xicoord  = dble(ix)/dble(nspec_surf_whole_circle)
 
@@ -585,7 +585,7 @@
 
 !---- volume
 
-  do irad=0,nspec_rad_doubling_OC_to_CMB
+  do irad = 0,nspec_rad_doubling_OC_to_CMB
       radcoord  = dble(irad)/dble(nspec_rad_doubling_OC_to_CMB)
       x3vol(ix,irad) = x3surf(ix) * radcoord + x3bot(ix) * (one - radcoord)
       y3vol(ix,irad) = y3surf(ix) * radcoord + y3bot(ix) * (one - radcoord)
@@ -594,8 +594,8 @@
   enddo
 
 ! --- bloc principal
-  do irad=0,nspec_rad_doubling_OC_to_CMB-4,4
-  do ix=0,nspec_surf_whole_circle/factor_divide_mesh-4,4
+  do irad = 0,nspec_rad_doubling_OC_to_CMB-4,4
+  do ix = 0,nspec_surf_whole_circle/factor_divide_mesh-4,4
 
       ispec = ispec + 1
 
@@ -627,7 +627,7 @@
 
 ! generation maillage de la surface
 
-  do ix=0,nspec_surf_whole_circle
+  do ix = 0,nspec_surf_whole_circle
 
   xicoord  = dble(ix)/dble(nspec_surf_whole_circle)
 
@@ -652,7 +652,7 @@
 
 !---- volume
 
-  do irad=0,nspec_rad_ICB_to_doubling_OC
+  do irad = 0,nspec_rad_ICB_to_doubling_OC
       radcoord  = dble(irad)/dble(nspec_rad_ICB_to_doubling_OC)
       x3vol(ix,irad) = x3surf(ix) * radcoord + x3bot(ix) * (one - radcoord)
       y3vol(ix,irad) = y3surf(ix) * radcoord + y3bot(ix) * (one - radcoord)
@@ -661,8 +661,8 @@
   enddo
 
 ! --- bloc principal
-  do irad=0,nspec_rad_ICB_to_doubling_OC-8,4
-  do ix=0,nspec_surf_whole_circle/factor_divide_mesh-8,8
+  do irad = 0,nspec_rad_ICB_to_doubling_OC-8,4
+  do ix = 0,nspec_surf_whole_circle/factor_divide_mesh-8,8
 
       ispec = ispec + 1
 
@@ -691,8 +691,8 @@
   enddo
 
 ! --- zone de raccord geometrique conforme
-  irad=nspec_rad_ICB_to_doubling_OC-4
-  do ix=0,nspec_surf_whole_circle/factor_divide_mesh-16,16
+  irad = nspec_rad_ICB_to_doubling_OC-4
+  do ix = 0,nspec_surf_whole_circle/factor_divide_mesh-16,16
 
       ispec = ispec + 1
 
@@ -769,8 +769,8 @@
   enddo
 
 ! --- zone de raccord geometrique conforme inverse
-  irad=nspec_rad_ICB_to_doubling_OC-4
-  do ix=8,nspec_surf_whole_circle/factor_divide_mesh-8,16
+  irad = nspec_rad_ICB_to_doubling_OC-4
+  do ix = 8,nspec_surf_whole_circle/factor_divide_mesh-8,16
 
       ispec = ispec + 1
 
@@ -850,7 +850,7 @@
 
 ! generation maillage de la surface
 
-  do ix=0,nspec_surf_whole_circle
+  do ix = 0,nspec_surf_whole_circle
 
   xicoord  = dble(ix)/dble(nspec_surf_whole_circle)
 
@@ -909,7 +909,7 @@
 
 !---- volume
 
-  do irad=0,nspec_rad_Cube_ICB
+  do irad = 0,nspec_rad_Cube_ICB
       radcoord  = dble(irad)/dble(nspec_rad_Cube_ICB)
       x4vol(ix,irad) = x4surf(ix) * radcoord + x4bot(ix) * (one - radcoord)
       y4vol(ix,irad) = y4surf(ix) * radcoord + y4bot(ix) * (one - radcoord)
@@ -917,8 +917,8 @@
 
   enddo
 
-  do irad=0,nspec_rad_Cube_ICB-4,4
-  do ix=0,nspec_surf_whole_circle/factor_divide_mesh-8,8
+  do irad = 0,nspec_rad_Cube_ICB-4,4
+  do ix = 0,nspec_surf_whole_circle/factor_divide_mesh-8,8
 
       ispec = ispec + 1
 
@@ -951,13 +951,13 @@
 !---- generer l'interieur du cube
 !----
 
-  do ix=0,nspec_surf_whole_circle/16
+  do ix = 0,nspec_surf_whole_circle/16
 
       xlincoord  = dble(ix)/dble(nspec_surf_whole_circle/16)
 
 !---- volume
 
-  do irad=0,nspec_surf_whole_circle/16
+  do irad = 0,nspec_surf_whole_circle/16
       radcoord  = dble(irad)/dble(nspec_surf_whole_circle/16)
 
 ! use a "flat" cubed sphere to create the central cube
@@ -987,8 +987,8 @@
     icentral_cube2 = nspec_surf_whole_circle/16-2
   endif
 
-  do irad=0,nspec_surf_whole_circle/16-2,2
-  do ix=icentral_cube1,icentral_cube2,2
+  do irad = 0,nspec_surf_whole_circle/16-2,2
+  do ix = icentral_cube1,icentral_cube2,2
 
       ispec = ispec + 1
 
@@ -1035,7 +1035,7 @@
 ! get coordinates of the grid points
   xp(:) = 0.d0
   yp(:) = 0.d0
-  do ispec=1,nspec
+  do ispec = 1,nspec
    ieoff = ngnod*(ispec - 1)
    ilocnum = 0
 
@@ -1050,9 +1050,9 @@
 ! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 !  Establish initial pointers
-  do ie=1,nspec
+  do ie = 1,nspec
    ieoff = ngnod*(ie -1)
-   do ix=1,ngnod
+   do ix = 1,ngnod
       loc (ix+ieoff) = ix+ieoff
    enddo
   enddo
@@ -1061,18 +1061,18 @@
 
   xtypdist=+HUGEVAL
 
-  do ispec=1,nspec
+  do ispec = 1,nspec
 
   xminval=+HUGEVAL
   yminval=+HUGEVAL
   xmaxval=-HUGEVAL
   ymaxval=-HUGEVAL
   ieoff=ngnod*(ispec-1)
-  do ilocnum=1,ngnod
-    xmaxval=max(xp(ieoff+ilocnum),xmaxval)
-    xminval=min(xp(ieoff+ilocnum),xminval)
-    ymaxval=max(yp(ieoff+ilocnum),ymaxval)
-    yminval=min(yp(ieoff+ilocnum),yminval)
+  do ilocnum = 1,ngnod
+    xmaxval = max(xp(ieoff+ilocnum),xmaxval)
+    xminval = min(xp(ieoff+ilocnum),xminval)
+    ymaxval = max(yp(ieoff+ilocnum),ymaxval)
+    yminval = min(yp(ieoff+ilocnum),yminval)
   enddo
 
 ! compute the minimum typical "size" of an element in the mesh
@@ -1089,10 +1089,10 @@
   ifseg(1)    = .true.
   ninseg(1)   = npoin_max
 
-  do j=1,NDIM
+  do j = 1,NDIM
 !  Sort within each segment
-   ioff=1
-   do iseg=1,nseg
+   ioff = 1
+   do iseg = 1,nseg
       if (j == 1) then
          call rank(xp(ioff),ind,ninseg(iseg))
       else
@@ -1105,17 +1105,17 @@
    enddo
 !  Check for jumps in current coordinate
    if (j == 1) then
-     do i=2,npoin_max
-       if (abs(xp(i)-xp(i-1)) > xtol) ifseg(i)=.true.
+     do i = 2,npoin_max
+       if (abs(xp(i)-xp(i-1)) > xtol) ifseg(i) = .true.
      enddo
    else
-     do i=2,npoin_max
-       if (abs(yp(i)-yp(i-1)) > xtol) ifseg(i)=.true.
+     do i = 2,npoin_max
+       if (abs(yp(i)-yp(i-1)) > xtol) ifseg(i) = .true.
      enddo
    endif
 !  Count up number of different segments
    nseg = 0
-   do i=1,npoin_max
+   do i = 1,npoin_max
       if (ifseg(i)) then
          nseg = nseg+1
          ninseg(nseg) = 1
@@ -1128,8 +1128,8 @@
 !  Assign global node numbers (now sorted lexicographically!)
 !
   ig = 0
-  do i=1,npoin_max
-   if (ifseg(i)) ig=ig+1
+  do i = 1,npoin_max
+   if (ifseg(i)) ig = ig+1
    iglob(loc(i)) = ig
   enddo
 
@@ -1150,7 +1150,7 @@
 ! generer les coordonnees des points du maillage global
 ! in global numbering
   print *,'Generating the coordinates of the points of the global mesh...'
-  do ispec=1,nspec
+  do ispec = 1,nspec
   do ia = 1,ngnod
       xp(ibool(ia,ispec)) = xcoord(ia,ispec)
       yp(ibool(ia,ispec)) = ycoord(ia,ispec)
@@ -1251,7 +1251,7 @@
   ispec_count = 0
 
 ! count the number of elements that are in contact with the symmetry axis
-  do ispec=1,nspec
+  do ispec = 1,nspec
     i = 0
 
     if (xcoord(1,ispec) < 0.001d0) i = i + 1
@@ -1278,7 +1278,7 @@
   write(22,*) ispec_count
 #endif
 
-  do ispec=1,nspec
+  do ispec = 1,nspec
 #ifdef USE_BINARY_FOR_EXTERNAL_MESH_DATABASE
     if (xcoord(1,ispec) < 0.001d0 .and. xcoord(2,ispec) < 0.001d0) write(22) ispec,' 2 ',ibool(1,ispec),ibool(2,ispec),IBOTTOM
     if (xcoord(2,ispec) < 0.001d0 .and. xcoord(3,ispec) < 0.001d0) write(22) ispec,' 2 ',ibool(2,ispec),ibool(3,ispec),IRIGHT
@@ -1307,7 +1307,7 @@
 
     open(unit=20,file='gridfile.gnu',status='unknown')
 
-    do ispec=1,nspec
+    do ispec = 1,nspec
 
   ! draw the four edges of each element (using straight lines to simplify)
       ia1 = 1
@@ -1377,41 +1377,41 @@
   integer i,j,l,ir,indx
   double precision q
 
-  do J=1,N
+  do J = 1,N
    IND(j)=j
   enddo
 
   if (n == 1) return
-  L=n/2+1
-  ir=n
+  L = n/2+1
+  ir = n
   100 continue
    if (l > 1) then
-     l=l-1
+     l = l-1
      indx=ind(l)
      q=a(indx)
    ELSE
      indx=ind(ir)
      q=a(indx)
      ind(ir)=ind(1)
-     ir=ir-1
+     ir = ir-1
      if (ir == 1) then
        ind(1)=indx
        return
      endif
    endif
-   i=l
-   j=l+l
+   i = l
+   j = l+l
   200 continue
    if (J <= IR) then
       if (J < IR) then
-         if (A(IND(j)) < A(IND(j+1))) j=j+1
+         if (A(IND(j)) < A(IND(j+1))) j = j+1
       endif
       if (q < A(IND(j))) then
          IND(I)=IND(J)
-         I=J
-         J=J+J
+         I = J
+         J = J+J
       ELSE
-         J=IR+1
+         J = IR+1
       endif
    goto 200
    endif
@@ -1436,7 +1436,7 @@
 
   W(:) = A(:)
 
-  do J=1,N
+  do J = 1,N
     A(j) = W(ind(j))
   enddo
 
@@ -1457,7 +1457,7 @@
 
   W(:) = A(:)
 
-  do J=1,N
+  do J = 1,N
     A(j) = W(ind(j))
   enddo
 

@@ -266,7 +266,7 @@
      allocate(my_nb_interfaces(0:ninterfaces-1))
   else
      ! dummy allocation
-     ninterfaces=0
+     ninterfaces = 0
      allocate(my_interfaces(0:ninterfaces-1))
      allocate(my_nb_interfaces(0:ninterfaces-1))
   endif

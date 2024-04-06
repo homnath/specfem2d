@@ -121,7 +121,7 @@
   enddo
 
 ! in the image format, the image starts in the upper-left corner
-  do iy=NZ_IMAGE_color,1,-1
+  do iy = NZ_IMAGE_color,1,-1
     do ix= 1,NX_IMAGE_color
 
 ! check if pixel is defined or not (can be above topography for instance)

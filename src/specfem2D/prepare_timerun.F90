@@ -523,39 +523,39 @@
     d2_RGB_recv_ps_velocity_model = d2_RGB_recv_ps_velocity_model*((NGLLX-subsamp_postscript)/subsamp_postscript)* &
        ((NGLLX-subsamp_postscript)/subsamp_postscript)*4
   else
-    d1_coorg_recv_ps_velocity_model=1
-    d2_coorg_recv_ps_velocity_model=1
-    d1_RGB_recv_ps_velocity_model=1
-    d2_RGB_recv_ps_velocity_model=1
+    d1_coorg_recv_ps_velocity_model = 1
+    d2_coorg_recv_ps_velocity_model = 1
+    d1_RGB_recv_ps_velocity_model = 1
+    d2_RGB_recv_ps_velocity_model = 1
   endif
 
-  d1_coorg_send_ps_element_mesh=2
+  d1_coorg_send_ps_element_mesh = 2
   if (NGNOD == 4) then
     if (DISPLAY_ELEMENT_NUMBERS_POSTSCRIPT == 1) then
-      d2_coorg_send_ps_element_mesh=nspec*5
+      d2_coorg_send_ps_element_mesh = nspec*5
       if (DISPLAY_COLORS == 1) then
-        d1_color_send_ps_element_mesh=2*nspec
+        d1_color_send_ps_element_mesh = 2*nspec
       else
-        d1_color_send_ps_element_mesh=1*nspec
+        d1_color_send_ps_element_mesh = 1*nspec
       endif
     else
-      d2_coorg_send_ps_element_mesh=nspec*6
+      d2_coorg_send_ps_element_mesh = nspec*6
       if (DISPLAY_COLORS == 1) then
-        d1_color_send_ps_element_mesh=1*nspec
+        d1_color_send_ps_element_mesh = 1*nspec
       endif
     endif
   else
     if (DISPLAY_ELEMENT_NUMBERS_POSTSCRIPT == 1) then
-      d2_coorg_send_ps_element_mesh=nspec*((pointsdisp-1)*3+max(0,pointsdisp-2)+1+1)
+      d2_coorg_send_ps_element_mesh = nspec*((pointsdisp-1)*3+max(0,pointsdisp-2)+1+1)
       if (DISPLAY_COLORS == 1) then
-        d1_color_send_ps_element_mesh=2*nspec
+        d1_color_send_ps_element_mesh = 2*nspec
       else
-        d1_color_send_ps_element_mesh=1*nspec
+        d1_color_send_ps_element_mesh = 1*nspec
       endif
     else
-      d2_coorg_send_ps_element_mesh=nspec*((pointsdisp-1)*3+max(0,pointsdisp-2)+1)
+      d2_coorg_send_ps_element_mesh = nspec*((pointsdisp-1)*3+max(0,pointsdisp-2)+1)
       if (DISPLAY_COLORS == 1) then
-        d1_color_send_ps_element_mesh=1*nspec
+        d1_color_send_ps_element_mesh = 1*nspec
       endif
     endif
   endif
@@ -564,63 +564,63 @@
   call max_all_all_i(d2_coorg_send_ps_element_mesh,d2_coorg_recv_ps_element_mesh)
   call max_all_all_i(d1_color_send_ps_element_mesh,d1_color_recv_ps_element_mesh)
 
-  d1_coorg_send_ps_abs=5
-  d2_coorg_send_ps_abs=4*num_abs_boundary_faces
+  d1_coorg_send_ps_abs = 5
+  d2_coorg_send_ps_abs = 4*num_abs_boundary_faces
   call max_all_all_i(d1_coorg_send_ps_abs,d1_coorg_recv_ps_abs)
   call max_all_all_i(d2_coorg_send_ps_abs,d2_coorg_recv_ps_abs)
 
-  d1_coorg_send_ps_free_surface=4
-  d2_coorg_send_ps_free_surface=4*nelem_acoustic_surface
+  d1_coorg_send_ps_free_surface = 4
+  d2_coorg_send_ps_free_surface = 4*nelem_acoustic_surface
   call max_all_all_i(d1_coorg_send_ps_free_surface,d1_coorg_recv_ps_free_surface)
   call max_all_all_i(d2_coorg_send_ps_free_surface,d2_coorg_recv_ps_free_surface)
 
-  d1_coorg_send_ps_vector_field=8
+  d1_coorg_send_ps_vector_field = 8
   if (interpol) then
     if (plot_lowerleft_corner_only) then
-      d2_coorg_send_ps_vector_field=nspec*1*1
+      d2_coorg_send_ps_vector_field = nspec*1*1
     else
-      d2_coorg_send_ps_vector_field=nspec*pointsdisp*pointsdisp
+      d2_coorg_send_ps_vector_field = nspec*pointsdisp*pointsdisp
     endif
   else
-    d2_coorg_send_ps_vector_field=nglob
+    d2_coorg_send_ps_vector_field = nglob
   endif
   call max_all_all_i(d1_coorg_send_ps_vector_field,d1_coorg_recv_ps_vector_field)
   call max_all_all_i(d2_coorg_send_ps_vector_field,d2_coorg_recv_ps_vector_field)
 
 #else
   ! dummy values
-  d1_coorg_recv_ps_velocity_model=1
-  d2_coorg_recv_ps_velocity_model=1
-  d1_RGB_recv_ps_velocity_model=1
-  d2_RGB_recv_ps_velocity_model=1
+  d1_coorg_recv_ps_velocity_model = 1
+  d2_coorg_recv_ps_velocity_model = 1
+  d1_RGB_recv_ps_velocity_model = 1
+  d2_RGB_recv_ps_velocity_model = 1
 
-  d1_coorg_send_ps_element_mesh=1
-  d2_coorg_send_ps_element_mesh=1
-  d1_coorg_recv_ps_element_mesh=1
-  d2_coorg_recv_ps_element_mesh=1
-  d1_color_send_ps_element_mesh=1
-  d1_color_recv_ps_element_mesh=1
+  d1_coorg_send_ps_element_mesh = 1
+  d2_coorg_send_ps_element_mesh = 1
+  d1_coorg_recv_ps_element_mesh = 1
+  d2_coorg_recv_ps_element_mesh = 1
+  d1_color_send_ps_element_mesh = 1
+  d1_color_recv_ps_element_mesh = 1
 
-  d1_coorg_send_ps_abs=1
-  d2_coorg_send_ps_abs=1
-  d1_coorg_recv_ps_abs=1
-  d2_coorg_recv_ps_abs=1
-  d1_coorg_send_ps_free_surface=1
-  d2_coorg_send_ps_free_surface=1
-  d1_coorg_recv_ps_free_surface=1
-  d2_coorg_recv_ps_free_surface=1
+  d1_coorg_send_ps_abs = 1
+  d2_coorg_send_ps_abs = 1
+  d1_coorg_recv_ps_abs = 1
+  d2_coorg_recv_ps_abs = 1
+  d1_coorg_send_ps_free_surface = 1
+  d2_coorg_send_ps_free_surface = 1
+  d1_coorg_recv_ps_free_surface = 1
+  d2_coorg_recv_ps_free_surface = 1
 
-  d1_coorg_send_ps_vector_field=1
-  d2_coorg_send_ps_vector_field=1
-  d1_coorg_recv_ps_vector_field=1
-  d2_coorg_recv_ps_vector_field=1
+  d1_coorg_send_ps_vector_field = 1
+  d2_coorg_send_ps_vector_field = 1
+  d1_coorg_recv_ps_vector_field = 1
+  d2_coorg_recv_ps_vector_field = 1
 #endif
 
-  d1_coorg_send_ps_velocity_model=2
-  d2_coorg_send_ps_velocity_model=nspec*((NGLLX-subsamp_postscript)/subsamp_postscript)* &
+  d1_coorg_send_ps_velocity_model = 2
+  d2_coorg_send_ps_velocity_model = nspec*((NGLLX-subsamp_postscript)/subsamp_postscript)* &
                                         ((NGLLX-subsamp_postscript)/subsamp_postscript)*4
-  d1_RGB_send_ps_velocity_model=1
-  d2_RGB_send_ps_velocity_model=nspec*((NGLLX-subsamp_postscript)/subsamp_postscript)* &
+  d1_RGB_send_ps_velocity_model = 1
+  d2_RGB_send_ps_velocity_model = nspec*((NGLLX-subsamp_postscript)/subsamp_postscript)* &
                                       ((NGLLX-subsamp_postscript)/subsamp_postscript)
 
   allocate(coorg_send_ps_velocity_model(d1_coorg_send_ps_velocity_model,d2_coorg_send_ps_velocity_model))

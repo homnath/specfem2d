@@ -306,11 +306,11 @@
 
   else if (NOISE_TOMOGRAPHY == 2) then
      if (SIMULATION_TYPE /= 1) call exit_MPI(myrank,'NOISE_TOMOGRAPHY=2 requires SIMULATION_TYPE=1, check DATA/Par_file')
-     if (.not. SAVE_FORWARD) call exit_MPI(myrank,'NOISE_TOMOGRAPHY=2 requires SAVE_FORWARD=.true., check DATA/Par_file')
+     if (.not. SAVE_FORWARD) call exit_MPI(myrank,'NOISE_TOMOGRAPHY=2 requires SAVE_FORWARD = .true., check DATA/Par_file')
 
   else if (NOISE_TOMOGRAPHY == 3) then
      if (SIMULATION_TYPE /= 3) call exit_MPI(myrank,'NOISE_TOMOGRAPHY=3 requires SIMULATION_TYPE=3, check DATA/Par_file')
-     if (SAVE_FORWARD)       call exit_MPI(myrank,'NOISE_TOMOGRAPHY=3 requires SAVE_FORWARD=.false., check DATA/Par_file')
+     if (SAVE_FORWARD)       call exit_MPI(myrank,'NOISE_TOMOGRAPHY=3 requires SAVE_FORWARD = .false., check DATA/Par_file')
   endif
 
   ! check model parameters

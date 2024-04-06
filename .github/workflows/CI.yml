@@ -575,7 +575,7 @@ jobs:
       shell: bash
 
   linuxTest_12:
-    name: Test run example 11 - Marmousi2
+    name: Test run example 12 - Marmousi2
     runs-on: ubuntu-latest
     needs: [linuxCheck]
 

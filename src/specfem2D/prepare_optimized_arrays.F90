@@ -78,7 +78,6 @@
   implicit none
 
   ! local parameters
-  integer :: ier
   integer :: max_threads
   integer,external :: OMP_GET_MAX_THREADS
 

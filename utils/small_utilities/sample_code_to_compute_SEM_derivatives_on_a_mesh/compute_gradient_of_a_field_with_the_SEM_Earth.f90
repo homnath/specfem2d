@@ -292,9 +292,9 @@
 ! for the simple geometry that we use
   area = ZERO
   do ispec = 1,nspec
-    do i=1,NGLLX
-      do j=1,NGLLZ
-        weight=wxgll(i)*wzgll(j)
+    do i = 1,NGLLX
+      do j = 1,NGLLZ
+        weight = wxgll(i)*wzgll(j)
         area = area + jacobian(i,j,ispec)*weight
       enddo
     enddo

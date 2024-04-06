@@ -114,11 +114,11 @@
   integer dgr,i,j
   double precision prod1,prod2
 
-  do dgr=1,NGLL
+  do dgr = 1,NGLL
 
     prod1 = 1.0d0
     prod2 = 1.0d0
-    do i=1,NGLL
+    do i = 1,NGLL
       if (i /= dgr) then
         prod1 = prod1*(xi-xigll(i))
         prod2 = prod2*(xigll(dgr)-xigll(i))
@@ -127,10 +127,10 @@
     h(dgr)=prod1/prod2
 
     hprime(dgr)=0.0d0
-    do i=1,NGLL
+    do i = 1,NGLL
       if (i /= dgr) then
-        prod1=1.0d0
-        do j=1,NGLL
+        prod1 = 1.0d0
+        do j = 1,NGLL
           if (j /= dgr .and. j /= i) prod1 = prod1*(xi-xigll(j))
         enddo
         hprime(dgr) = hprime(dgr)+prod1

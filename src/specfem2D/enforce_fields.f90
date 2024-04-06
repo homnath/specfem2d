@@ -256,7 +256,7 @@ end module enforce_par
   ! safety check
   if (.not. USE_ENFORCE_FIELDS) return
 
-  f0 = 0.125d6 ! frequency ! (fd=200,f=50KHz) (fd=500,f=125KHz) (fd=800,f=200KHz)
+  f0 = 0.125d6 ! frequency ! (fd = 200,f = 50KHz) (fd = 500,f = 125KHz) (fd = 800,f = 200KHz)
   d = 4.0d-3 ! half width of the plate
   cp = 5960.0d0 ! Compressional waves velocity
   cs = 3260.d0 ! Shear waves velocity
@@ -405,7 +405,7 @@ end module enforce_par
     ux=(0.0,0.0)
     uz=(0.0,0.0)
 
-    omegaj=TWO*PI*f0
+    omegaj = TWO*PI*f0
 
     !DSP = weight = 0 at fmin and fmax
     ! this frequency range corresponds to the principal lobe of the DSP
@@ -420,17 +420,17 @@ end module enforce_par
     sum_uz = (0.0,0.0)
     sum_Weight = 0
 
-    do iweight=indexFdIn-Nweight,indexFdIn+Nweight
+    do iweight = indexFdIn-Nweight,indexFdIn+Nweight
         !fdin=fdmin+(iweight-1)*stepfd
         !freq=fdin/d
         cphase = cphaseVec(iweight)
         freq=fdVec(iweight)/d
-        omegaj=TWO*PI*freq
+        omegaj = TWO*PI*freq
         call Calculate_Weigth_Burst(Weigth_Burst,fc,freq,Nc)
         call calculateUxUz(ux,uz,z,cp,cs,d,omegaj,cphase,antisym)
-        sum_ux=sum_ux+Weigth_Burst*ux
-        sum_uz=sum_uz+Weigth_Burst*uz
-        sum_Weight=sum_Weight+Weigth_Burst
+        sum_ux = sum_ux+Weigth_Burst*ux
+        sum_uz = sum_uz+Weigth_Burst*uz
+        sum_Weight = sum_Weight+Weigth_Burst
 
 !        print *
 !        print *,'***************************************************'
@@ -442,8 +442,8 @@ end module enforce_par
 !        print *,'***************************************************'
 !        print *
     enddo
-    sum_ux=sum_ux/sum_Weight; ! division by the sum of weights
-    sum_uz=sum_uz/sum_Weight; ! of course ! it is a weighted Sum !
+    sum_ux = sum_ux/sum_Weight; ! division by the sum of weights
+    sum_uz = sum_uz/sum_Weight; ! of course ! it is a weighted Sum !
     !! but in fact, it does no matter because it must be OK up to a constant
 
   end subroutine weighted_sum_Lamb_disp
@@ -569,7 +569,7 @@ end module enforce_par
 
     do while(error == 0)    ! determine the number of line in the file
     read(7,*,iostat=error)
-    number_of_lines_in_file=number_of_lines_in_file+1
+    number_of_lines_in_file = number_of_lines_in_file+1
     enddo
     rewind 7 ! to restart at the begining of the file
 
@@ -654,20 +654,20 @@ subroutine Calculate_Weigth_Burst(Weigth_Burst,f0,freq,Nc)
     real(kind=CUSTOM_REAL) :: cste,den,M,f04,f,fbw1,fbw2
     ! SMALLVAL not TINYVAL because it does not work if val in too tiny !
 
-    fbw1=f0-f0/Nc
-    fbw2=f0+f0/Nc
+    fbw1 = f0-f0/Nc
+    fbw2 = f0+f0/Nc
 
-    f=freq-f0
+    f = freq-f0
     if (abs(f) < SMALLVAL) then
-    Weigth_Burst=1
+    Weigth_Burst = 1
     else if (abs(freq-fbw1) < SMALLVAL .or. abs(freq-fbw2) < SMALLVAL ) then
-    Weigth_Burst=0.5
+    Weigth_Burst = 0.5
     else
     M=sqrt(Nc**2/f0**2)    !max @ f0
     cste=sqrt(TWO)/TWO/PI/M
     den=(Nc**2*f**2-f0**2)**2*f**2
-    f04=f0**4
-    Weigth_Burst=cste*sqrt(-1.0*f04*(cos(2*Nc*PI*f/f0)-1)/den)
+    f04 = f0**4
+    Weigth_Burst = cste*sqrt(-1.0*f04*(cos(2*Nc*PI*f/f0)-1)/den)
     endif
 
 !~     print *
@@ -942,7 +942,7 @@ end subroutine Calculate_Weigth_Burst
         call exit_MPI(myrank,"Error reading real mode file")
       endif
       ! format: #depth #mode value
-      do i=1,nLines
+      do i = 1,nLines
         read(num_file,*) zmode(i),realMode(i)
       enddo
       ! closes external file
@@ -952,14 +952,14 @@ end subroutine Calculate_Weigth_Burst
         call exit_MPI(myrank,"Error reading imag mode file")
       endif
       ! format: #depth #mode value
-      do i=1,nLines
+      do i = 1,nLines
         read(num_file,*) zmode(i),imagMode(i)
       enddo
       ! closes external file
       close(num_file)
       neverRead = .false.
     endif
-    idx=searchInf(nLines,zmode,dble(z)) ! Look for index idx in sorted array zmode such as : zmode(idx) < z < zmode(idx+1)
+    idx = searchInf(nLines,zmode,dble(z)) ! Look for index idx in sorted array zmode such as : zmode(idx) < z < zmode(idx+1)
     ! Linear interpolation. Near to z: realMode = A*zmode+B
     A = (realMode(idx + 1) - realMode(idx))/(zmode(idx+1) - zmode(idx))
     B = (zmode(idx+1)*realMode(idx) - zmode(idx)*realMode(idx+1)) / (zmode(idx+1) - zmode(idx))

@@ -88,7 +88,7 @@
 
   implicit none
 
-  double precision, parameter    :: alphaGLJ=0.d0,betaGLJ=1.d0
+  double precision, parameter    :: alphaGLJ = 0.d0,betaGLJ = 1.d0
 
   integer :: NGLJ
 
@@ -107,8 +107,8 @@
 ! calculate derivatives of the GLJ quadrature polynomials
 ! and precalculate some products in double precision
 ! hprimeBar(i,j) = hBar'_j(xiglj_i) by definition of the derivation matrix
-  do i1=1,NGLJ
-    do i2=1,NGLJ
+  do i1 = 1,NGLJ
+    do i2 = 1,NGLJ
       hprimeBar_xx(i2,i1) = poly_deriv_GLJ(i1-1,i2-1,xiglj,NGLJ)
       hprimeBarwglj_xx(i2,i1) = wxglj(i2) * hprimeBar_xx(i2,i1)
     enddo

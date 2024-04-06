@@ -92,16 +92,16 @@
 
   do j = 1, 4
     if (j == 1) then
-      index_edge=3
+      index_edge = 3
       ibool_rotated(:,:) = ibool(:,:)
     else if (j == 2) then
-      index_edge=1
+      index_edge = 1
       ibool(:,:) = ibool_rotated(:,:)
     else if (j == 3) then
-      index_edge=4
+      index_edge = 4
       ibool(:,:) = ibool_rotated(:,:)
     else if (j == 4) then
-      index_edge=2
+      index_edge = 2
       ibool(:,:) = ibool_rotated(:,:)
     else
       call stop_the_code('j should be >= 1 and <= 4')
@@ -556,16 +556,16 @@
 
   do j = 1, 4
     if (j == 1) then
-      index_edge=3
+      index_edge = 3
       ibool_rotated(:,:) = ibool(:,:)
     else if (j == 2) then
-      index_edge=1
+      index_edge = 1
       ibool(:,:) = ibool_rotated(:,:)
     else if (j == 3) then
-      index_edge=4
+      index_edge = 4
       ibool(:,:) = ibool_rotated(:,:)
     else if (j == 4) then
-      index_edge=2
+      index_edge = 2
       ibool(:,:) = ibool_rotated(:,:)
     else
       call stop_the_code('j should be >= 1 and <= 4')

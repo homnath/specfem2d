@@ -67,7 +67,7 @@
   xgamma = 0.d0
   zgamma = 0.d0
 
-  do ia=1,ngnod
+  do ia = 1,ngnod
 
     nnum = knods(ia,ispec)
 
@@ -92,7 +92,7 @@
 ! print the coordinates of the mesh points of this element
     print *, 'ispec = ', ispec
     print *, 'ngnod = ', ngnod
-    do ia=1,ngnod
+    do ia = 1,ngnod
       nnum = knods(ia,ispec)
       xelm = coorg(1,nnum)
       zelm = coorg(2,nnum)

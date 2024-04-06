@@ -149,7 +149,7 @@ program filter_input_trace
             filesToFilter(i) = adjustl(trim(name)) ! assign a value to filesToFilter(i)
             inquire(file=filesToFilter(i),exist=fileExist) ! check if the file exists
             if (.not. fileExist) then
-              write(*,*)'File ',adjustl(trim(filesToFilter(i))),' not found.'
+              write(*,*) 'File ',adjustl(trim(filesToFilter(i))),' not found.'
               write(*,*) "Nothing has been done!"
               stop
             endif
@@ -329,7 +329,7 @@ subroutine rekurs(x,y,ndat,a,b1,b2,npoles,iflag)
      do i = 2, npoles
         z(i) = a(i)*(z(i-1)-z2(i-1))-b1(i)*z1(i)-b2(i)*z2(i)
      enddo
-     x2=x1
+     x2 = x1
      x1=x(n)
      do i = 1, npoles
         z2(i) =z1(i)
@@ -354,10 +354,10 @@ subroutine rekurs(x,y,ndat,a,b1,b2,npoles,iflag)
 
   do n = ndat, 1, -1
      z(1) = a(1)*(y(n)-x2)-b1(1)*z1(1)-b2(1)*z2(1)
-     do i =2, npoles
+     do i = 2, npoles
         z(i) = a(i)*(z(i-1)-z2(i-1))-b1(i)*z1(i)-b2(i)*z2(i)
      enddo
-     x2=x1
+     x2 = x1
      x1=y(n)
      do i = 1,npoles
         z2(i)=z1(i)
@@ -393,23 +393,23 @@ subroutine bpcoeff(f1,f2,npoles,dt,a,b1,b2)
   w2=d2*tan(2.d0*pi*f2/d2)
   w0=0.5*(w2-w1)
 
-  i=1
-  npol2=npoles/2+1
-  do n =1,npoles
+  i = 1
+  npol2 = npoles/2+1
+  do n = 1,npoles
      p = cexp(cmplx(0.d0,dble(2*n-1+npoles)*pi/dble(2*npoles)))
      t1 = p*cmplx(w0,0.d0)
      t2 = sqrt(t1*t1-cmplx(w1*w2,0.d0))
      s(i)=t1+t2
      s(i+1)=t1-t2
-     i=i+2
+     i = i+2
   enddo
 
-  do n=1,npoles
-     ssum=2*real(s(n))
-     sprod=dble(s(n)*conjg(s(n)))
-     fact1=d2*d2-d2*ssum+sprod
+  do n = 1,npoles
+     ssum = 2*real(s(n))
+     sprod = dble(s(n)*conjg(s(n)))
+     fact1 = d2*d2-d2*ssum+sprod
      fact2=2.d0*(sprod-d2*d2)
-     fact3=d2*d2+d2*ssum+sprod
+     fact3 = d2*d2+d2*ssum+sprod
      a(n)=2.d0*d2*w0/fact1
      b1(n)=fact2/fact1
      b2(n)=fact3/fact1

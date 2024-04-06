@@ -463,9 +463,9 @@
         ! recovering original velocities and accelerations on boundaries (elastic side)
 !        if (i_stage==1 .or. i_stage==2 .or. i_stage==3) then
 
-!        if (i_stage == 1)weight_rk = 0.5d0
-!        if (i_stage == 2)weight_rk = 0.5d0
-!        if (i_stage == 3)weight_rk = 1.0d0
+!        if (i_stage == 1) weight_rk = 0.5d0
+!        if (i_stage == 2) weight_rk = 0.5d0
+!        if (i_stage == 3) weight_rk = 1.0d0
 
 !        veloc_elastic(1,iglob) = veloc_elastic_initial_rk(1,iglob) - weight_rk * accel_elastic_rk(1,iglob,i_stage)
 !        veloc_elastic(2,iglob) = veloc_elastic_initial_rk(2,iglob) - weight_rk * accel_elastic_rk(2,iglob,i_stage)
@@ -505,9 +505,9 @@
         ! recovering original velocities and accelerations on boundaries (poro side)
 !        if (i_stage==1 .or. i_stage==2 .or. i_stage==3) then
 
-!        if (i_stage == 1)weight_rk = 0.5d0
-!        if (i_stage == 2)weight_rk = 0.5d0
-!        if (i_stage == 3)weight_rk = 1.0d0
+!        if (i_stage == 1) weight_rk = 0.5d0
+!        if (i_stage == 2) weight_rk = 0.5d0
+!        if (i_stage == 3) weight_rk = 1.0d0
 
 !        velocs_poroelastic(1,iglob) = velocs_poroelastic_initial_rk(1,iglob) - weight_rk * accels_poroelastic_rk(1,iglob,i_stage)
 !  velocs_poroelastic(2,iglob) = velocs_poroelastic_initial_rk(2,iglob) - weight_rk * accels_poroelastic_rk(2,iglob,i_stage)
@@ -560,9 +560,9 @@
 
  !       if (i_stage==1 .or. i_stage==2 .or. i_stage==3) then
 
- !       if (i_stage == 1)weight_rk = 0.5d0
- !       if (i_stage == 2)weight_rk = 0.5d0
- !       if (i_stage == 3)weight_rk = 1.0d0
+ !       if (i_stage == 1) weight_rk = 0.5d0
+ !       if (i_stage == 2) weight_rk = 0.5d0
+ !       if (i_stage == 3) weight_rk = 1.0d0
 
  !       veloc_elastic(1,iglob) = veloc_elastic_initial_rk(1,iglob) + weight_rk * accel_elastic_rk(1,iglob,i_stage)
  !       veloc_elastic(2,iglob) = veloc_elastic_initial_rk(2,iglob) + weight_rk * accel_elastic_rk(2,iglob,i_stage)
@@ -599,9 +599,9 @@
 
  !       if (i_stage==1 .or. i_stage==2 .or. i_stage==3) then
 
- !       if (i_stage == 1)weight_rk = 0.5d0
- !       if (i_stage == 2)weight_rk = 0.5d0
- !       if (i_stage == 3)weight_rk = 1.0d0
+ !       if (i_stage == 1) weight_rk = 0.5d0
+ !       if (i_stage == 2) weight_rk = 0.5d0
+ !       if (i_stage == 3) weight_rk = 1.0d0
 
  !       velocs_poroelastic(1,iglob) = velocs_poroelastic_initial_rk(1,iglob) + weight_rk * accels_poroelastic_rk(1,iglob,i_stage)
  ! velocs_poroelastic(2,iglob) = velocs_poroelastic_initial_rk(2,iglob) + weight_rk * accels_poroelastic_rk(2,iglob,i_stage)

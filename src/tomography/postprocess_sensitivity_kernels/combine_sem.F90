@@ -110,7 +110,7 @@ program combine_sem
   call parse_kernel_names(kernel_names_comma_delimited,kernel_names,nker)
 
   ! parse paths from INPUT_FILE
-  npath=0
+  npath = 0
   open(unit = IIN, file = trim(input_file), status = 'old',iostat = ier)
   if (ier /= 0) then
      print *,'Error opening ',trim(input_file)

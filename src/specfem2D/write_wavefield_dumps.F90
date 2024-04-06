@@ -372,7 +372,7 @@
     endif
 
     ! Write file content
-    do ii=1, size(dump_write, 2)
+    do ii = 1, size(dump_write, 2)
 
       if (use_binary_for_wavefield_dumps) then
         if (P_SV) then
@@ -441,7 +441,7 @@
       allocate(duplicate_index_mask(count(dump_duplicate_gather)))
 
       ! Might be inefficient to reform the entire index array every time, but avoids storage.
-      duplicate_index = pack([(jj, jj=1, size(dump_gather, 2))], dump_duplicate_gather)
+      duplicate_index = pack([(jj, jj = 1, size(dump_gather, 2))], dump_duplicate_gather)
       ! Search for duplicates of first entry still marked as duplicates.
       duplicate_index_mask = dump_gather(1,duplicate_index(1)) == dump_gather(1,duplicate_index) .and. &
                              dump_gather(2,duplicate_index(1)) == dump_gather(2,duplicate_index)

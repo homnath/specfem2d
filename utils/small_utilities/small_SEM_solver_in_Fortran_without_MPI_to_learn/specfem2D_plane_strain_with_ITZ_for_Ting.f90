@@ -250,8 +250,8 @@
 
 ! create the knods array
   ispec = 0
-  do j=0,nelem_z/2-1
-    do i=0,nelem_x-1
+  do j = 0,nelem_z/2-1
+    do i = 0,nelem_x-1
       ispec = ispec + 1
       knods(1,ispec) = num(i,j,nelem_x)
       knods(2,ispec) = num(i+1,j,nelem_x)
@@ -294,8 +294,8 @@
   enddo
 
 ! create the knods array
-  do j=0,nelem_z/2-1
-    do i=0,nelem_x-1
+  do j = 0,nelem_z/2-1
+    do i = 0,nelem_x-1
       ispec = ispec + 1
       knods(1,ispec) = num(i,j,nelem_x) + value_to_add_to_knods
       knods(2,ispec) = num(i+1,j,nelem_x) + value_to_add_to_knods

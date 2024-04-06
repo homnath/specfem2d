@@ -278,7 +278,7 @@
   write(24,*) '% spectral element mesh'
   write(24,*) '%'
 
-  do ispec=1,NSPEC
+  do ispec = 1,NSPEC
 
   write(24,*) '% elem ',ispec
 
@@ -293,31 +293,31 @@
 
 ! draw straight lines for the element edges (if drawing curved elements with 9 nodes, they will thus appear with no curvature)
 
-  ir=NGLLX
+  ir = NGLLX
   x2 = (coord(1,ibool(ir,is,ispec))-xmin)*ratio_page + orig_x
   z2 = (coord(2,ibool(ir,is,ispec))-zmin)*ratio_page + orig_z
   x2 = x2 * centim
   z2 = z2 * centim
   write(24,681) x2,z2
 
-  ir=NGLLX
-  is=NGLLZ
+  ir = NGLLX
+  is = NGLLZ
   x2 = (coord(1,ibool(ir,is,ispec))-xmin)*ratio_page + orig_x
   z2 = (coord(2,ibool(ir,is,ispec))-zmin)*ratio_page + orig_z
   x2 = x2 * centim
   z2 = z2 * centim
   write(24,681) x2,z2
 
-  is=NGLLZ
-  ir=1
+  is = NGLLZ
+  ir = 1
   x2 = (coord(1,ibool(ir,is,ispec))-xmin)*ratio_page + orig_x
   z2 = (coord(2,ibool(ir,is,ispec))-zmin)*ratio_page + orig_z
   x2 = x2 * centim
   z2 = z2 * centim
   write(24,681) x2,z2
 
-  ir=1
-  is=2
+  ir = 1
+  is = 2
   x2 = (coord(1,ibool(ir,is,ispec))-xmin)*ratio_page + orig_x
   z2 = (coord(2,ibool(ir,is,ispec))-zmin)*ratio_page + orig_z
   x2 = x2 * centim
@@ -354,7 +354,7 @@
   write(24,*) '0 setgray'
 
 ! draw the vectors at all the GLL nodes of the mesh
-  do ipoin=1,NGLOB
+  do ipoin = 1,NGLOB
 
   x1 =(coord(1,ipoin)-xmin)*ratio_page
   z1 =(coord(2,ipoin)-zmin)*ratio_page

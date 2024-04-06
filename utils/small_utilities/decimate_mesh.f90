@@ -7,12 +7,12 @@ program subdivide_mesh
   ! Number of nodes per elements.
   integer, parameter  :: ESIZE = 4
   ! Max number of neighbors per elements.
-  integer,parameter  :: max_neighbor=30
+  integer,parameter  :: max_neighbor = 30
   ! Max number of elements that can contain the same node.
-  integer, parameter  :: nsize=20
+  integer, parameter  :: nsize = 20
 
 
-  integer, parameter  :: NSUB=2
+  integer, parameter  :: NSUB = 2
 
   integer :: nspec
   integer, dimension(:,:), allocatable  :: elmnts
@@ -72,7 +72,7 @@ program subdivide_mesh
 ! set up local geometric tolerances
   xtypdist=+HUGEVAL
 
-  do ispec=1,nspec
+  do ispec = 1,nspec
 
   xminval=+HUGEVAL
   yminval=+HUGEVAL
@@ -80,10 +80,10 @@ program subdivide_mesh
   ymaxval=-HUGEVAL
 
   do inode = 1, 4
-     xmaxval=max(nodes_coords(1,elmnts(inode,ispec)),xmaxval)
-     xminval=min(nodes_coords(1,elmnts(inode,ispec)),xminval)
-     ymaxval=max(nodes_coords(2,elmnts(inode,ispec)),ymaxval)
-     yminval=min(nodes_coords(2,elmnts(inode,ispec)),yminval)
+     xmaxval = max(nodes_coords(1,elmnts(inode,ispec)),xmaxval)
+     xminval = min(nodes_coords(1,elmnts(inode,ispec)),xminval)
+     ymaxval = max(nodes_coords(2,elmnts(inode,ispec)),ymaxval)
+     yminval = min(nodes_coords(2,elmnts(inode,ispec)),yminval)
   enddo
 
 ! compute the minimum typical "size" of an element in the mesh
@@ -93,7 +93,7 @@ program subdivide_mesh
   enddo
 
 ! define a tolerance, small with respect to the minimum size
-  xtol=smallvaltol*xtypdist
+  xtol = smallvaltol*xtypdist
 
   print *, 'facteur de tolerance XTOL = ', xtol
 
@@ -260,9 +260,9 @@ end program subdivide_mesh
     ! Number of nodes per elements.
     integer, parameter  :: ESIZE = 4
     ! Max number of neighbors per elements.
-    integer,parameter  :: max_neighbor=30
+    integer,parameter  :: max_neighbor = 30
     ! Max number of elements that can contain the same node.
-    integer, parameter  :: nsize=20
+    integer, parameter  :: nsize = 20
 
 
     integer, intent(in)  :: nelmnts

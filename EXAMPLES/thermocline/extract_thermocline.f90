@@ -20,9 +20,9 @@
   read(*,*)
 
 ! in the PNM format, the image starts in the upper-left corner
-  do iy=NY,1,-1
+  do iy = NY,1,-1
     first_red_pixel_in_this_line = .true.
-    do ix=1,NX
+    do ix = 1,NX
       read(*,*) R
       read(*,*) G
       read(*,*) B
