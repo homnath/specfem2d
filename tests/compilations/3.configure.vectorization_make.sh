@@ -2,10 +2,10 @@
 ###################################################
 
 # test name
-NAME="configure.1.parallel_make"
+NAME="configure.3.vectorization_make"
 
 # configuration parameters
-CONF_PARAM="--with-mpi"
+CONF_PARAM="--enable-openmp --enable-vectorization"
 
 ###################################################
 

@@ -2,10 +2,10 @@
 ###################################################
 
 # test name
-NAME="configure.1.parallel_make"
+NAME="configure.2.openmp_make"
 
 # configuration parameters
-CONF_PARAM="--with-mpi"
+CONF_PARAM="--with-mpi --enable-openmp --enable-debug"
 
 ###################################################
 
