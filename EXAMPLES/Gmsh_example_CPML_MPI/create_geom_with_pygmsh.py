@@ -53,6 +53,12 @@ class rectangles:
                                         mat_tag=mat_tag, pml_tag=pml_tag, bound_tag=bound_tag))
         self.n_rects += 1
 
+
+    # add pml layers
+    # Currently only works for one column of rectangles
+    # but it is easy to update for multiple columns, which only requires
+    # additional lines to detect the leftmost and rightmost rectangles
+    # + multiple top/bottom rectangles
     def add_pml_layers(self, geom, w_pml, lc_pml, top_pml=False):
         # find the bottom and top rectangle
         ave_y_min = 1e10
