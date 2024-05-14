@@ -7,28 +7,31 @@ This is the velocity profile set:
 
                  vmin
                o----------------> velocity (m/s)
-               |   |   /
-               |   |  /
-               |   | /  gradient : -d1
-          ZMIN |___|/
-               |    \
+               |   |   //
+               |   |  //
+               |   | //  gradient : -d1
+          ZMIN |___|//
+               |    \\
                |      -
-               |        \  gradient : d2
+               |        \\  gradient : d2
                |          -
-               |            \
+               |            \\
      Depth (m) v
 
 How to use external velocity model in specfem (03/20/2017) :
 
-To set an arbitrary velocity model you have to use the option TOMOGRAPHY_FILE that I have implemented and that you have to set like that in the Par_file when you define the velocity model:
+To set an arbitrary velocity model you have to use the option TOMOGRAPHY_FILE that I have implemented,
+and you have to set it like that in the Par_file when you define the velocity model:
 
 2 -1 9999 9999 9999 9999 9999 9999 9999 0 0 0 0 0 0
 
 # external tomography file
 TOMOGRAPHY_FILE                 = ./profile.xyz
 
-The program understand that the velocity model number 2 has to be read in the file profile.xyz as a regular grid it will then deal with the interpolation. You can set what you want in place of the 9999, it does not matter.
-The file profile.xyz has to be written under the following format:
+The program understands that the velocity model number 2 has to be read in the file profile.xyz as a regular grid;
+it will then deal with the interpolation. You can set what you want in place of the 9999, it doesn't matter.
+
+The file profile.xyz has to be written using the following format:
 
   ! The xyz file TOMOGRAPHY_FILE that describe the tomography should be located in the TOMOGRAPHY_PATH
   ! directory, set in the Par_file. The format of the file, as read from define_external_model_from_xyz_file.f90 looks like :
@@ -70,14 +73,16 @@ The file profile.xyz has to be written under the following format:
   !  coordinate (from ORIGIN_X to END_X with step of SPACING_X) for each given z (from ORIGIN_Z
   !  to END_Z, with step of SPACING_Z).
 
-This is a working script writing such file for a 1D profile (velocity depending just on depth). Read carefully all the comments but in particular the lines containing "!!WARNING!!" that I have added for
+This is a working script, writing such a file for a 1D profile (velocity depending just on depth).
+Read carefully all the comments, in particular the lines containing "!!WARNING!!" that I have added for
 people who need range dependent models.
 
 run that script ./createTomographyFile.py and look at the file profile.xyz created.
 
 In the case of range dependent models vp, vs and rho will be 2D arrays, you have to modify that.
 
-For the moment just one model can be read from an external file but it is not very difficult to implement that. Likewise viscoelastic parameters can not vary with position for now.
+For the moment just one model can be read from an external file, but it is not very difficult to implement that.
+Likewise, viscoelastic parameters can not vary with position for now.
 
 @author: alexis bottero (alexis dot bottero at gmail dot com)
 """
