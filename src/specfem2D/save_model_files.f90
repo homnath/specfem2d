@@ -44,6 +44,8 @@
   integer :: i,ispec,j,iglob
   integer :: ier
   real(kind=4),dimension(:,:,:),allocatable :: rho_save, vp_save, vs_save, kappa_save, x_save, z_save, Qkappa_save,Qmu_save
+  real(kind=4),dimension(:,:,:,:),allocatable :: spermittivity_save, sconductivity_save
+  real(kind=4),dimension(:,:,:),allocatable :: inv_magpermeability_save
   double precision :: rhol
   character(len=MAX_STRING_LEN) :: filename
 
@@ -97,9 +99,22 @@
     Qkappa_save(:,:,:) = 0.0
   endif
 
+  if (any_electromagnetic) then
+    allocate(spermittivity_save(2,NGLLX,NGLLZ,nspec),stat=ier)
+    if (ier /= 0) call exit_MPI(myrank, 'error allocating save model arrays 09')
+    spermittivity_save(:,:,:,:) = 0.0
+     allocate(sconductivity_save(2,NGLLX,NGLLZ,nspec),stat=ier)
+    if (ier /= 0) call exit_MPI(myrank, 'error allocating save model arrays 10')
+    sconductivity_save(:,:,:,:) = 0.0
+     allocate(inv_magpermeability_save(NGLLX,NGLLZ,nspec),stat=ier)
+    if (ier /= 0) call exit_MPI(myrank, 'error allocating save model arrays 11')
+    inv_magpermeability_save(:,:,:) = 0.0
+  endif
+
   do ispec = 1,nspec
     do j = 1,NGLLZ
       do i = 1,NGLLX
+       if (.not. any_electromagnetic) then
         rhol = rhostore(i,j,ispec)
         vp_save(i,j,ispec) = rho_vpstore(i,j,ispec) / rhol
         vs_save(i,j,ispec) = rho_vsstore(i,j,ispec) / rhol
@@ -118,6 +133,11 @@
           Qkappa_save(i,j,ispec) = qkappa_attenuation_store(i,j,ispec)
           Qmu_save(i,j,ispec) = qmu_attenuation_store(i,j,ispec)
         endif
+       else
+          spermittivity_save(:,i,j,ispec) = spermittivitystore(:,i,j,ispec)
+          sconductivity_save(:,i,j,ispec) = sconductivitystore(:,i,j,ispec)
+          inv_magpermeability_save(i,j,ispec) = inv_magpermeabilitystore(i,j,ispec)
+       endif
       enddo
     enddo
   enddo
@@ -162,27 +182,6 @@
 
   else if ((trim(SAVE_MODEL) == 'binary') .or. (trim(SAVE_MODEL) == 'gll')) then
     ! binary and GLL format
-    write(filename,'(a,i6.6,a)') trim(IN_DATA_FILES)//'proc',myrank,'_rho.bin'
-    open(unit=172,file=trim(filename),status='unknown',form='unformatted',iostat=ier)
-    if (ier /= 0) call exit_MPI(myrank,'Error opening model file proc**_rho.bin')
-    write(172) rho_save
-    close(172)
-    if (myrank == 0) write(IMAIN,*) '  written to file(s): ',trim(filename)
-
-    write(filename,'(a,i6.6,a)') trim(IN_DATA_FILES)//'proc',myrank,'_vp.bin'
-    open(unit=172,file=trim(filename),status='unknown',form='unformatted',iostat=ier)
-    if (ier /= 0) call exit_MPI(myrank,'Error opening model file proc**_vp.bin')
-    write(172) vp_save
-    close(172)
-    if (myrank == 0) write(IMAIN,*) '  written to file(s): ',trim(filename)
-
-    write(filename,'(a,i6.6,a)') trim(IN_DATA_FILES)//'proc',myrank,'_vs.bin'
-    open(unit=172,file=trim(filename),status='unknown',form='unformatted',iostat=ier)
-    if (ier /= 0) call exit_MPI(myrank,'Error opening model file proc**_vs.bin')
-    write(172) vs_save
-    close(172)
-    if (myrank == 0) write(IMAIN,*) '  written to file(s): ',trim(filename)
-
     write(filename,'(a,i6.6,a)') trim(IN_DATA_FILES)//'proc',myrank,'_x.bin'
     open(unit=172,file=trim(filename),status='unknown',form='unformatted',iostat=ier)
     if (ier /= 0) call exit_MPI(myrank,'Error opening model file proc**_x.bin')
@@ -201,6 +200,28 @@
     open(unit=172,file=trim(filename),status='unknown',form='unformatted',iostat=ier)
     if (ier /= 0) call exit_MPI(myrank,'Error opening model file proc**_jacobian.bin')
     write(172) jacobian
+    close(172)
+    if (myrank == 0) write(IMAIN,*) '  written to file(s): ',trim(filename)
+
+     if (.not. any_electromagnetic) then
+    write(filename,'(a,i6.6,a)') trim(IN_DATA_FILES)//'proc',myrank,'_rho.bin'
+    open(unit=172,file=trim(filename),status='unknown',form='unformatted',iostat=ier)
+    if (ier /= 0) call exit_MPI(myrank,'Error opening model file proc**_rho.bin')
+    write(172) rho_save
+    close(172)
+    if (myrank == 0) write(IMAIN,*) '  written to file(s): ',trim(filename)
+
+    write(filename,'(a,i6.6,a)') trim(IN_DATA_FILES)//'proc',myrank,'_vp.bin'
+    open(unit=172,file=trim(filename),status='unknown',form='unformatted',iostat=ier)
+    if (ier /= 0) call exit_MPI(myrank,'Error opening model file proc**_vp.bin')
+    write(172) vp_save
+    close(172)
+    if (myrank == 0) write(IMAIN,*) '  written to file(s): ',trim(filename)
+
+    write(filename,'(a,i6.6,a)') trim(IN_DATA_FILES)//'proc',myrank,'_vs.bin'
+    open(unit=172,file=trim(filename),status='unknown',form='unformatted',iostat=ier)
+    if (ier /= 0) call exit_MPI(myrank,'Error opening model file proc**_vs.bin')
+    write(172) vs_save
     close(172)
     if (myrank == 0) write(IMAIN,*) '  written to file(s): ',trim(filename)
 
@@ -228,7 +249,30 @@
       close(172)
       if (myrank == 0) write(IMAIN,*) '  written to file(s): ',trim(filename)
     endif
+     else
+      write(filename,'(a,i6.6,a)') trim(IN_DATA_FILES)//'proc',myrank,'_permittivity.bin'
+      open(unit=172,file=trim(filename),status='unknown',form='unformatted',iostat=ier)
+      if (ier /= 0) call exit_MPI(myrank,'Error opening model file proc**_permittivity.bin')
+      write(172) spermittivity_save(1,:,:,:)
+      write(172) spermittivity_save(2,:,:,:)
+      close(172)
+      if (myrank == 0) write(IMAIN,*) '  written to file(s): ',trim(filename)
 
+      write(filename,'(a,i6.6,a)') trim(IN_DATA_FILES)//'proc',myrank,'_conductivity.bin'
+      open(unit=172,file=trim(filename),status='unknown',form='unformatted',iostat=ier)
+      if (ier /= 0) call exit_MPI(myrank,'Error opening model file proc**_conductivity.bin')
+      write(172) sconductivity_save(1,:,:,:)
+      write(172) sconductivity_save(2,:,:,:)
+      close(172)
+      if (myrank == 0) write(IMAIN,*) '  written to file(s): ',trim(filename)
+
+      write(filename,'(a,i6.6,a)') trim(IN_DATA_FILES)//'proc',myrank,'_invmagpermeability.bin'
+      open(unit=172,file=trim(filename),status='unknown',form='unformatted',iostat=ier)
+      if (ier /= 0) call exit_MPI(myrank,'Error opening model file proc**_invmagpermeability.bin')
+      write(172) inv_magpermeability_save
+      close(172)
+      if (myrank == 0) write(IMAIN,*) '  written to file(s): ',trim(filename)
+     endif 
   else
     call stop_the_code('Save Model not implemented for external and tomo')
   endif !Type of model

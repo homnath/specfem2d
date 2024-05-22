@@ -1,8 +1,8 @@
-#-----------------------------------------------------------
+#-----------------------------------------------------------------------------
 #
-# Simulation input parameters
+# simulation input parameters
 #
-#-----------------------------------------------------------
+#-----------------------------------------------------------------------------
 
 # title of job
 title                           = Test
@@ -17,7 +17,7 @@ NOISE_TOMOGRAPHY                = 0
 SAVE_FORWARD                    = .true.
 
 # parameters concerning partitioning
-NPROC                           = 1              # number of processes
+NPROC                           = 1
 
 # time step parameters
 # total number of time steps
@@ -30,7 +30,7 @@ DT                              = 1.1d-3
 # 1 = Newmark (2nd order), 2 = LDDRK4-6 (4th-order 6-stage low storage Runge-Kutta), 3 = classical RK4 4th-order 4-stage Runge-Kutta
 time_stepping_scheme            = 1
 
-# set the type of calculation (P-SV or SH/membrane waves)
+# set the type of calculation (P-SV (EM TE) or SH/membrane waves (EM TM))
 P_SV                            = .true.
 
 # axisymmetric (2.5D) or Cartesian planar (2D) simulation
@@ -72,20 +72,20 @@ SAVE_MODEL                      = default
 # (used for tomography materials with negative material ids and/or MODEL==tomo settings)
 TOMOGRAPHY_FILE                 = ./DATA/tomo_file.xyz
 
-#-----------------------------------------------------------
+#-----------------------------------------------------------------------------
 #
 # Attenuation
 #
-#-----------------------------------------------------------
+#-----------------------------------------------------------------------------
 
 # attenuation parameters
 ATTENUATION_VISCOELASTIC        = .false.        # turn attenuation (viscoelasticity) on or off for non-poroelastic solid parts of the model
 ATTENUATION_VISCOACOUSTIC       = .false.        # turn attenuation (viscoacousticity) on or off for non-poroelastic fluid parts of the model
 
-# for viscoelastic or viscoacoustic attenuation
+# for viscoelastic attenuation
 N_SLS                           = 3              # number of standard linear solids for attenuation (3 is usually the minimum)
-ATTENUATION_f0_REFERENCE        = 5.196152422706633 # in case of attenuation, reference frequency in Hz at which the velocity values in the velocity model are given (unused otherwise); relevant only if source is a Dirac or a Heaviside, otherwise it is automatically set to f0 the dominant frequency of the source in the DATA/SOURCE file
-READ_VELOCITIES_AT_f0           = .false.        # read seismic velocities at ATTENUATION_f0_REFERENCE instead of at infinite frequency (see user manual for more information)
+ATTENUATION_f0_REFERENCE        = 5.196152422706633 # (Hz) relevant only if source is a Dirac or a Heaviside, otherwise it is f0 the dominant frequency of the source in the DATA/SOURCE file
+READ_VELOCITIES_AT_f0           = .false.        # shift velocities to account for physical dispersion (see user manual for more information)
 USE_SOLVOPT                     = .false.        # use more precise but much more expensive way of determining the Q factor relaxation times, as in https://doi.org/10.1093/gji/ggw024
 
 # for poroelastic attenuation
@@ -93,8 +93,13 @@ ATTENUATION_PORO_FLUID_PART     = .false.        # turn viscous attenuation on o
 Q0_poroelastic                  = 1              # quality factor for viscous attenuation (ignore it if you are not using a poroelastic material)
 freq0_poroelastic               = 10             # frequency for viscous attenuation (ignore it if you are not using a poroelastic material)
 
-# to undo attenuation and/or PMLs for sensitivity kernel calculations or forward runs with SAVE_FORWARD
-# use the flag below. It performs undoing of attenuation and/or of PMLs in an exact way for sensitivity kernel calculations
+# for electromagnetic attenuation
+ATTENUATION_PERMITTIVITY        = .false.        # turn permittivity (Zener model) attenuation on or off for electromagnetic material
+ATTENUATION_CONDUCTIVITY        = .false.        # turn conductivity (Kelvin-Voigt model) attenuation on or off for electromagnetic material
+f0_electromagnetic              = 1d9            # (Hz) relevant only if source is a Dirac or a Heaviside, otherwise it is f0 the dominant frequency of the source in the DATA/SOURCE file
+
+# to undo attenuation for sensitivity kernel calculations or forward runs with SAVE_FORWARD
+# use the flag below. It performs undoing of attenuation in an exact way for sensitivity kernel calculations
 # but requires disk space for temporary storage, and uses a significant amount of memory used as buffers for temporary storage.
 # When that option is on the second parameter indicates how often the code dumps restart files to disk (if in doubt, use something between 100 and 1000).
 UNDO_ATTENUATION_AND_OR_PML     = .false.
@@ -104,11 +109,11 @@ NT_DUMP_ATTENUATION             = 500
 # Outperforms conventional mode using a value of NTSTEP_BETWEEN_COMPUTE_KERNELS high enough.
 NO_BACKWARD_RECONSTRUCTION      = .false.
 
-#-----------------------------------------------------------
+#-----------------------------------------------------------------------------
 #
 # Sources
 #
-#-----------------------------------------------------------
+#-----------------------------------------------------------------------------
 
 # source parameters
 NSOURCES                        = 1              # number of sources (source information is then read from the DATA/SOURCE file)
@@ -137,14 +142,14 @@ noise_source_time_function_type = 4
 # This is only useful for GPU version (for now)
 write_moving_sources_database   = .false.
 
-#-----------------------------------------------------------
+#-----------------------------------------------------------------------------
 #
 # Receivers
 #
-#-----------------------------------------------------------
+#-----------------------------------------------------------------------------
 
 # receiver set parameters for recording stations (i.e. recording points)
-# seismotype : record 1=displ 2=veloc 3=accel 4=pressure 5=curl of displ 6=the fluid potential
+# record 1=displ 2=veloc 3=accel 4=pressure 5=curl of displ 6=the fluid potential 7=electric field
 seismotype                      = 6              # several values can be chosen. For example : 1,2,4
 
 # interval in time steps for writing of seismograms
@@ -188,11 +193,11 @@ zfin                            = 1500.          # last receiver z in meters (ig
 record_at_surface_same_vertical = .false.        # receivers inside the medium or at the surface
 
 
-#-----------------------------------------------------------
+#-----------------------------------------------------------------------------
 #
-# adjoint kernel outputs
+# Adjoint kernel outputs
 #
-#-----------------------------------------------------------
+#-----------------------------------------------------------------------------
 
 # save sensitivity kernels in ASCII format (much bigger files, but compatible with current GMT scripts) or in binary format
 save_ASCII_kernels              = .true.
@@ -203,11 +208,11 @@ NTSTEP_BETWEEN_COMPUTE_KERNELS  = 1
 # outputs approximate Hessian for preconditioning
 APPROXIMATE_HESS_KL             = .false.
 
-#-----------------------------------------------------------
+#-----------------------------------------------------------------------------
 #
 # Boundary conditions
 #
-#-----------------------------------------------------------
+#-----------------------------------------------------------------------------
 
 # Perfectly Matched Layer (PML) boundaries
 # absorbing boundary active or not
@@ -232,11 +237,11 @@ STACEY_ABSORBING_CONDITIONS     = .true.
 ADD_PERIODIC_CONDITIONS         = .false.
 PERIODIC_HORIZ_DIST             = 0.3597d0
 
-#-----------------------------------------------------------
+#-----------------------------------------------------------------------------
 #
 # MESHING - Velocity and density models
 #
-#-----------------------------------------------------------
+#-----------------------------------------------------------------------------
 
 # use an external mesh created by an external meshing tool or use the internal mesher
 read_external_mesh              = .false.
@@ -265,7 +270,6 @@ tangential_detection_curve_file = dummy                                   # file
 # PARAMETERS FOR INTERNAL MESHING
 #
 #-----------------------------------------------------------
-
 # material properties
 # number of model materials
 nbmodels                        = 4
@@ -310,11 +314,11 @@ nbregions                       = 3              # then set below the different 
 41  60  1 60 1
 61 100  1 60 2
 
-#-----------------------------------------------------------
+#-----------------------------------------------------------------------------
 #
 # Display parameters
 #
-#-----------------------------------------------------------
+#-----------------------------------------------------------------------------
 
 # interval at which we output time step info and max of norm of displacement
 # (every how many time steps we display information about the simulation. costly, do not use a very small value)
@@ -335,11 +339,11 @@ NTSTEP_BETWEEN_OUTPUT_ENERGY    = 10
 # the script utils/visualisation/plotIntegratedEnergyFile.py to watch. It is refreshed at the same time than the seismograms
 COMPUTE_INTEGRATED_ENERGY_FIELD = .false.
 
-#-----------------------------------------------------------
+#-----------------------------------------------------------------------------
 #
 # Movies/images/snaphots visualizations
 #
-#-----------------------------------------------------------
+#-----------------------------------------------------------------------------
 
 # every how many time steps we draw JPEG or PostScript pictures of the simulation
 # and/or we dump results of the simulation as ASCII or binary files (costly, do not use a very small value)
@@ -392,9 +396,9 @@ use_binary_for_wavefield_dumps  = .false.        # use ASCII or single-precision
 # When that option is on, of course the number of processor cores used to start
 # the code in the batch system must be a multiple of NUMBER_OF_SIMULTANEOUS_RUNS,
 # all the individual runs must use the same number of processor cores,
-# which as usual is NPROC in the Par_file,
+# which as usual is proc in the Par_file,
 # and thus the total number of processor cores to request from the batch system
-# should be NUMBER_OF_SIMULTANEOUS_RUNS * NPROC.
+# should be NUMBER_OF_SIMULTANEOUS_RUNS * proc.
 # All the runs to perform must be placed in directories called run0001, run0002, run0003 and so on
 # (with exactly four digits).
 #

@@ -39,7 +39,7 @@
 
   use constants, only: TINYVAL,VERYTINYVAL,HUGEVAL,STABILITY_THRESHOLD,OUTPUT_FILES,IMAIN
 
-  use specfem_par, only: myrank,it,NSOURCES,P_SV,nrec,SIMULATION_TYPE
+  use specfem_par, only: myrank,it,NSOURCES,nrec,SIMULATION_TYPE
 
   use shared_parameters, only: cutsnaps,USE_SNAPSHOT_NUMBER_IN_FILENAME,POWER_DISPLAY_COLOR, &
     DRAW_SOURCES_AND_RECEIVERS, &
@@ -155,7 +155,7 @@
       else if (abs(image_color_data(ix,iy)) < amplitude_max * cutsnaps) then
 
         ! use P velocity model as background where amplitude is negligible
-        if ((P_SV) .and. ((vpmax-vpmin)/max(vpmin, TINYVAL) > 0.02d0)) then
+        if ((vpmax-vpmin)/max(vpmin, TINYVAL) > 0.02d0) then
           if (abs(vpmax - vpmin) > TINYVAL) then
             x1 = (image_color_vp_display(ix,iy)-vpmin)/(vpmax-vpmin)
           else

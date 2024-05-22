@@ -200,6 +200,45 @@
         close(IOUT)
       endif
     endif ! poroelastic
+
+    if (any_electromagnetic) then
+      !--- left absorbing boundary
+      if (nspec_left > 0) then
+        write(outputname,'(a,i6.6,a)') 'absorb_electromagnetic_left',myrank,'.bin'
+        open(unit=IOUT,file=trim(OUTPUT_FILES)//outputname,status='unknown',form='unformatted',iostat=ier)
+        if (ier /= 0) call exit_MPI(myrank,'Error opening absorbing boundary file')
+        ! writes boundary contributions
+        write(IOUT) b_absorb_electromagnetic_left
+        close(IOUT)
+      endif
+      !--- right absorbing boundary
+      if (nspec_right > 0) then
+        write(outputname,'(a,i6.6,a)') 'absorb_electromagnetic_right',myrank,'.bin'
+        open(unit=IOUT,file=trim(OUTPUT_FILES)//outputname,status='unknown',form='unformatted',iostat=ier)
+        if (ier /= 0) call exit_MPI(myrank,'Error opening absorbing boundary file')
+        ! writes boundary contributions
+        write(IOUT) b_absorb_electromagnetic_right
+        close(IOUT)
+      endif
+      !--- bottom absorbing boundary
+      if (nspec_bottom > 0) then
+        write(outputname,'(a,i6.6,a)') 'absorb_electromagnetic_bottom',myrank,'.bin'
+        open(unit=IOUT,file=trim(OUTPUT_FILES)//outputname,status='unknown',form='unformatted',iostat=ier)
+        if (ier /= 0) call exit_MPI(myrank,'Error opening absorbing boundary file')
+        ! writes boundary contributions
+        write(IOUT) b_absorb_electromagnetic_bottom
+        close(IOUT)
+      endif
+      !--- top absorbing boundary
+      if (nspec_top > 0) then
+        write(outputname,'(a,i6.6,a)') 'absorb_electromagnetic_top',myrank,'.bin'
+        open(unit=IOUT,file=trim(OUTPUT_FILES)//outputname,status='unknown',form='unformatted',iostat=ier)
+        if (ier /= 0) call exit_MPI(myrank,'Error opening absorbing boundary file')
+        ! writes boundary contributions
+        write(IOUT) b_absorb_electromagnetic_top
+        close(IOUT)
+      endif
+    endif !any electromagnetic
   endif ! STACEY_ABSORBING_CONDITIONS
 
   ! PML
@@ -264,5 +303,21 @@
     write(IOUT) potential_dot_dot_acoustic
     close(IOUT)
   endif ! acoustic
+
+  if (any_electromagnetic) then
+    ! user output
+    if (myrank == 0) then
+      write(IMAIN,*) 'Saving electromagetic last frame...'
+      call flush_IMAIN()
+    endif
+
+    write(outputname,'(a,i6.6,a)') 'lastframe_electromagnetic',myrank,'.bin'
+    open(unit=IOUT,file=trim(OUTPUT_FILES)//trim(outputname),status='unknown',form='unformatted',iostat=ier)
+    if (ier /= 0) call exit_MPI(myrank,'Error opening file lastframe_electromagnetic**.bin')
+    write(IOUT) displ_electromagnetic
+    write(IOUT) veloc_electromagnetic
+    write(IOUT) accel_electromagnetic
+    close(IOUT)
+  endif ! electromagnetic
 
   end subroutine save_forward_arrays

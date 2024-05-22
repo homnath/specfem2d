@@ -113,6 +113,10 @@
     call bcast_all_singledp(Q0_poroelastic)
     call bcast_all_singledp(freq0_poroelastic)
 
+    call bcast_all_singlel(ATTENUATION_PERMITTIVITY)
+    call bcast_all_singlel(ATTENUATION_CONDUCTIVITY)
+    call bcast_all_singledp(f0_electromagnetic)
+
     call bcast_all_singlel(UNDO_ATTENUATION_AND_OR_PML)
     call bcast_all_singlei(NT_DUMP_ATTENUATION)
 
@@ -550,6 +554,28 @@
   if (err_occurred() /= 0) then
     some_parameters_missing_from_Par_file = .true.
     write(*,'(a)') 'freq0_poroelastic               = 10'
+    write(*,*)
+  endif
+
+  ! read attenuation parameters (electromagnetic media)
+  call read_value_logical_p(ATTENUATION_PERMITTIVITY, 'ATTENUATION_PERMITTIVITY')
+  if (err_occurred() /= 0) then
+    some_parameters_missing_from_Par_file = .true.
+    write(*,'(a)') 'ATTENUATION_PERMITTIVITY        = .false.'
+    write(*,*)
+  endif
+    
+  call read_value_logical_p(ATTENUATION_CONDUCTIVITY, 'ATTENUATION_CONDUCTIVITY')
+  if (err_occurred() /= 0) then
+    some_parameters_missing_from_Par_file = .true.
+    write(*,'(a)') 'ATTENUATION_CONDUCTIVITY       = .false.'
+    write(*,*)
+  endif
+    
+  call read_value_double_precision_p(f0_electromagnetic, 'f0_electromagnetic')
+  if (err_occurred() /= 0) then
+    some_parameters_missing_from_Par_file = .true.
+    write(*,'(a)') 'f0_electromagnetic                  = 1000'
     write(*,*)
   endif
 

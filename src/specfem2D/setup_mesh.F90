@@ -542,7 +542,9 @@
   real(kind=CUSTOM_REAL), dimension(:,:,:), allocatable :: QKappa_attenuationext,Qmu_attenuationext
   real(kind=CUSTOM_REAL), dimension(:,:,:), allocatable :: c11ext,c12ext,c13ext,c15ext,c22ext,c23ext,c25ext, &
                                                            c33ext,c35ext,c55ext
-
+  real(kind=CUSTOM_REAL), dimension(:,:,:,:), allocatable :: spermittivityext,sconductivityext
+  real(kind=CUSTOM_REAL), dimension(:,:,:), allocatable :: inv_magpermeabilityext
+  
   ! for shifting of velocities if needed in the case of viscoelasticity
   double precision :: vp,vs,rhol,mul,lambdal,kappal,qmul,qkappal
   double precision :: phi,tort,kappa_s,kappa_f,kappa_fr,mu_s,mu_fr
@@ -550,18 +552,24 @@
   double precision :: D_biot,H_biot,C_biot,M_biot
   double precision :: cpIsquare,cpIIsquare,cssquare,vpII
   double precision :: perm_xx,perm_xz,perm_zz
+  double precision :: condlxx,condlzz
+  double precision :: permlxx,permlzz
+  double precision :: two_inv_magpermeability
+  double precision :: cpxsquare,cpzsquare
+  double precision, dimension(2):: econdl,eperml
 
   ! stats
   double precision :: tmp_val
   double precision :: vpmin_glob,vpmax_glob,vsmin_glob,vsmax_glob,rhomin_glob,rhomax_glob
   double precision :: qkappamin_glob,qkappamax_glob,qmumin_glob,qmumax_glob
   double precision :: vpIImin_glob,vpIImax_glob,phimin_glob,phimax_glob
+  double precision :: vEmin_glob,vEmax_glob
   double precision :: c11min_glob,c11max_glob,c12min_glob,c12max_glob,c13min_glob,c13max_glob,c15min_glob,c15max_glob
   double precision :: c22min_glob,c22max_glob,c23min_glob,c23max_glob,c25min_glob,c25max_glob
   double precision :: c33min_glob,c33max_glob,c35min_glob,c35max_glob
   double precision :: c55min_glob,c55max_glob
 
-  logical :: has_poroelasticity, has_anisotropy
+  logical :: has_elasticity, has_poroelasticity, has_anisotropy, has_electromagnetic
 
   ! vtk output
   character(len=MAX_STRING_LEN) :: filename,prname
@@ -598,10 +606,15 @@
   allocate(vpext(NGLLX,NGLLZ,nspec_ext), &
            vsext(NGLLX,NGLLZ,nspec_ext), &
            rhoext(NGLLX,NGLLZ,nspec_ext), &
+           spermittivityext(2,NGLLX,NGLLZ,nspec_ext), &
+           sconductivityext(2,NGLLX,NGLLZ,nspec_ext), &
+           inv_magpermeabilityext(NGLLX,NGLLZ,nspec_ext), &
            QKappa_attenuationext(NGLLX,NGLLZ,nspec_ext), &
            Qmu_attenuationext(NGLLX,NGLLZ,nspec_ext),stat=ier)
   if (ier /= 0) call stop_the_code('Error allocating external model arrays for vp vs rho attenuation')
   vpext(:,:,:) = 0.0_CUSTOM_REAL; vsext(:,:,:) = 0.0_CUSTOM_REAL; rhoext(:,:,:) = 0.0_CUSTOM_REAL
+  spermittivityext(:,:,:,:) = 0.0_CUSTOM_REAL; sconductivityext(:,:,:,:) = 0.0_CUSTOM_REAL
+  inv_magpermeabilityext(:,:,:) = 0.0_CUSTOM_REAL
   QKappa_attenuationext(:,:,:) = 0.0_CUSTOM_REAL
   Qmu_attenuationext(:,:,:) = 0.0_CUSTOM_REAL
 
@@ -635,8 +648,10 @@
     endif
 
     call read_external_model(rhoext,vpext,vsext,QKappa_attenuationext,Qmu_attenuationext, &
-                             nspec_ext,c11ext,c12ext,c13ext,c15ext,c22ext,c23ext,c25ext,c33ext,c35ext,c55ext)
+                             nspec_ext,c11ext,c12ext,c13ext,c15ext,c22ext,c23ext,c25ext,c33ext,c35ext,c55ext, &
+                             spermittivityext,sconductivityext,inv_magpermeabilityext)
   endif
+
 
   ! allocates material arrays (acoustic/elastic/poroelastic - isotropic)
   allocate(kappastore(NGLLX,NGLLZ,nspec), &
@@ -647,7 +662,6 @@
            rho_vpstore(NGLLX,NGLLZ,nspec), &
            rho_vsstore(NGLLX,NGLLZ,nspec),stat=ier)
   if (ier /= 0) call stop_the_code('Error allocating material arrays')
-
   kappastore(:,:,:) = 0.0_CUSTOM_REAL
   mustore(:,:,:) = 0.0_CUSTOM_REAL
   rhostore(:,:,:) = 0.0_CUSTOM_REAL
@@ -688,6 +702,28 @@
   phimin_glob = +HUGEVAL
   phimax_glob = 0.d0
 
+ ! electromagnetic materials
+  if (any_electromagnetic) then
+    nspec_tmp = nspec
+  else
+    nspec_tmp = 1  ! for dummy allocation
+  endif
+
+! allocates arrays (needed if electromagnetic domains present in this slice)
+  allocate(spermittivitystore(2,NGLLX,NGLLZ,nspec_tmp), &
+           sconductivitystore(2,NGLLX,NGLLZ,nspec_tmp), &
+           inv_magpermeabilitystore(NGLLX,NGLLZ,nspec_tmp), &
+           vEstore(NGLLX,NGLLZ,nspec_tmp), stat=ier)
+  if (ier /= 0) call stop_the_code('Error allocating electromagnetic material arrays')
+  spermittivitystore(:,:,:,:) = 0.0_CUSTOM_REAL
+  sconductivitystore(:,:,:,:) = 0.0_CUSTOM_REAL
+  inv_magpermeabilitystore(:,:,:) = 0.0_CUSTOM_REAL
+  vEstore(:,:,:) = 0.0_CUSTOM_REAL
+
+  ! for stats
+  vEmin_glob = +HUGEVAL
+  vEmax_glob = 0.d0
+
   ! user output
   if (myrank == 0) then
     write(IMAIN,*) '  setting up material arrays'
@@ -700,7 +736,8 @@
     do j = 1,NGLLZ
       do i = 1,NGLLX
         ! gets material values
-        if (use_external_velocity_model) then
+       if (.not.ispec_is_electromagnetic(ispec)) then
+         if (use_external_velocity_model) then
           ! external model
           rhol = rhoext(i,j,ispec)
           vp = vpext(i,j,ispec)
@@ -731,7 +768,7 @@
           !attenuation
           qmul = Qmu_attenuationext(i,j,ispec)
           qkappal = QKappa_attenuationext(i,j,ispec)
-        else
+         else
           ! internal mesh
           imaterial = kmato(ispec)
 
@@ -749,7 +786,7 @@
           ! attenuation
           qmul = Qmu_attenuationcoef(imaterial)
           qkappal = Qkappa_attenuationcoef(imaterial)
-        endif
+         endif
 
         ! note: poroelastic materials are only defined using internal meshes so far, no external model defines it yet.
         !       in future, this might change and the corresponding arrays might have to be taken below.
@@ -820,6 +857,41 @@
 
         rho_vpstore(i,j,ispec) = rhol * vp
         rho_vsstore(i,j,ispec) = rhol * vs
+
+       else if (ispec_is_electromagnetic(ispec)) then
+       ! material is electromagnetic
+         if (use_external_velocity_model) then
+         ! external model
+          permlxx = spermittivityext(1,i,j,ispec)  !e11
+          permlzz = spermittivityext(2,i,j,ispec)  !e33
+          condlxx = sconductivityext(1,i,j,ispec)  !sig11
+          condlzz = sconductivityext(2,i,j,ispec)  !sig33 
+          two_inv_magpermeability = 2.d0 * inv_magpermeabilityext(i,j,ispec) !2mu0^-1
+         else
+         ! internal mesh
+          permlxx = spermittivity(1,kmato(ispec))   !e11
+          permlzz = spermittivity(2,kmato(ispec))   !e33
+          condlxx = sconductivity(1,kmato(ispec))   !sig11
+          condlzz = sconductivity(2,kmato(ispec))   !sig33 
+          two_inv_magpermeability = 2.d0 * inv_magpermeability(kmato(ispec)) !2mu0^-1
+         endif
+
+         call get_electromagnetic_velocities(cpxsquare,cpzsquare,econdl,eperml,ATTENUATION_CONDUCTIVITY, &
+             ATTENUATION_PERMITTIVITY,f0_electromagnetic,Qe11_electromagnetic(kmato(ispec)),Qe33_electromagnetic(kmato(ispec)),&
+             Qs11_electromagnetic(kmato(ispec)),Qs33_electromagnetic(kmato(ispec)), &
+             permlxx,permlzz,condlxx,condlzz,two_inv_magpermeability)
+
+        ! stores 
+        vEstore(i,j,ispec)=max(sqrt(cpxsquare),sqrt(cpzsquare)) 
+        spermittivitystore(1,i,j,ispec)=permlxx
+        spermittivitystore(2,i,j,ispec)=permlzz
+        sconductivitystore(1,i,j,ispec)=condlxx
+        sconductivitystore(2,i,j,ispec)=condlzz
+        inv_magpermeabilitystore(i,j,ispec)=two_inv_magpermeability/2.d0
+
+        vEmin_glob = min(vEmin_glob,max(sqrt(cpxsquare),sqrt(cpzsquare))) 
+        vEmax_glob = max(vEmax_glob,max(sqrt(cpxsquare),sqrt(cpzsquare)))  
+       endif
       enddo
     enddo
   enddo
@@ -910,8 +982,13 @@
   deallocate(rhoext,vpext,vsext)
   deallocate(QKappa_attenuationext,Qmu_attenuationext)
   deallocate(c11ext,c13ext,c15ext,c33ext,c35ext,c55ext,c12ext,c23ext,c25ext,c22ext)
+  deallocate(spermittivityext,sconductivityext,inv_magpermeabilityext)
 
   ! stats
+  ! poroelasticity 
+  ! check if any poroelastic elements in domains
+  call any_all_l(any_elastic,has_elasticity)
+  if (has_elasticity) then
   ! rho
   tmp_val = minval(rhostore)
   call min_all_dp(tmp_val, rhomin_glob)
@@ -946,6 +1023,7 @@
   call min_all_dp(tmp_val, qmumin_glob)
   tmp_val = maxval(qmu_attenuation_store)
   call max_all_dp(tmp_val, qmumax_glob)
+  endif
 
   ! poroelasticity
   ! check if any poroelastic elements in domains
@@ -961,6 +1039,17 @@
     call min_all_dp(tmp_val, phimin_glob)
     tmp_val = phimax_glob
     call max_all_dp(tmp_val, phimax_glob)
+  endif
+
+  ! elecromagnetic
+  ! check if any electromagnetic elements in domains
+  call any_all_l(any_electromagnetic,has_electromagnetic)
+  if (has_electromagnetic) then
+    ! vE
+    tmp_val = vEmin_glob
+    call min_all_dp(tmp_val, vEmin_glob)
+    tmp_val = vEmax_glob
+    call max_all_dp(tmp_val, vEmax_glob)
   endif
 
   ! anisotropy
@@ -1023,15 +1112,22 @@
 
   ! user output
   if (myrank == 0) then
+    if (has_elasticity) then
     write(IMAIN,*)
     write(IMAIN,*) '  rho : min/max = ',sngl(rhomin_glob),'/',sngl(rhomax_glob)
     write(IMAIN,*) '  vs  : min/max = ',sngl(vsmin_glob),'/',sngl(vsmax_glob)
     write(IMAIN,*) '  vp  : min/max = ',sngl(vpmin_glob),'/',sngl(vpmax_glob)
     write(IMAIN,*)
+    endif
     if (has_poroelasticity) then
       write(IMAIN,*) '  poroelasticity:'
       write(IMAIN,*) '    vpII: min/max = ',sngl(vpIImin_glob),'/',sngl(vpIImax_glob)
       write(IMAIN,*) '    phi : min/max = ',sngl(phimin_glob),'/',sngl(phimax_glob)
+      write(IMAIN,*)
+    endif
+    if (has_electromagnetic) then
+      write(IMAIN,*) '  electromagnetic:'
+      write(IMAIN,*) '    vE: min/max = ',sngl(vEmin_glob),'/',sngl(vEmax_glob)
       write(IMAIN,*)
     endif
     if (has_anisotropy) then
@@ -1065,6 +1161,7 @@
     zstore(:) = coord(2,:)
     write(prname,"(a,i5.5,a)") trim(OUTPUT_FILES)//'mesh',myrank,'_'
 
+    if (any_elastic) then
     ! vs
     tmp_store(:,:,:) = sqrt( mustore / rhostore )
     filename = trim(prname) // 'vs'
@@ -1091,7 +1188,7 @@
     call write_VTK_data_gll_dp(nspec,nglob,ibool,xstore,zstore,tmp_store,filename)
     ! user output
     if (myrank == 0) write(IMAIN,*) '  written file: ',trim(filename) // '.vtk'
-
+    endif
 
     if (any_poroelastic) then
       ! vpII
@@ -1104,6 +1201,15 @@
       ! phi
       tmp_store(:,:,:) = phistore(:,:,:)
       filename = trim(prname) // 'phi'
+      call write_VTK_data_gll_dp(nspec,nglob,ibool,xstore,zstore,tmp_store,filename)
+      ! user output
+      if (myrank == 0) write(IMAIN,*) '  written file: ',trim(filename) // '.vtk'
+    endif
+
+    if (any_electromagnetic) then
+      ! vE
+      tmp_store(:,:,:) = vEstore(:,:,:)
+      filename = trim(prname) // 'vE'
       call write_VTK_data_gll_dp(nspec,nglob,ibool,xstore,zstore,tmp_store,filename)
       ! user output
       if (myrank == 0) write(IMAIN,*) '  written file: ',trim(filename) // '.vtk'
@@ -1167,15 +1273,25 @@
     if (ispec_is_acoustic(ispec) .and. ispec_is_poroelastic(ispec)) &
       call stop_the_code('Error invalid domain element found! element is acoustic and poroelastic, please check...')
 
+    if (ispec_is_acoustic(ispec) .and. ispec_is_electromagnetic(ispec)) &
+      stop 'Error invalid domain element found! element is acoustic and electromagnetic, please check...'
+
     if (ispec_is_elastic(ispec) .and. ispec_is_poroelastic(ispec)) &
       call stop_the_code('Error invalid domain element found! element is elastic and poroelastic, please check...')
+
+    if (ispec_is_elastic(ispec) .and. ispec_is_electromagnetic(ispec)) &
+      stop 'Error invalid domain element found! element is elastic and electromagnetic, please check...'
+
+    if (ispec_is_poroelastic(ispec) .and. ispec_is_electromagnetic(ispec)) &
+      stop 'Error invalid domain element found! element is poroelastic and electromagnetic, please check...'
 
     ! un-assigned element
     if ((.not. ispec_is_acoustic(ispec)) .and. &
         (.not. ispec_is_elastic(ispec)) .and. &
+        (.not. ispec_is_electromagnetic(ispec)) .and. &
         (.not. ispec_is_poroelastic(ispec))) &
-      call stop_the_code('Error invalid domain element found! element has no domain (acoustic, elastic, or poroelastic), &
-            & please check...')
+      call stop_the_code('Error invalid domain element found! element has no domain (acoustic, elastic, poroelastic, &
+                           & or electromagnetic), please check...')
   enddo
 
   ! synchronizes all processes
@@ -1199,7 +1315,7 @@
   implicit none
 
   ! local parameters
-  integer :: nspec_acoustic_all,nspec_elastic_all,nspec_poroelastic_all,nspec_anisotropic_all
+  integer :: nspec_acoustic_all,nspec_elastic_all,nspec_poroelastic_all,nspec_anisotropic_all,nspec_electromagnetic_all
   integer :: nspec_total,nspec_in_domains
 
   ! re-counts domain elements
@@ -1210,6 +1326,7 @@
   call sum_all_i(nspec_elastic,nspec_elastic_all)
   call sum_all_i(nspec_poroelastic,nspec_poroelastic_all)
   call sum_all_i(nspec_aniso,nspec_anisotropic_all)
+  call sum_all_i(nspec_electromagnetic,nspec_electromagnetic_all)
 
   ! user output
   if (myrank == 0) then
@@ -1220,9 +1337,10 @@
       write(IMAIN,*) '    with number of anisotropic elements         = ',nspec_anisotropic_all
     endif
     write(IMAIN,*) '  total number of poroelastic elements     = ',nspec_poroelastic_all
+    write(IMAIN,*) '  total number of electromagnetic elements     = ',nspec_electromagnetic_all
   endif
 
-  nspec_in_domains = nspec_acoustic_all + nspec_elastic_all + nspec_poroelastic_all
+  nspec_in_domains = nspec_acoustic_all + nspec_elastic_all + nspec_poroelastic_all + nspec_electromagnetic_all
 
   ! checks with total
   call sum_all_i(nspec,nspec_total)
@@ -1242,6 +1360,7 @@
   call any_all_l(any_elastic, ELASTIC_SIMULATION)
   call any_all_l(any_acoustic, ACOUSTIC_SIMULATION)
   call any_all_l(any_poroelastic, POROELASTIC_SIMULATION)
+  call any_all_l(any_electromagnetic, ELECTROMAGNETIC_SIMULATION)
 
   ! check for solid attenuation
   if (.not. ELASTIC_SIMULATION .and. .not. ACOUSTIC_SIMULATION) then

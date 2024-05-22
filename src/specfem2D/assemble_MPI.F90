@@ -53,10 +53,11 @@
 
   use specfem_par, only: NPROC,ninterface,my_neighbors,N_SLS,ATTENUATION_VISCOACOUSTIC
 
-  ! acoustic/elastic/poroelastic interfaces
+  ! acoustic/elastic/poroelastic/electromagnetic interfaces
   use specfem_par, only: max_ibool_interfaces_size_ac,max_ibool_interfaces_size_el,max_ibool_interfaces_size_po, &
     ibool_interfaces_acoustic,ibool_interfaces_elastic,ibool_interfaces_poroelastic, &
-    nibool_interfaces_acoustic,nibool_interfaces_elastic,nibool_interfaces_poroelastic
+    nibool_interfaces_acoustic,nibool_interfaces_elastic,nibool_interfaces_poroelastic, &
+    max_ibool_interfaces_size_em,ibool_interfaces_electromagnetic,nibool_interfaces_electromagnetic
 
   implicit none
 
@@ -86,6 +87,7 @@
   ! in order to handle the C deltat / 2 contribution of the Stacey conditions to the mass matrix
   real(kind=CUSTOM_REAL), dimension(max_ibool_interfaces_size_ac + &
     NDIM * max_ibool_interfaces_size_el + &
+    NDIM * max_ibool_interfaces_size_em + &
     2 * max_ibool_interfaces_size_po + &
     n_sls_loc*max_ibool_interfaces_size_ac, ninterface)  :: buffer_send_faces_scalar, buffer_recv_faces_scalar
 
@@ -129,9 +131,19 @@
         buffer_send_faces_scalar(ipoin,iinterface) = array_val4(iglob)
       enddo
 
+      ! electromagnetic
+      do idim = 1,NDIM
+        do i = 1, nibool_interfaces_electromagnetic(iinterface)
+          ipoin = ipoin + 1
+          iglob = ibool_interfaces_electromagnetic(i,iinterface)
+          buffer_send_faces_scalar(ipoin,iinterface) = array_val5(idim,iglob)
+        enddo
+      enddo
+
       ! total number of points in buffer
       nbuffer_points = nibool_interfaces_acoustic(iinterface) &
                       + NDIM*nibool_interfaces_elastic(iinterface) &
+                      + NDIM*nibool_interfaces_electromagnetic(iinterface) &
                       + 2*nibool_interfaces_poroelastic(iinterface)
 
       if (ATTENUATION_VISCOACOUSTIC .and. (.not. USE_A_STRONG_FORMULATION_FOR_E1)) then
@@ -196,6 +208,15 @@
         ipoin = ipoin + 1
         iglob = ibool_interfaces_poroelastic(i,iinterface)
         array_val4(iglob) = array_val4(iglob) + buffer_recv_faces_scalar(ipoin,iinterface)
+      enddo
+
+      ! electromagnetic
+      do idim = 1,NDIM
+        do i = 1, nibool_interfaces_electromagnetic(iinterface)
+          ipoin = ipoin + 1
+          iglob = ibool_interfaces_electromagnetic(i,iinterface)
+          array_val5(idim,iglob) = array_val5(idim,iglob) + buffer_recv_faces_scalar(ipoin,iinterface)
+        enddo
       enddo
 
       if (ATTENUATION_VISCOACOUSTIC .and. (.not. USE_A_STRONG_FORMULATION_FOR_E1)) then
@@ -1111,6 +1132,234 @@
   endif
 
   end subroutine assemble_MPI_vector_po_w
+
+
+!-------------------------------------------------------------------------------------------------
+!
+! electromagnetic domains
+!
+!-------------------------------------------------------------------------------------------------
+
+
+#ifdef USE_MPI
+! only supported with parallel version...
+
+!-----------------------------------------------
+! Assembling accel_electromagnetic for electromagnetic elements :
+! the buffers are filled, the ISEND and IRECV are started here, then
+! contributions are added.
+! The previous version included communication overlap using persistent
+! communication, but the merging of the outer and inner elements rendered
+! overlap no longer possible, while persistent communications were removed
+! because trace tool MPITrace does not yet instrument those.
+! Particular care should be taken concerning possible optimizations of the
+! communication scheme.
+!-----------------------------------------------
+! note: although it uses asynchronuous isend/irecv, the routine is waiting to
+! have all buffers transfered.
+!       the scheme is therefore similar to a blocking MPI scheme.
+
+  subroutine assemble_MPI_vector_em_blocking(array_val)
+
+  use constants, only: CUSTOM_REAL,NDIM
+
+  use specfem_par, only: NPROC, &
+    nglob,ninterface_electromagnetic, &
+    inum_interfaces_electromagnetic, &
+    ibool_interfaces_electromagnetic, nibool_interfaces_electromagnetic, &
+    request_send_recv_electromagnetic, &
+    buffer_send_faces_vector_em, &
+    buffer_recv_faces_vector_em, &
+    my_neighbors
+
+  implicit none
+  include "mpif.h"
+  include "precision.h"
+
+  ! array to assemble
+  real(kind=CUSTOM_REAL), dimension(NDIM,nglob), intent(inout) :: array_val
+
+  ! local parameters
+  integer  :: ipoin, num_interface, iinterface, i
+
+  ! assemble only if more than one partition
+  if (NPROC > 1) then
+
+    ! fills buffer
+    do iinterface = 1, ninterface_electromagnetic
+
+       num_interface = inum_interfaces_electromagnetic(iinterface)
+
+       ipoin = 0
+       do i = 1, nibool_interfaces_electromagnetic(num_interface)
+        buffer_send_faces_vector_em(ipoin+1:ipoin+NDIM,iinterface) = array_val(:,ibool_interfaces_electromagnetic(i,num_interface))
+        ipoin = ipoin + NDIM
+       enddo
+    enddo
+
+    ! send/receive with neighbors
+    do iinterface = 1, ninterface_electromagnetic
+
+      num_interface = inum_interfaces_electromagnetic(iinterface)
+
+      call isend_cr(buffer_send_faces_vector_em(1,iinterface),NDIM * nibool_interfaces_electromagnetic(num_interface), &
+                      my_neighbors(num_interface),12,request_send_recv_electromagnetic(iinterface))
+
+      call irecv_cr(buffer_recv_faces_vector_em(1,iinterface),NDIM * nibool_interfaces_electromagnetic(num_interface), &
+                    my_neighbors(num_interface), 12, request_send_recv_electromagnetic(ninterface_electromagnetic+iinterface))
+
+    enddo
+
+    ! waits for all send/receive has finished
+    do iinterface = 1, ninterface_electromagnetic*2
+      call wait_req(request_send_recv_electromagnetic(iinterface))
+    enddo
+
+    ! adds contributions
+    do iinterface = 1, ninterface_electromagnetic
+
+       num_interface = inum_interfaces_electromagnetic(iinterface)
+
+       ipoin = 0
+       do i = 1, nibool_interfaces_electromagnetic(num_interface)
+          array_val(:,ibool_interfaces_electromagnetic(i,num_interface)) = &
+              array_val(:,ibool_interfaces_electromagnetic(i,num_interface)) + buffer_recv_faces_vector_em(ipoin+1:ipoin+NDIM,iinterface)
+          ipoin = ipoin + NDIM
+       enddo
+
+    enddo
+
+  endif
+
+  end subroutine assemble_MPI_vector_em_blocking
+
+#endif
+
+!
+!-------------------------------------------------------------------------------------------------
+!
+
+
+  subroutine assemble_MPI_vector_em_s(array_val)
+
+! sends MPI buffers (asynchronuous) - non-blocking routine
+
+  use constants, only: CUSTOM_REAL,NDIM
+
+  use specfem_par, only: NPROC, &
+    nglob,ninterface_electromagnetic, &
+    inum_interfaces_electromagnetic, &
+    ibool_interfaces_electromagnetic, nibool_interfaces_electromagnetic, &
+    request_send_recv_electromagnetic, &
+    buffer_send_faces_vector_em, &
+    buffer_recv_faces_vector_em, &
+    my_neighbors
+
+  implicit none
+
+  ! array to assemble
+  real(kind=CUSTOM_REAL), dimension(NDIM,nglob), intent(inout) :: array_val
+
+  ! local parameters
+  integer  :: ipoin, num_interface, iinterface, i
+  integer, parameter :: itag = 12
+
+  ! assemble only if more than one partition
+  if (NPROC > 1) then
+
+    ! fills buffer
+    do iinterface = 1, ninterface_electromagnetic
+
+       num_interface = inum_interfaces_electromagnetic(iinterface)
+
+       ipoin = 0
+       do i = 1, nibool_interfaces_electromagnetic(num_interface)
+          buffer_send_faces_vector_em(ipoin+1:ipoin+NDIM,iinterface) = &
+                   array_val(:,ibool_interfaces_electromagnetic(i,num_interface))
+          ipoin = ipoin + NDIM
+       enddo
+    enddo
+
+    ! send/request messages
+    do iinterface = 1, ninterface_electromagnetic
+
+      num_interface = inum_interfaces_electromagnetic(iinterface)
+
+      call isend_cr( buffer_send_faces_vector_em(1,iinterface), &
+                     NDIM * nibool_interfaces_electromagnetic(num_interface), &
+                     my_neighbors(num_interface), &
+                     itag, &
+                     request_send_recv_electromagnetic(iinterface) )
+
+      call irecv_cr( buffer_recv_faces_vector_em(1,iinterface), &
+                     NDIM * nibool_interfaces_electromagnetic(num_interface), &
+                     my_neighbors(num_interface), &
+                     itag, &
+                     request_send_recv_electromagnetic(ninterface_electromagnetic+iinterface) )
+    enddo
+
+  endif
+
+  end subroutine assemble_MPI_vector_em_s
+
+!
+!-------------------------------------------------------------------------------------------------
+!
+
+
+
+  subroutine assemble_MPI_vector_em_w(array_val)
+
+! waits for data and assembles
+
+  use constants, only: CUSTOM_REAL,NDIM
+
+  use specfem_par, only: NPROC, &
+    nglob,ninterface_electromagnetic, &
+    inum_interfaces_electromagnetic, &
+    ibool_interfaces_electromagnetic, nibool_interfaces_electromagnetic, &
+    request_send_recv_electromagnetic,buffer_recv_faces_vector_em
+
+  implicit none
+
+  ! array to assemble
+  real(kind=CUSTOM_REAL), dimension(NDIM,nglob), intent(inout) :: array_val
+
+  ! local parameters
+  integer  :: ipoin, num_interface, iinterface, i
+
+  ! assemble only if more than one partition
+  if (NPROC > 1) then
+
+    ! waits for communication complection (all receive has finished)
+    do iinterface = 1, ninterface_electromagnetic
+      call wait_req(request_send_recv_electromagnetic(ninterface_electromagnetic+iinterface))
+    enddo
+
+    ! adds contributions
+    do iinterface = 1, ninterface_electromagnetic
+
+       num_interface = inum_interfaces_electromagnetic(iinterface)
+
+       ipoin = 0
+       do i = 1, nibool_interfaces_electromagnetic(num_interface)
+          array_val(:,ibool_interfaces_electromagnetic(i,num_interface)) = &
+              array_val(:,ibool_interfaces_electromagnetic(i,num_interface)) + &
+              buffer_recv_faces_vector_em(ipoin+1:ipoin+NDIM,iinterface)
+          ipoin = ipoin + NDIM
+       enddo
+
+    enddo
+
+    ! waits for communication completion (all send has finished, we can clear
+    ! the buffer...)
+    do iinterface = 1, ninterface_electromagnetic
+      call wait_req(request_send_recv_electromagnetic(iinterface))
+    enddo
+
+  endif
+
+  end subroutine assemble_MPI_vector_em_w
 
 
 

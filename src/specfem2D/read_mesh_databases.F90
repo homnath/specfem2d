@@ -241,6 +241,8 @@
 
   read(IIN) local_dble,local_dble ! Q0_poroelastic,freq0_poroelastic
 
+  read(IIN) local_l1,local_l2,local_dble ! ATTENUATION_PERMITTIVITY,ATTENUATION_CONDUCTIVITY,f0_electromagnetic 
+
   read(IIN) local_l ! AXISYM
   if (local_l .neqv. AXISYM) then
      print *,'Warning: rank ',myrank,' read mesh: AXISYM setting changed'
@@ -435,7 +437,6 @@
 
   ! material properties
   call read_mesh_databases_mato()
-
   ! add a small crack (discontinuity) in the medium manually
   if (ADD_A_SMALL_CRACK_IN_THE_MEDIUM) call add_manual_crack()
 
@@ -568,6 +569,16 @@
            Qmu_attenuationcoef(numat),stat=ier)
   if (ier /= 0) call stop_the_code('Error allocating attenuation arrays')
 
+  allocate(spermittivity(2,numat), &
+           sconductivity(2,numat), &
+           inv_magpermeability(numat),stat=ier)
+  if (ier /= 0) stop 'Error allocating permittivity,.. arrays'
+
+  allocate(Qe11_electromagnetic(numat), &
+           Qe33_electromagnetic(numat), &
+           Qs11_electromagnetic(numat), &
+           Qs33_electromagnetic(numat),stat=ier)
+  if (ier /= 0) stop 'Error allocating electromagnetic attenuation arrays'
 
   ! output formats
 107 format(/1x,'-- Spectral Elements --',//)
@@ -727,25 +738,29 @@
     allocate(ibool_interfaces_acoustic(NGLLX*max_interface_size,ninterface), &
              ibool_interfaces_elastic(NGLLX*max_interface_size,ninterface), &
              ibool_interfaces_poroelastic(NGLLX*max_interface_size,ninterface), &
+             ibool_interfaces_electromagnetic(NGLLX*max_interface_size,ninterface), &
              ibool_interfaces_ext_mesh_init(NGLLX*max_interface_size,ninterface),stat=ier)
     if (ier /= 0) call stop_the_code('Error allocating interfaces ibool arrays')
 
     allocate(nibool_interfaces_acoustic(ninterface), &
              nibool_interfaces_elastic(ninterface), &
              nibool_interfaces_poroelastic(ninterface), &
+             nibool_interfaces_electromagnetic(ninterface), &
              nibool_interfaces_ext_mesh(ninterface), &
              inum_interfaces_acoustic(ninterface), &
              inum_interfaces_elastic(ninterface), &
-             inum_interfaces_poroelastic(ninterface),stat=ier)
+             inum_interfaces_poroelastic(ninterface), &
+             inum_interfaces_electromagnetic(ninterface),stat=ier)
     if (ier /= 0) call stop_the_code('Error allocating interfaces nibool arrays')
   else
     ! dummy
     allocate(my_neighbors(1),my_nelmnts_neighbors(1),my_interfaces(1,1,1))
     allocate(ibool_interfaces_acoustic(1,1),ibool_interfaces_elastic(1,1))
-    allocate(ibool_interfaces_poroelastic(1,1),ibool_interfaces_ext_mesh_init(1,1))
+    allocate(ibool_interfaces_poroelastic(1,1),ibool_interfaces_electromagnetic(1,1),ibool_interfaces_ext_mesh_init(1,1))
     allocate(nibool_interfaces_acoustic(1),nibool_interfaces_elastic(1))
-    allocate(nibool_interfaces_poroelastic(1),nibool_interfaces_ext_mesh(1))
+    allocate(nibool_interfaces_poroelastic(1),nibool_interfaces_electromagnetic(1),nibool_interfaces_ext_mesh(1))
     allocate(inum_interfaces_acoustic(1),inum_interfaces_elastic(1),inum_interfaces_poroelastic(1))
+    allocate(inum_interfaces_electromagnetic(1))
   endif
   ! initializes
   my_neighbors(:) = -1

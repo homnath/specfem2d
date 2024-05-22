@@ -155,7 +155,7 @@
       select case(time_stepping_scheme)
       case (1)
         ! Newmark time scheme
-        ! forward wavefield (acoustic/elastic/poroelastic)
+        ! forward wavefield (acoustic/elastic/poroelastic/electromagnetic)
         call update_displ_Newmark()
         ! reconstructed/backward wavefields
         if (SIMULATION_TYPE == 3 .and. .not. NO_BACKWARD_RECONSTRUCTION) call update_displ_Newmark_backward()
@@ -293,7 +293,16 @@
             if (any_poroelastic) call exit_MPI(myrank,'poroelastic not implemented in GPU MODE yet')
           endif
         endif
-
+      ! electromagnetic domains
+      if (ELECTROMAGNETIC_SIMULATION) then
+        if (.not. GPU_MODE) then
+          call compute_forces_electromagnetic_main()
+        else
+          ! on GPU
+          if (any_electromagnetic) call exit_MPI(myrank,'electromagnetic not implemented in GPU MODE yet')
+        endif
+      endif
+   
       case (3)
         ! kernel simulations
         ! forward (adjoint) wavefields use switched update ordering

@@ -56,11 +56,13 @@
   ninterface_acoustic = 0
   ninterface_elastic = 0
   ninterface_poroelastic = 0
+  ninterface_electromagnetic = 0
 
   max_nibool_interfaces_ext_mesh = 0
   max_ibool_interfaces_size_ac = 0
   max_ibool_interfaces_size_el = 0
   max_ibool_interfaces_size_po = 0
+  max_ibool_interfaces_size_em = 0
 
   ! user output
   call max_all_i(ninterface,imax_all)
@@ -81,6 +83,7 @@
       write(IMAIN,*) '  number of MPI interfaces in acoustic domain    = ',ninterface_acoustic
       write(IMAIN,*) '  number of MPI interfaces in elastic domain     = ',ninterface_elastic
       write(IMAIN,*) '  number of MPI interfaces in poroelastic domain = ',ninterface_poroelastic
+      write(IMAIN,*) '  number of MPI interfaces in electromagnetic domain = ',ninterface_electromagnetic
       write(IMAIN,*)
       call flush_IMAIN()
     endif
@@ -92,6 +95,7 @@
     max_ibool_interfaces_size_ac = maxval(nibool_interfaces_acoustic(:))
     max_ibool_interfaces_size_el = NDIM*maxval(nibool_interfaces_elastic(:))
     max_ibool_interfaces_size_po = NDIM*maxval(nibool_interfaces_poroelastic(:))
+    max_ibool_interfaces_size_em = NDIM*maxval(nibool_interfaces_electromagnetic(:))
 
     if (ACOUSTIC_SIMULATION) then
       n_sls_loc = 0
@@ -124,6 +128,15 @@
       if (ier /= 0) call stop_the_code('error in allocation of array buffer_send_faces_vector_pow')
       allocate(buffer_recv_faces_vector_pow(max_ibool_interfaces_size_po,ninterface_poroelastic),stat=ier)
       if (ier /= 0) call stop_the_code('error in allocation of array buffer_recv_faces_vector_pow')
+    endif
+
+    if (ELECTROMAGNETIC_SIMULATION) then
+      allocate(request_send_recv_electromagnetic(ninterface_electromagnetic*2),stat=ier)
+      if (ier /= 0) stop 'error in allocation of array request_send_recv_electromagnetic'
+      allocate(buffer_send_faces_vector_em(max_ibool_interfaces_size_em,ninterface_electromagnetic),stat=ier)
+      if (ier /= 0) stop 'error in allocation of array buffer_send_faces_vector_em'
+      allocate(buffer_recv_faces_vector_em(max_ibool_interfaces_size_em,ninterface_electromagnetic),stat=ier)
+      if (ier /= 0) stop 'error in allocation of array buffer_recv_faces_vector_em'
     endif
 
   else
@@ -177,10 +190,10 @@
   use specfem_par, only: nspec,ibool,nglob,ninterface,myrank,coord,ACOUSTIC_SIMULATION
 
   use specfem_par, only: ibool_interfaces_acoustic,ibool_interfaces_elastic, &
-    ibool_interfaces_poroelastic, &
+    ibool_interfaces_poroelastic,ibool_interfaces_electromagnetic, &
     nibool_interfaces_acoustic,nibool_interfaces_elastic, &
-    nibool_interfaces_poroelastic, &
-    ninterface_acoustic,ninterface_elastic,ninterface_poroelastic
+    nibool_interfaces_poroelastic,nibool_interfaces_electromagnetic, &
+    ninterface_acoustic,ninterface_elastic,ninterface_poroelastic,ninterface_electromagnetic
 
   use specfem_par, only: buffer_send_faces_vector_ac,buffer_recv_faces_vector_ac,request_send_recv_acoustic
 
@@ -218,7 +231,7 @@
   num_points2 = 0
   allocate(nibool_interfaces_true(ninterface))
 
-  ! acoustic/elastic/poroelastic domains
+  ! acoustic/elastic/poroelastic/electromagnetic domains
   do idomain = 1,3
 
     ! checks number of interface in this domain
@@ -229,6 +242,8 @@
       num_interface = ninterface_elastic
     else if (idomain == 3) then
       num_interface = ninterface_poroelastic
+    else if (idomain == 4) then
+      num_interface = ninterface_electromagnetic
     endif
     if (num_interface == 0) cycle
 
@@ -243,6 +258,8 @@
         num_nibool = nibool_interfaces_elastic(iinterface)
       else if (idomain == 3) then
         num_nibool = nibool_interfaces_poroelastic(iinterface)
+      else if (idomain == 4) then
+        num_nibool = nibool_interfaces_electromagnetic(iinterface)
       endif
       ! checks if anything to sort
       if (num_nibool == 0) cycle
@@ -265,6 +282,8 @@
         ibool_dummy(:) = ibool_interfaces_elastic(1:num_nibool,iinterface)
       else if (idomain == 3) then
         ibool_dummy(:) = ibool_interfaces_poroelastic(1:num_nibool,iinterface)
+      else if (idomain == 4) then
+        ibool_dummy(:) = ibool_interfaces_electromagnetic(1:num_nibool,iinterface)
       endif
 
       ! gets x,y,z coordinates of global points on MPI interface
@@ -299,6 +318,8 @@
         ibool_interfaces_elastic(1:num_nibool,iinterface) = ibool_dummy(:)
       else if (idomain == 3) then
         ibool_interfaces_poroelastic(1:num_nibool,iinterface) = ibool_dummy(:)
+      else if (idomain == 4) then
+        ibool_interfaces_electromagnetic(1:num_nibool,iinterface) = ibool_dummy(:)
       endif
 
       ! cleanup temporary arrays
@@ -780,6 +801,73 @@
       percentage_edge = 100.0 * ispec_inner/real(ispec_inner + ispec_outer)
       ! output
       write(IMAIN,*) '  poroelastic domains:'
+      write(IMAIN,*) '  total number of outer/inner elements = ',ispec_outer,ispec_inner
+      write(IMAIN,*) '  total percentage of outer elements ',100. - percentage_edge,'%'
+      write(IMAIN,*) '  total percentage of inner elements ',percentage_edge,'%'
+      write(IMAIN,*)
+      call flush_IMAIN()
+    endif
+  endif
+
+  ! electromagnetic domains
+  nspec_inner_electromagnetic = 0
+  nspec_outer_electromagnetic = 0
+
+  ! only if this slice contains electromagnetic elements
+  if (any_electromagnetic) then
+    ! counts inner and outer elements
+    do ispec = 1, nspec
+      if (ispec_is_electromagnetic(ispec)) then
+        if (ispec_is_inner(ispec) .eqv. .true.) then
+          nspec_inner_electromagnetic = nspec_inner_electromagnetic + 1
+        else
+          nspec_outer_electromagnetic = nspec_outer_electromagnetic + 1
+        endif
+      endif
+    enddo
+
+    ! stores indices of inner and outer elements
+    num_phase_ispec_electromagnetic = max(nspec_inner_electromagnetic,nspec_outer_electromagnetic)
+    if (num_phase_ispec_electromagnetic < 0 ) &
+                stop 'Error electromagnetic simulation: num_phase_ispec_electromagnetic is < zero'
+
+    allocate( phase_ispec_inner_electromagnetic(num_phase_ispec_electromagnetic,2),stat=ier)
+    if (ier /= 0 ) stop 'Error allocating array phase_ispec_inner_electromagnetic'
+    phase_ispec_inner_electromagnetic(:,:) = 0
+
+    ispec_inner = 0
+    ispec_outer = 0
+    do ispec = 1, nspec
+      if (ispec_is_electromagnetic(ispec)) then
+        if (ispec_is_inner(ispec) .eqv. .true.) then
+          ispec_inner = ispec_inner + 1
+          phase_ispec_inner_electromagnetic(ispec_inner,2) = ispec
+        else
+          ispec_outer = ispec_outer + 1
+          phase_ispec_inner_electromagnetic(ispec_outer,1) = ispec
+        endif
+      endif
+    enddo
+  else
+    ! allocates dummy array
+    num_phase_ispec_electromagnetic = 0
+    allocate( phase_ispec_inner_electromagnetic(num_phase_ispec_electromagnetic,2),stat=ier)
+    if (ier /= 0 ) stop 'Error allocating dummy array phase_ispec_inner_electromagnetic'
+    phase_ispec_inner_electromagnetic(:,:) = 0
+  endif
+
+  ! user output
+  if (ELECTROMAGNETIC_SIMULATION) then
+    call sum_all_i(nspec_outer_electromagnetic,ispec_outer)
+    call sum_all_i(nspec_inner_electromagnetic,ispec_inner)
+    if (myrank == 0) then
+      ! check
+      if (ispec_inner + ispec_outer == 0) &
+          stop 'Invalid total number of inner/outer elements for electromagnetic simulation'
+      ! ratio inner/outer
+      percentage_edge = 100.0 * ispec_inner/real(ispec_inner + ispec_outer)
+      ! output
+      write(IMAIN,*) '  electromagnetic domains:'
       write(IMAIN,*) '  total number of outer/inner elements = ',ispec_outer,ispec_inner
       write(IMAIN,*) '  total percentage of outer elements ',100. - percentage_edge,'%'
       write(IMAIN,*) '  total percentage of inner elements ',percentage_edge,'%'

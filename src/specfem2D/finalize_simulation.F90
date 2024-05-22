@@ -108,6 +108,14 @@
   deallocate(rmass_inverse_elastic)
   deallocate(b_displ_elastic,b_veloc_elastic,b_accel_elastic)
   deallocate(b_displ_elastic_old)
+  deallocate(displs_poroelastic,velocs_poroelastic,accels_poroelastic)
+  deallocate(displw_poroelastic,velocw_poroelastic,accelw_poroelastic)
+  deallocate(displs_poroelastic_old)
+  deallocate(rmass_s_inverse_poroelastic,rmass_w_inverse_poroelastic)
+  deallocate(b_displs_poroelastic,b_velocs_poroelastic,b_accels_poroelastic)
+  deallocate(b_displw_poroelastic,b_velocw_poroelastic,b_accelw_poroelastic)
+  deallocate(displ_electromagnetic,veloc_electromagnetic,accel_electromagnetic)
+  deallocate(rmass_inverse_electromagnetic)
   deallocate(potential_acoustic,potential_acoustic_old)
   deallocate(potential_dot_acoustic,potential_dot_dot_acoustic)
   deallocate(rmass_inverse_acoustic)
@@ -123,6 +131,7 @@
 
   ! material
   deallocate(kappastore,mustore,rhostore,rho_vpstore,rho_vsstore)
+  deallocate(spermittivitystore,sconductivitystore,inv_magpermeabilitystore)
 
   ! attenuation
   deallocate(e1,e11,e13)
@@ -142,7 +151,7 @@
   deallocate(ibool)
   deallocate(xix,xiz,gammax,gammaz,jacobian)
   deallocate(deriv_mapping)
-  deallocate(ispec_is_acoustic,ispec_is_elastic,ispec_is_poroelastic)
+  deallocate(ispec_is_acoustic,ispec_is_elastic,ispec_is_poroelastic,ispec_is_electromagnetic)
 
   ! close energy file
   if (OUTPUT_ENERGY .and. myrank == 0) close(IOUT_ENERGY)

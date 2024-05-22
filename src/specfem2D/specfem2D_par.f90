@@ -106,6 +106,10 @@ module specfem_par
   real(kind=CUSTOM_REAL), dimension(:,:,:), allocatable :: vpIIstore
   real(kind=CUSTOM_REAL), dimension(:,:,:,:), allocatable :: rhoarraystore,kappaarraystore,permstore
 
+  ! electromagnetic
+  real(kind=CUSTOM_REAL), dimension(:,:,:,:), allocatable :: spermittivitystore,sconductivitystore
+  real(kind=CUSTOM_REAL), dimension(:,:,:), allocatable :: inv_magpermeabilitystore,vEstore 
+  
   ! resolution
   double precision :: mesh_T_min
 
@@ -594,6 +598,55 @@ module specfem_par
   integer :: num_phase_ispec_poroelastic
   integer, dimension(:,:), allocatable :: phase_ispec_inner_poroelastic
 
+
+  !---------------------------------------------------------------------
+  ! for electromagnetic simulation
+  !---------------------------------------------------------------------
+  integer :: nglob_electromagnetic
+
+  ! number of purely electromagnetic elements in this slice
+  integer :: nspec_electromagnetic
+  integer :: nspec_elecromagnetic_b
+
+  ! local flag to determine if this slice has electromagnetic elements
+  logical :: coupled_electromagnetic_poro, any_electromagnetic
+
+  ! global flag for electromagnetic simulations
+  logical :: ELECTROMAGNETIC_SIMULATION
+  logical :: USE_CONDUCTIVE_DIFFUSION
+    
+  logical, dimension(:), allocatable :: ispec_is_electromagnetic
+  
+  ! inverse mass matrices
+  real(kind=CUSTOM_REAL), dimension(:,:), allocatable :: rmass_inverse_electromagnetic
+
+  ! material properties of the electromagnetic medium 
+  real(kind=CUSTOM_REAL), dimension(:,:), allocatable :: &
+    accel_electromagnetic,veloc_electromagnetic,displ_electromagnetic
+  
+  double precision, dimension(:,:), allocatable :: spermittivity,sconductivity
+  double precision, dimension(:), allocatable :: inv_magpermeability
+
+  ! for permittivity & conductivity attenuation 
+  double precision, dimension(:), allocatable :: Qe11_electromagnetic,Qe33_electromagnetic
+  double precision, dimension(:), allocatable :: Qs11_electromagnetic,Qs33_electromagnetic
+  double precision, dimension(:,:,:,:), allocatable :: tau_e,tau_d,tau_s
+  double precision, dimension(:,:,:,:), allocatable :: alphavalem,betavalem,gammavalem
+  double precision, dimension(:), allocatable :: tauinv
+
+  double precision, dimension(:,:,:), allocatable :: rx_permattenuation,rz_permattenuation,permx,permz
+
+  !for backward simulation in adjoint inversion
+  real(kind=CUSTOM_REAL), dimension(:,:), allocatable :: &
+    b_accel_electromagnetic,b_veloc_electromagnetic,b_displ_electromagnetic
+  real(kind=CUSTOM_REAL), dimension(:,:,:), allocatable :: &
+    b_conductionx,b_conductionz
+
+  ! MPI inner/outer
+  integer :: nspec_inner_electromagnetic,nspec_outer_electromagnetic
+  integer :: num_phase_ispec_electromagnetic
+  integer, dimension(:,:), allocatable :: phase_ispec_inner_electromagnetic
+
   !---------------------------------------------------------------------
 
   ! PML parameters
@@ -650,6 +703,9 @@ module specfem_par
   ! poroelastic fluid
   real(kind=CUSTOM_REAL), dimension(:,:,:,:), allocatable :: &
     b_absorb_poro_w_left,b_absorb_poro_w_right,b_absorb_poro_w_bottom,b_absorb_poro_w_top
+  ! electromagnetic 
+  real(kind=CUSTOM_REAL), dimension(:,:,:,:), allocatable :: &
+    b_absorb_electromagnetic_left,b_absorb_electromagnetic_right,b_absorb_electromagnetic_bottom,b_absorb_electromagnetic_top
 
   integer :: nspec_left,nspec_right,nspec_bottom,nspec_top
   integer, dimension(:), allocatable :: ib_left,ib_right,ib_bottom,ib_top
@@ -679,12 +735,16 @@ module specfem_par
   integer, dimension(:,:), allocatable :: ibool_interfaces_ext_mesh
   integer :: max_nibool_interfaces_ext_mesh
 
-  integer, dimension(:), allocatable  :: nibool_interfaces_acoustic,nibool_interfaces_elastic,nibool_interfaces_poroelastic
-  integer, dimension(:,:), allocatable  :: ibool_interfaces_acoustic,ibool_interfaces_elastic,ibool_interfaces_poroelastic
+  integer, dimension(:), allocatable  :: nibool_interfaces_acoustic,nibool_interfaces_elastic,nibool_interfaces_poroelastic, &
+                                         nibool_interfaces_electromagnetic
+  integer, dimension(:,:), allocatable  :: ibool_interfaces_acoustic,ibool_interfaces_elastic,ibool_interfaces_poroelastic, &
+                                           ibool_interfaces_electromagnetic
 
-  integer :: ninterface_acoustic, ninterface_elastic,ninterface_poroelastic
-  integer, dimension(:), allocatable :: inum_interfaces_acoustic, inum_interfaces_elastic, inum_interfaces_poroelastic
-  integer :: max_ibool_interfaces_size_ac, max_ibool_interfaces_size_el, max_ibool_interfaces_size_po
+  integer :: ninterface_acoustic, ninterface_elastic,ninterface_poroelastic,ninterface_electromagnetic
+  integer, dimension(:), allocatable :: inum_interfaces_acoustic, inum_interfaces_elastic, inum_interfaces_poroelastic, &
+                                        inum_interfaces_electromagnetic
+  integer :: max_ibool_interfaces_size_ac, max_ibool_interfaces_size_el, max_ibool_interfaces_size_po, &
+             max_ibool_interfaces_size_em
 
   real(kind=CUSTOM_REAL), dimension(:,:), allocatable  :: buffer_send_faces_vector_ac
   real(kind=CUSTOM_REAL), dimension(:,:), allocatable  :: buffer_recv_faces_vector_ac
@@ -697,6 +757,10 @@ module specfem_par
   real(kind=CUSTOM_REAL), dimension(:,:), allocatable  :: buffer_send_faces_vector_pos,buffer_send_faces_vector_pow
   real(kind=CUSTOM_REAL), dimension(:,:), allocatable  :: buffer_recv_faces_vector_pos,buffer_recv_faces_vector_pow
   integer, dimension(:), allocatable  :: request_send_recv_poro
+
+  real(kind=CUSTOM_REAL), dimension(:,:), allocatable  :: buffer_send_faces_vector_em
+  real(kind=CUSTOM_REAL), dimension(:,:), allocatable  :: buffer_recv_faces_vector_em
+  integer, dimension(:), allocatable :: request_send_recv_electromagnetic
 
   ! for overlapping MPI communications with computation
   integer  :: nspec_outer, nspec_inner

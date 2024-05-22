@@ -36,7 +36,7 @@
 ! reads in material definitions in DATA/Par_file
 
   use constants, only: IMAIN,TINYVAL,ISOTROPIC_MATERIAL,ANISOTROPIC_MATERIAL,POROELASTIC_MATERIAL, &
-    ATTENUATION_COMP_MAXIMUM
+    ELECTROMAGNETIC_MATERIAL,ATTENUATION_COMP_MAXIMUM
 
   use shared_parameters, only: nbmodels,icodemat, &
                                cp,cs, &
@@ -45,7 +45,8 @@
                                rho_s_read,rho_f_read, &
                                phi_read,tortuosity_read, &
                                permxx_read,permxz_read,permzz_read,kappa_s_read,kappa_f_read,kappa_fr_read, &
-                               eta_f_read,mu_fr_read, &
+                               eta_f_read,mu_fr_read,mu0_read,e0_read,e11_read,e33_read,sig11_read,sig33_read,&
+                               Qe11_read,Qe33_read,Qs11_read,Qs33_read, &
                                compaction_grad
 
   implicit none
@@ -78,6 +79,7 @@
     !  anisotropic             - model_number  2 rho   c11 c13 c15 c33    c35 c55 c12 c23 c25    0 QKappa Qmu
     !  anisotropic (in AXISYM) - model_number  2 rho   c11 c13 c15 c33    c35 c55 c12 c23 c25  c22 QKappa Qmu
     !  poroelastic             - model_number  3 rhos rhof phi   c kxx    kxz kzz  Ks  Kf Kfr etaf   mufr Qmu
+    !  electromagetic          - model_number  4 mu0 e0 e11(e0) e33(e0) sig11 sig33 Qe11 Qe33 Qs11 Qs33 Qv 0 0
     !  tomo                    - model_number -1 0       0   A   0   0      0   0   0   0   0    0      0   0
     !
     ! and specially for Marmousi2-type models with a compaction gradient k
@@ -164,6 +166,20 @@
       if (Qmu(i) <= 0.00000001d0) &
         call stop_the_code('Invalid poroelastic material: non-positive value of Qmu')
 
+    else if (icodemat(i) == ELECTROMAGNETIC_MATERIAL) then
+      ! electromagnetic material 
+      mu0_read(i) = val0read
+      e0_read(i) = val1read
+      e11_read(i) = val2read
+      e33_read(i) = val3read
+      sig11_read(i) = val4read
+      sig33_read(i) = val5read
+      Qe11_read(i) = val6read
+      Qe33_read(i) = val7read
+      Qs11_read(i) = val8read
+      Qs33_read(i) = val9read
+      phi_read(i) = 2.d0           ! electromagnetic
+
     else if (icodemat(i) <= 0) then
       ! tomographic material
       number_of_materials_defined_by_tomo_file = number_of_materials_defined_by_tomo_file + 1
@@ -231,6 +247,10 @@
                                kappa_s_read,kappa_f_read,kappa_fr_read, &
                                eta_f_read,mu_fr_read
 
+  ! electromagnetic
+  use shared_parameters, only: mu0_read,e0_read,e11_read,e33_read,sig11_read,sig33_read,&
+                               Qe11_read,Qe33_read,Qs11_read,Qs33_read
+
   implicit none
 
   ! safety check
@@ -269,6 +289,17 @@
            eta_f_read(nbmodels), &
            mu_fr_read(nbmodels))
 
+  allocate( mu0_read(nbmodels),&
+            e0_read(nbmodels),&
+            e11_read(nbmodels),&
+            e33_read(nbmodels),&
+            sig11_read(nbmodels),&
+            sig33_read(nbmodels),&
+            Qe11_read(nbmodels),&
+            Qe33_read(nbmodels),&
+            Qs11_read(nbmodels),&
+            Qs33_read(nbmodels))
+
   allocate(compaction_grad(nbmodels))
 
   ! initializes material properties
@@ -304,6 +335,17 @@
   eta_f_read(:) = 0.d0
   mu_fr_read(:) = 0.d0
 
+  mu0_read(:) = 0.d0
+  e0_read(:) = 0.d0
+  e11_read(:) = 0.d0
+  e33_read(:) = 0.d0
+  sig11_read(:) = 0.d0
+  sig33_read(:) = 0.d0
+  Qe11_read(:) = 0.d0
+  Qe33_read(:) = 0.d0
+  Qs11_read(:) = 0.d0
+  Qs33_read(:) = 0.d0
+
   compaction_grad(:) = 0.0d0
 
   end subroutine initialize_material_properties
@@ -315,7 +357,7 @@
   subroutine print_materials_info()
 
   use constants, only: IMAIN,TINYVAL, &
-                       ISOTROPIC_MATERIAL,ANISOTROPIC_MATERIAL,POROELASTIC_MATERIAL
+                       ISOTROPIC_MATERIAL,ANISOTROPIC_MATERIAL,POROELASTIC_MATERIAL,ELECTROMAGNETIC_MATERIAL
 
   use shared_parameters, only: nbmodels, &
                                icodemat,AXISYM
@@ -335,6 +377,10 @@
                                permxx_read,permxz_read,permzz_read, &
                                kappa_s_read,kappa_f_read,kappa_fr_read, &
                                eta_f_read,mu_fr_read
+
+  ! electromagnetic
+  use shared_parameters, only: mu0_read,e0_read,e11_read,e33_read,sig11_read,sig33_read,&
+                               Qe11_read,Qe33_read,Qs11_read,Qs33_read
 
   implicit none
   ! local parameters
@@ -379,6 +425,15 @@
       write(IMAIN,*) 'permxx, permxz, permzz = ',permxx_read(i),permxz_read(i),permzz_read(i)
       write(IMAIN,*) 'kappa_fr, mu_fr, Qmu   = ',kappa_fr_read(i),mu_fr_read(i),Qmu(i)
       write(IMAIN,*) 'Material is porous'
+    else if (icodemat(i) == ELECTROMAGNETIC_MATERIAL) then
+      ! electromagnetic
+      write(IMAIN,*) 'Material #',i,' electromagnetic'
+      write(IMAIN,*) 'mu0, e0 (cstes vaccum)         = ',mu0_read(i),e0_read(i)
+      write(IMAIN,*) 'e11(e0), e33(e0)          = ',e11_read(i),e33_read(i)
+      write(IMAIN,*) 'sig11(e0), sig33(e0)          = ',sig11_read(i),sig33_read(i)
+      write(IMAIN,*) 'Qe11(e0), Qe33(e0)          = ',Qe11_read(i),Qe33_read(i)
+      write(IMAIN,*) 'Qs11(e0), Qs33(e0)          = ',Qs11_read(i),Qs33_read(i)
+      write(IMAIN,*) 'Material is electromagnetic'
     else if (icodemat(i) <= 0) then
       write(IMAIN,*) 'Material #',i,' will be read in an external tomography file (TOMOGRAPHY_FILE in Par_file)'
     else

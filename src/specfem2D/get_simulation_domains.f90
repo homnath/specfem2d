@@ -35,9 +35,9 @@
 
   use constants, only: TINYVAL
 
-  use specfem_par, only: any_acoustic,any_elastic,any_poroelastic,any_anisotropy, &
+  use specfem_par, only: any_acoustic,any_elastic,any_poroelastic,any_anisotropy,any_electromagnetic, &
     ispec_is_anisotropic,ispec_is_acoustic,ispec_is_elastic,ispec_is_poroelastic, &
-    nspec,porosity,anisotropycoef,kmato
+    ispec_is_electromagnetic,nspec,porosity,anisotropycoef,kmato
 
   implicit none
 
@@ -49,11 +49,13 @@
   any_elastic = .false.
   any_poroelastic = .false.
   any_anisotropy = .false.
+  any_electromagnetic = .false.
 
   ispec_is_acoustic(:) = .false.
   ispec_is_anisotropic(:) = .false.
   ispec_is_elastic(:) = .false.
   ispec_is_poroelastic(:) = .false.
+  ispec_is_electromagnetic(:) = .false.
 
   ! loops over all elements
   do ispec = 1,nspec
@@ -63,6 +65,11 @@
       ! assume acoustic domain
       ispec_is_acoustic(ispec) = .true.
       any_acoustic = .true.
+
+    else if (porosity(kmato(ispec)) > 1) then
+      ! assume electromagnetic domain
+      ispec_is_electromagnetic(ispec) = .true.
+      any_electromagnetic = .true.
 
     else if (porosity(kmato(ispec)) < TINYVAL) then
       ! assume elastic domain
@@ -97,9 +104,9 @@
 
   use constants, only: TINYVAL,NGLLX,NGLLZ,CUSTOM_REAL
 
-  use specfem_par, only: any_acoustic,any_elastic,any_poroelastic,any_anisotropy, &
+  use specfem_par, only: any_acoustic,any_elastic,any_poroelastic,any_anisotropy,any_electromagnetic, &
     ispec_is_anisotropic,ispec_is_acoustic,ispec_is_elastic,ispec_is_poroelastic, &
-    nspec,myrank,P_SV,MODEL
+    ispec_is_electromagnetic,nspec,myrank,P_SV,MODEL,porosity,kmato
 
   implicit none
 
@@ -119,13 +126,19 @@
   any_elastic = .false.
   any_poroelastic = .false.
   any_anisotropy = .false.
+  any_electromagnetic = .false.
 
   ispec_is_acoustic(:) = .false.
   ispec_is_anisotropic(:) = .false.
   ispec_is_elastic(:) = .false.
   ispec_is_poroelastic(:) = .false.
+  ispec_is_electromagnetic(:) = .false.
 
   do ispec = 1,nspec
+
+   if (porosity(kmato(ispec)) > 1) then
+      ispec_is_electromagnetic(ispec) = .true.
+   else
     ! value at corner
     previous_vsext = vsext(1,1,ispec)
 
@@ -165,6 +178,7 @@
         previous_vsext = vsext(i,j,ispec)
       enddo
     enddo
+   endif
   enddo ! ispec
 
   ! sets domain numbers
@@ -192,9 +206,10 @@
   if (ANY(ispec_is_acoustic(:)) .neqv. any_acoustic) call stop_the_code('Error any_acoustic invalid')
   if (ANY(ispec_is_elastic(:)) .neqv. any_elastic) call stop_the_code('Error any_elastic invalid')
   if (ANY(ispec_is_poroelastic(:)) .neqv. any_poroelastic) call stop_the_code('Error any_poroelastic invalid')
+  if (ANY(ispec_is_electromagnetic(:)) .neqv. any_electromagnetic) stop 'Error any_electromagnetic invalid'
 
   ! safety checks
-  if (.not. P_SV .and. .not. any_elastic) then
+  if (.not. P_SV .and. .not. any_elastic .and. .not. any_electromagnetic) then
     print *, '*************** WARNING ***************'
     print *, 'Surface (membrane) waves calculation needs an elastic medium'
     print *, '*************** WARNING ***************'
@@ -205,26 +220,34 @@
     call stop_the_code('PML boundary conditions not implemented for poroelastic simulations yet')
   endif
 
+  if (PML_BOUNDARY_CONDITIONS .and. any_electromagnetic ) then
+    stop 'PML boundary conditions not implemented for electromagnetic simulations yet'
+  endif
+
   ! checks material domains
   do ispec = 1,nspec
     ! checks if at least one domain is set
     if ((.not. ispec_is_acoustic(ispec)) .and. (.not. ispec_is_elastic(ispec)) &
-        .and. (.not. ispec_is_poroelastic(ispec))) then
+        .and. (.not. ispec_is_poroelastic(ispec)) .and. (.not. ispec_is_electromagnetic(ispec))) then
       print *,'Error material domain not assigned to element:',ispec
       print *,'acoustic       : ',ispec_is_acoustic(ispec)
       print *,'elastic        : ',ispec_is_elastic(ispec)
       print *,'poroelastic    : ',ispec_is_poroelastic(ispec)
+      print *,'electromagnetic    : ',ispec_is_electromagnetic(ispec)
       call stop_the_code('Error material domain index element')
     endif
 
     ! checks if domain is unique
     if ((ispec_is_acoustic(ispec) .and. ispec_is_elastic(ispec)) .or. &
         (ispec_is_acoustic(ispec) .and. ispec_is_poroelastic(ispec)) .or. &
+        (ispec_is_elastic(ispec) .and. ispec_is_electromagnetic(ispec)) .or. &
+        (ispec_is_poroelastic(ispec) .and. ispec_is_electromagnetic(ispec)) .or. &
         (ispec_is_elastic(ispec) .and. ispec_is_poroelastic(ispec))) then
       print *,'Error material domain assigned twice to element:',ispec
       print *,'acoustic       : ',ispec_is_acoustic(ispec)
       print *,'elastic        : ',ispec_is_elastic(ispec)
       print *,'poroelastic    : ',ispec_is_poroelastic(ispec)
+      print *,'electromagnetic    : ',ispec_is_electromagnetic(ispec)
       call stop_the_code('Error material domain index element')
     endif
   enddo
@@ -262,6 +285,11 @@
   ! aniso
   nspec_aniso = count(ispec_is_anisotropic(:))
   if (nspec_aniso > 0) any_anisotropy = .true.
+
+  ! electromagnetic
+  ! number of electromagetic elements in this partition
+  nspec_electromagnetic = count(ispec_is_electromagnetic(:))
+  if (nspec_electromagnetic > 0 ) any_electromagnetic = .true.
 
   end subroutine get_simulation_domain_counts
 
