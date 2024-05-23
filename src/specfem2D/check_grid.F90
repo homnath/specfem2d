@@ -47,12 +47,14 @@
   ! local parameters
   double precision :: vpIImax_local,vpIImin_local
   double precision :: vsmin,vsmax,densmin,densmax,vpImax_local,vpImin_local,vsmin_local,vsmax_local
+  double precision :: vEmin,vEmax,vEmax_local,vEmin_local
 
-  double precision :: cpIloc,cpIIloc,csloc
+  double precision :: cpIloc,cpIIloc,csloc,cEloc
   double precision :: f0,f0max
   double precision :: mul,rhol
   double precision :: distance_min,distance_max,distance_min_local,distance_max_local
-  double precision :: courant_stability_number_max,lambdaPImin,lambdaPImax,lambdaPIImin,lambdaPIImax,lambdaSmin,lambdaSmax
+  double precision :: courant_stability_number_max,lambdaPImin,lambdaPImax,lambdaPIImin,lambdaPIImax,lambdaSmin,lambdaSmax, &
+                      lambdaEmax,lambdaEmin
   double precision :: distance_1,distance_2,distance_3,distance_4
 
   ! for the stability condition
@@ -63,10 +65,12 @@
   ! for slice totals
   double precision :: vpImin_glob,vpImax_glob,vsmin_glob,vsmax_glob,densmin_glob,densmax_glob
   double precision :: vpIImin_glob,vpIImax_glob
+  double precision :: vEmax_glob,vEmin_glob
   double precision :: distance_min_glob,distance_max_glob
   double precision :: courant_stability_max_glob,lambdaPImin_glob,lambdaPImax_glob, &
                        lambdaPIImin_glob,lambdaPIImax_glob,lambdaSmin_glob,lambdaSmax_glob, &
-                       lambdaPmin_in_fluid_histo_glob,lambdaPmax_in_fluid_histo_glob
+                       lambdaPmin_in_fluid_histo_glob,lambdaPmax_in_fluid_histo_glob, &
+                       lambdaEmin_glob,lambdaEmax_glob
 
   double precision :: pmax_glob,pmax
   double precision :: dt_suggested,dt_suggested_glob
@@ -102,8 +106,13 @@
   call check_grid_setup_GLLper(percent_GLL,NGLLX_MAX_STABILITY)
 
   !---- compute parameters for the spectral elements
-  vpImin = HUGEVAL
-  vpImax = -HUGEVAL
+  if (ELASTIC_SIMULATION .or. POROELASTIC_SIMULATION .or. ACOUSTIC_SIMULATION) then
+    vpImin = HUGEVAL
+    vpImax = -HUGEVAL
+  else
+    vpImin = 0.d0
+    vpImax = 0.d0
+  endif
 
   if (ELASTIC_SIMULATION .or. POROELASTIC_SIMULATION) then
     vsmin = HUGEVAL
@@ -121,6 +130,14 @@
     vpIImax = 0.d0
   endif
 
+  if (ELECTROMAGNETIC_SIMULATION) then
+    vEmin = HUGEVAL
+    vEmax = -HUGEVAL
+  else
+    vEmin = 0.d0
+    vEmax = 0.d0
+  endif
+
   densmin = HUGEVAL
   densmax = -HUGEVAL
 
@@ -131,8 +148,13 @@
   pmax = -HUGEVAL
   dt_suggested = HUGEVAL
 
-  lambdaPImin = HUGEVAL
-  lambdaPImax = -HUGEVAL
+  if (ELASTIC_SIMULATION .or. POROELASTIC_SIMULATION .or. ACOUSTIC_SIMULATION) then
+    lambdaPImin = HUGEVAL
+    lambdaPImax = -HUGEVAL
+  else
+    lambdaPImin = 0.d0
+    lambdaPImax = 0.d0
+  endif
 
   if (ELASTIC_SIMULATION .or. POROELASTIC_SIMULATION) then
     lambdaSmin = HUGEVAL
@@ -150,6 +172,14 @@
     lambdaPIImax = 0.d0
   endif
 
+  if (ELECTROMAGNETIC_SIMULATION) then
+    lambdaEmin = HUGEVAL
+    lambdaEmax = -HUGEVAL
+  else
+    lambdaEmin = 0.d0
+    lambdaEmax = 0.d0
+  endif
+
   lambdaPmin_in_fluid_histo = HUGEVAL
   lambdaPmax_in_fluid_histo = -HUGEVAL
 
@@ -157,37 +187,52 @@
 
   do ispec = 1,nspec
 
-    ! min/max values for vpI,vpII,vs
+    ! min/max values for vpI,vpII,vs,vE
     vpImax_local = -HUGEVAL
     vpImin_local = HUGEVAL
     vpIImax_local = -HUGEVAL
     vpIImin_local = HUGEVAL
     vsmin_local = HUGEVAL
     vsmax_local = -HUGEVAL
+    vEmin_local = HUGEVAL
+    vEmax_local = -HUGEVAL
 
     distance_min_local = HUGEVAL
     distance_max_local = -HUGEVAL
 
     do j = 1,NGLLZ
       do i = 1,NGLLX
-        ! velocity model
-        mul = mustore(i,j,ispec)
-        rhol = rhostore(i,j,ispec)
-        cpIloc = rho_vpstore(i,j,ispec) / rhol
-        csloc = sqrt(mul/rhol)
+        if (.not.ispec_is_electromagnetic(ispec)) then
+        ! velocity model elastic/acoustic/poroelastic
+         mul = mustore(i,j,ispec)
+         rhol = rhostore(i,j,ispec)
+         cpIloc = rho_vpstore(i,j,ispec) / rhol
+         csloc = sqrt(mul/rhol)
 
-        ! vpII
-        if (ispec_is_poroelastic(ispec)) then
-          ! poroelastic material
-          cpIIloc = vpIIstore(i,j,ispec)
+         ! vpII
+         if (ispec_is_poroelastic(ispec)) then
+           ! poroelastic material
+           cpIIloc = vpIIstore(i,j,ispec)
+         else
+           ! acoustic/elastic element
+           cpIIloc = 0.d0
+         endif
+         cEloc = 0.d0
+ 
         else
-          ! acoustic/elastic element
-          cpIIloc = 0.d0
+         cpIloc = 0.d0
+         cpIIloc = 0.d0
+         csloc = 0.d0
+         rhol = 0.d0
+        ! velocity model electromagnetic
+         cEloc = vEstore(i,j,ispec)
         endif
 
         !--- compute min and max of velocity and density models
         vpImin = min(vpImin,cpIloc)
         vpImax = max(vpImax,cpIloc)
+        densmin = min(densmin,rhol)
+        densmax = max(densmax,rhol)
 
         ! ignore acoustic and elastic regions with cpII = 0
         if (cpIIloc > TINYVAL) vpIImin = min(vpIImin,cpIIloc)
@@ -196,9 +241,9 @@
         ! ignore fluid regions with Vs = 0
         if (csloc > TINYVAL) vsmin = min(vsmin,csloc)
         vsmax = max(vsmax,csloc)
-
-        densmin = min(densmin,rhol)
-        densmax = max(densmax,rhol)
+        
+        if (cEloc > TINYVAL) vEmin = min(vEmin,cEloc)
+        vEmax = max(vEmax,cEloc)
 
         vpImax_local = max(vpImax_local,cpIloc)
         vpImin_local = min(vpImin_local,cpIloc)
@@ -206,6 +251,8 @@
         vpIImin_local = min(vpIImin_local,cpIIloc)
         vsmin_local = min(vsmin_local,csloc)
         vsmax_local = max(vsmax_local,csloc)
+        vEmax_local = max(vEmax_local,cEloc)
+        vEmin_local = min(vEmin_local,cEloc)
       enddo
     enddo
 
@@ -231,8 +278,13 @@
     ! Courant number
     ! based on minimum GLL point distance and maximum velocity
     ! i.e. on the maximum ratio of ( velocity / gridsize )
+        if (cEloc > TINYVAL) then
+    courant_stability_number_max = max(courant_stability_number_max, &
+                                       vEmax_local * DT / (distance_min_local * percent_GLL(NGLLX)))
+        else
     courant_stability_number_max = max(courant_stability_number_max, &
                                        vpImax_local * DT / (distance_min_local * percent_GLL(NGLLX)))
+        endif
 
     ! estimation of minimum period resolved
     ! based on average GLL distance within element and minimum velocity
@@ -255,15 +307,21 @@
 
     if (vel_min > TINYVAL) then
       pmax = max(pmax,avg_distance / vel_min * NPTS_PER_WAVELENGTH)
-    else
+    else if (vpImin_local > TINYVAL) then
       ! acoustic/fluid region uses vpImin_local
       pmax = max(pmax,avg_distance / vpImin_local * NPTS_PER_WAVELENGTH)
+    else
+      pmax = max(pmax,avg_distance / vEmin_local * NPTS_PER_WAVELENGTH)
     endif
 
     ! suggested timestep: uses minimum GLL point distance such that
     ! dt = C * min_gll_distance / vs_max
+        if (cEloc > TINYVAL) then
+    dt_suggested = min(dt_suggested,COURANT_SUGGESTED * distance_min_local * percent_GLL(NGLLX) / vEmax_local)
+        else
     vel_max = max(vpImax_local,vsmax_local)
     dt_suggested = min(dt_suggested,COURANT_SUGGESTED * distance_min_local * percent_GLL(NGLLX) / vel_max)
+        endif
 
     ! check if fluid region with Vs = 0
     if (vsmin_local > TINYVAL) then
@@ -283,6 +341,10 @@
       lambdaPIImax = max(lambdaPIImax,vpIImin_local / (distance_max_local / (NGLLX - 1)))
     endif
 
+    if (cEloc > TINYVAL) then
+      lambdaEmin = min(lambdaEmin,vEmin_local / (distance_max_local / (NGLLX - 1)))
+      lambdaEmax = max(lambdaEmax,vEmin_local / (distance_max_local / (NGLLX - 1)))
+    endif
   enddo ! ispec
 
   ! global statistics
@@ -307,6 +369,10 @@
   call max_all_all_dp(courant_stability_number_max, courant_stability_max_glob)
   call max_all_all_dp(pmax, pmax_glob)
   call min_all_all_dp(dt_suggested, dt_suggested_glob)
+  call min_all_all_dp(vEmin, vEmin_glob)
+  call max_all_all_dp(vEmax, vEmax_glob)
+  call min_all_all_dp(lambdaEmin, lambdaEmin_glob)
+  call max_all_all_dp(lambdaEmax, lambdaEmax_glob)
 
   vpImin = vpImin_glob
   vpImax = vpImax_glob
@@ -329,6 +395,10 @@
   courant_stability_number_max = courant_stability_max_glob
   pmax = pmax_glob
   dt_suggested = dt_suggested_glob
+  vEmin = vEmin_glob
+  vEmax = vEmax_glob
+  lambdaEmin = lambdaEmin_glob
+  lambdaEmax = lambdaEmax_glob
 
   ! mesh resolved minimum period
   mesh_T_min = pmax_glob
@@ -340,12 +410,17 @@
     if (.not. all_anisotropic) then
       write(IMAIN,*)
       write(IMAIN,*) '********'
+      if (ELASTIC_SIMULATION .or. POROELASTIC_SIMULATION .or. ACOUSTIC_SIMULATION) then
       write(IMAIN,*) 'Model: P (or PI) velocity min,max = ',vpImin,vpImax
       if (POROELASTIC_SIMULATION) then
         write(IMAIN,*) 'Model: PII velocity min,max       = ',vpIImin,vpIImax
       endif
       write(IMAIN,*) 'Model: S velocity min,max         = ',vsmin,vsmax
       write(IMAIN,*) 'Model: density min,max            = ',densmin,densmax
+      endif
+      if (ELECTROMAGNETIC_SIMULATION) then
+        write(IMAIN,*) 'Model: E velocity min,max       = ',vEmin,vEmax
+      endif
       write(IMAIN,*) '********'
       write(IMAIN,*)
 
@@ -400,6 +475,11 @@
             write(IMAIN,*) '  Source ',i
             write(IMAIN,*) '  maximum dominant source frequency = ',f0max,'Hz'
             write(IMAIN,*)
+            write(IMAIN,*)
+            if (ELECTROMAGNETIC_SIMULATION) then
+              write(IMAIN,*) '  Nb pts / lambdaE_fmax min = ',sngl(lambdaEmin/f0max)
+              write(IMAIN,*) '  Nb pts / lambdaE_fmax max = ',sngl(lambdaEmax/f0max)
+            endif
             if (POROELASTIC_SIMULATION) then
               ! slow and fast P-waves
               write(IMAIN,*) '  Nb pts / lambdaPI_fmax min = ',sngl(lambdaPImin/f0max)
@@ -407,7 +487,7 @@
               write(IMAIN,*)
               write(IMAIN,*) '  Nb pts / lambdaPII_fmax min = ',sngl(lambdaPIImin/f0max)
               write(IMAIN,*) '  Nb pts / lambdaPII_fmax max = ',sngl(lambdaPIImax/f0max)
-            else
+            else if (ELASTIC_SIMULATION .or. ACOUSTIC_SIMULATION) then
               write(IMAIN,*) '  Nb pts / lambdaP_fmax min = ',sngl(lambdaPImin/f0max)
               write(IMAIN,*) '  Nb pts / lambdaP_fmax max = ',sngl(lambdaPImax/f0max)
             endif
@@ -418,7 +498,7 @@
               write(IMAIN,*) '  Nb pts / lambdaS_fmax min = ',sngl(lambdaSmin/f0max)
               write(IMAIN,*) '  Nb pts / lambdaS_fmax max = ',sngl(lambdaSmax/f0max)
             else
-              write(IMAIN,*) '  purely fluid regions'
+              write(IMAIN,*) '  purely fluid or EM regions'
             endif
             call flush_IMAIN()
             ! for histogram
@@ -449,14 +529,14 @@
 !! DK DK take into account the fact that there is no S velocity in the fluid
 !! DK DK in this case, for the fluid, use the P wave data
 
-  if (create_wavelength_histogram) then
+  if (create_wavelength_histogram .and. .not. ELECTROMAGNETIC_SIMULATION) then
     ! create statistics about mesh sampling (number of points per wavelength)
     call check_grid_create_histogram(any_fluid_histo_glob,lambdaPmin_in_fluid_histo,lambdaPmax_in_fluid_histo, &
                                          lambdaSmin_histo,lambdaSmax_histo,f0max)
   endif
 
   ! creates a PostScript file with stability condition
-  if (output_postscript_snapshot) then
+  if (output_postscript_snapshot .and. .not. ELECTROMAGNETIC_SIMULATION) then
     call check_grid_create_postscript(courant_stability_number_max,lambdaPImin,lambdaPImax,lambdaSmin,lambdaSmax)
   endif
 

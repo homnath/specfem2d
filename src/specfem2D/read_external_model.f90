@@ -32,7 +32,8 @@
 !========================================================================
 
   subroutine read_external_model(rhoext,vpext,vsext,Qkappa_attenuationext,Qmu_attenuationext, &
-                                 nspec_ext,c11ext,c12ext,c13ext,c15ext,c22ext,c23ext,c25ext,c33ext,c35ext,c55ext)
+                                 nspec_ext,c11ext,c12ext,c13ext,c15ext,c22ext,c23ext,c25ext,c33ext,c35ext,c55ext, &
+                                 spermittivityext,sconductivityext,inv_magpermeabilityext)
 
 ! reads in external model files
 
@@ -40,7 +41,7 @@
     ATTENUATION_COMP_MAXIMUM
 
   use specfem_par, only: nspec,ibool,ispec_is_elastic,ispec_is_anisotropic, &
-    coord,kmato,MODEL,myrank,setup_with_binary_database
+    coord,kmato,MODEL,myrank,setup_with_binary_database,any_electromagnetic
 
   implicit none
 
@@ -51,8 +52,12 @@
                                                                             c22ext,c23ext,c25ext, &
                                                                             c33ext,c35ext,c55ext
 
+  real(kind=CUSTOM_REAL),dimension(2,NGLLX,NGLLZ,nspec), intent(inout) :: spermittivityext,sconductivityext
+  real(kind=CUSTOM_REAL),dimension(NGLLX,NGLLZ,nspec), intent(inout) :: inv_magpermeabilityext
+
   ! Local variables
-  integer :: i,j,ispec
+  integer :: i,j,ispec,ier
+  character(len=MAX_STRING_LEN) :: inputname
 
   ! note: we read in external models once the basic mesh with its geometry and GLL points has been setup.
   !       External models define new velocity/material parameters which need to be defined on all GLL points.
@@ -74,7 +79,33 @@
 
   case ('binary','gll')
     ! binary formats
+   if (.not. any_electromagnetic) then
     call read_binary_gll_model(rhoext,vpext,vsext,Qkappa_attenuationext,Qmu_attenuationext)
+   else
+    write(inputname,'(a,i6.6,a)') trim(IN_DATA_FILES)//'proc',myrank,'_permittivity.bin'
+    open(unit = IIN, file = inputname, status='old',action='read',form='unformatted',iostat=ier)
+    if (ier /= 0) stop 'Error opening DATA/proc*****_permittivity.bin file.'
+
+    read(IIN) spermittivityext(1,:,:,:)
+    read(IIN) spermittivityext(2,:,:,:)
+    close(IIN)
+    print *, 'permittivity', minval(spermittivityext), maxval(spermittivityext)
+
+    write(inputname,'(a,i6.6,a)') trim(IN_DATA_FILES)//'proc',myrank,'_conductivity.bin'
+    open(unit = IIN, file = inputname, status='old',action='read',form='unformatted',iostat=ier)
+    if (ier /= 0) stop 'Error opening DATA/proc*****_conductivity.bin file.'
+
+    read(IIN) sconductivityext(1,:,:,:)
+    read(IIN) sconductivityext(2,:,:,:)
+    close(IIN)
+
+    write(inputname,'(a,i6.6,a)') trim(IN_DATA_FILES)//'proc',myrank,'_invmagpermeability.bin'
+    open(unit = IIN, file = inputname, status='old',action='read',form='unformatted',iostat=ier)
+    if (ier /= 0) stop 'Error opening DATA/proc*****_invmagpermeability.bin file.'
+
+    read(IIN) inv_magpermeabilityext
+    close(IIN)
+   endif
 
   case ('binary_voigt')
     ! Voigt model

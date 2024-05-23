@@ -323,7 +323,8 @@
   call assemble_MPI_scalar(rmass_inverse_acoustic,nglob_acoustic, &
                            rmass_inverse_e1,n_sls_loc, &
                            rmass_inverse_elastic,nglob_elastic, &
-                           rmass_s_inverse_poroelastic,rmass_w_inverse_poroelastic,nglob_poroelastic)
+                           rmass_s_inverse_poroelastic,rmass_w_inverse_poroelastic,nglob_poroelastic, &
+                           rmass_inverse_electromagnetic,nglob_electromagnetic)
 #endif
 
   ! inverts mass matrix

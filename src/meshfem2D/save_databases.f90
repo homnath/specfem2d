@@ -266,6 +266,9 @@
   ! 'Q0_poroelastic freq0_poroelastic'
   write(IOUT) Q0_poroelastic,freq0_poroelastic
 
+  ! 'ATTENUATION_PERMITTIVITY ATTENUATION_CONDUCTIVITY f0_electromagnetic'
+  write(IOUT) ATTENUATION_PERMITTIVITY,ATTENUATION_CONDUCTIVITY,f0_electromagnetic
+
   ! 'Axisymmetric (2.5D, .true.) or Cartesian planar (2D; .false.) simulation'
   write(IOUT) AXISYM
 
@@ -441,7 +444,7 @@
 
   subroutine save_databases_materials()
 
-  use constants, only: IOUT,ISOTROPIC_MATERIAL,ANISOTROPIC_MATERIAL,POROELASTIC_MATERIAL
+  use constants, only: IOUT,ISOTROPIC_MATERIAL,ANISOTROPIC_MATERIAL,POROELASTIC_MATERIAL,ELECTROMAGNETIC_MATERIAL
   use part_unstruct_par
   use shared_parameters
 
@@ -452,9 +455,10 @@
   integer :: i,indic
 
   ! material set header
-  ! Material sets (num 1 rho vp vs 0 0 QKappa Qmu 0 0 0 0 0 0)                   acoustic/elastic
-  !               (num 2 rho c11 c13 c15 c33 c35 c55 c12 c23 c25 c22 Qkappa Qmu) anisotropic
-  !               (num 3 rhos rhof phi c k_xx k_xz k_zz Ks Kf Kfr etaf mufr Qmu) poroelastic
+  ! Material sets (num 1 rho vp vs 0 0 QKappa Qmu 0 0 0 0 0 0)                          acoustic/elastic
+  !               (num 2 rho c11 c13 c15 c33 c35 c55 c12 c23 c25 c22 Qkappa Qmu)        anisotropic
+  !               (num 3 rhos rhof phi c k_xx k_xz k_zz Ks Kf Kfr etaf mufr Qmu)        poroelastic
+  !               (num 4 mu0 e0 e11(e0) e33(e0) sig11 sig33 Qe11 Qe33 Qs11 Qs33 0 0 0)  electromagnetic
 
   do i = 1,nbmodels
     ! material type
@@ -517,6 +521,22 @@
       !write(IOUT) i,icodemat(i),rho_s_read(i),rho_f_read(i),phi_read(i),tortuosity_read(i), &
       !            permxx_read(i),permxz_read(i),permzz_read(i),kappa_s_read(i), &
       !            kappa_f_read(i),kappa_fr_read(i),eta_f_read(i),mu_fr_read(i),Qmu(i)
+
+    else if (indic == ELECTROMAGNETIC_MATERIAL) then
+      ! electromagnetic
+      val0 = mu0_read(i)
+      val1 = e0_read(i)
+      val2 = e11_read(i)
+      val3 = e33_read(i)
+      val4 = sig11_read(i)
+      val5 = sig33_read(i)
+      val6 = Qe11_read(i)
+      val7 = Qe33_read(i)
+      val8 = Qs11_read(i)
+      val9 = Qs33_read(i)
+      val10 = 0.d0
+      val11 = 0.d0
+      val12 = 0.d0
 
     else if (indic <= 0) then
       ! external material

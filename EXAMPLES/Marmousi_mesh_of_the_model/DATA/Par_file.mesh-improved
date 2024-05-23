@@ -93,6 +93,11 @@ ATTENUATION_PORO_FLUID_PART     = .false.        # turn viscous attenuation on o
 Q0_poroelastic                  = 1              # quality factor for viscous attenuation (ignore it if you are not using a poroelastic material)
 freq0_poroelastic               = 10             # frequency for viscous attenuation (ignore it if you are not using a poroelastic material)
 
+# for electromagnetic attenuation
+ATTENUATION_PERMITTIVITY        = .false.        # turn permittivity (Zener model) attenuation on or off for electromagnetic material
+ATTENUATION_CONDUCTIVITY        = .false.        # turn conductivity (Kelvin-Voigt model) attenuation on or off for electromagnetic material
+f0_electromagnetic              = 1d9            # (Hz) relevant only if source is a Dirac or a Heaviside, otherwise it is f0 the dominant frequency of the source in the DATA/SOURCE file
+
 # to undo attenuation and/or PMLs for sensitivity kernel calculations or forward runs with SAVE_FORWARD
 # use the flag below. It performs undoing of attenuation and/or of PMLs in an exact way for sensitivity kernel calculations
 # but requires disk space for temporary storage, and uses a significant amount of memory used as buffers for temporary storage.
@@ -144,7 +149,7 @@ write_moving_sources_database   = .false.
 #-----------------------------------------------------------
 
 # receiver set parameters for recording stations (i.e. recording points)
-# seismotype : record 1=displ 2=veloc 3=accel 4=pressure 5=curl of displ 6=the fluid potential
+# seismotype : record 1=displ 2=veloc 3=accel 4=pressure 5=curl of displ 6=the fluid potential 7=electric field
 seismotype                      = 1              # several values can be chosen. For example : 1,2,4
 
 # interval in time steps for writing of seismograms
@@ -182,9 +187,9 @@ rec_normal_to_surface           = .false.        # base anglerec normal to surfa
 # first receiver set (repeat these 6 lines and adjust nreceiversets accordingly)
 nrec                            = 11             # number of receivers TODO
 xdeb                            = 1000.          # first receiver x in meters
-zdeb                            = -50.          # first receiver z in meters
+zdeb                            = -50.           # first receiver z in meters
 xfin                            = 11000.         # last receiver x in meters (ignored if only one receiver)
-zfin                            = -50.          # last receiver z in meters (ignored if only one receiver)
+zfin                            = -50.           # last receiver z in meters (ignored if only one receiver)
 record_at_surface_same_vertical = .false.        # receivers inside the medium or at the surface (z values are ignored if this is set to true, they are replaced with the topography height)
 
 
@@ -249,16 +254,16 @@ read_external_mesh              = .true.
 
 # data concerning mesh, when generated using third-party app (more info in README)
 # (see also absorbing_conditions above)
-mesh_file                       = ./MESH-improved/Marmousi_connectivity               # file containing the mesh
-nodes_coords_file               = ./MESH-improved/Marmousi_coordinates                # file containing the nodes coordinates
-materials_file                  = ./MESH-improved/Marmousi_materials                  # file containing the material number for each element
-nummaterial_velocity_file       = ./MESH-default/nummaterial_velocity_file_marmousi2  # file containing the material properties for each material
-free_surface_file               = ./MESH-improved/Marmousi_free_surface               # file containing the free surface
-axial_elements_file             = dummy                                               # file containing the axial elements if AXISYM is true
-absorbing_surface_file          = ./MESH-improved/Marmousi_absorbing_surface          # file containing the absorbing surface
-acoustic_forcing_surface_file   = dummy                                               # file containing the acoustic forcing surface
-absorbing_cpml_file             = dummy                                               # file containing the CPML element numbers
-tangential_detection_curve_file = dummy                                               # file containing the curve delimiting the velocity model
+mesh_file                       = ./MESH-improved/Marmousi_connectivity   # file containing the mesh
+nodes_coords_file               = ./MESH-improved/Marmousi_coordinates    # file containing the nodes coordinates
+materials_file                  = ./MESH-improved/Marmousi_materials      # file containing the material number for each element
+nummaterial_velocity_file       = ./MESH-default/nummaterial_velocity_file_marmousi2   # file containing the material properties for each material
+free_surface_file               = ./MESH-improved/Marmousi_free_surface   # file containing the free surface
+axial_elements_file             = dummy                                   # file containing the axial elements if AXISYM is true
+absorbing_surface_file          = ./MESH-improved/Marmousi_absorbing_surface   # file containing the absorbing surface
+acoustic_forcing_surface_file   = dummy                                   # file containing the acoustic forcing surface
+absorbing_cpml_file             = dummy                                   # file containing the CPML element numbers
+tangential_detection_curve_file = dummy                                   # file containing the curve delimiting the velocity model
 
 #-----------------------------------------------------------
 #

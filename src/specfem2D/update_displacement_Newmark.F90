@@ -92,6 +92,9 @@
   ! poroelastic domain
   if (POROELASTIC_SIMULATION) call update_displ_poroelastic_forward()
 
+  ! electromagnetic domain
+  if (ELECTROMAGNETIC_SIMULATION) call update_displ_electromagnetic_forward()
+
   end subroutine update_displ_Newmark
 
 !
@@ -350,6 +353,37 @@
 !------------------------------------------------------------------------------------------------
 !
 
+  subroutine update_displ_electromagnetic_forward()
+
+! electromagnetic domains
+
+  use specfem_par
+
+  implicit none
+
+  ! checks if anything to do in this slice
+  if (.not. any_electromagnetic) return
+  ! Newmark
+  if (.not. time_stepping_scheme == 1) return
+
+  if (.not. GPU_MODE) then
+
+    ! updates electromagnetic wavefields
+    call update_displacement_newmark_electromagnetic(deltat,deltatover2,deltatsquareover2, &
+                                               accel_electromagnetic,veloc_electromagnetic, &
+                                               displ_electromagnetic)
+  else
+    ! on GPU
+    ! safety stop
+    call exit_MPI(myrank,'electromagnetic time marching scheme on GPU not implemented yet...')
+  endif
+
+  end subroutine update_displ_electromagnetic_forward
+
+!
+!------------------------------------------------------------------------------------------------
+!
+
   subroutine update_displacement_newmark_acoustic(deltat,deltatover2,deltatsquareover2, &
                                                   potential_dot_dot_acoustic,potential_dot_acoustic, &
                                                   potential_acoustic,PML_BOUNDARY_CONDITIONS,potential_acoustic_old)
@@ -492,6 +526,33 @@
   accelw_poroelastic(:,:) = 0._CUSTOM_REAL
 
   end subroutine update_displacement_newmark_poroelastic
+
+!
+!------------------------------------------------------------------------------------------------
+!
+
+  subroutine update_displacement_newmark_electromagnetic(deltat,deltatover2,deltatsquareover2, &
+                                                 accel_electromagnetic,veloc_electromagnetic, &
+                                                 displ_electromagnetic)
+
+  use constants, only: CUSTOM_REAL,NDIM
+
+  use specfem_par, only: nglob_electromagnetic,PML_BOUNDARY_CONDITIONS
+
+  implicit none
+
+  real(kind=CUSTOM_REAL),intent(in) :: deltat,deltatover2,deltatsquareover2
+  real(kind=CUSTOM_REAL), dimension(NDIM,nglob_electromagnetic),intent(inout) :: &
+     accel_electromagnetic,veloc_electromagnetic,displ_electromagnetic
+
+  if (PML_BOUNDARY_CONDITIONS) stop 'Updating displacement for PML on electromagnetic domain not implemented yet'
+
+    displ_electromagnetic(:,:) = displ_electromagnetic(:,:) + deltat * veloc_electromagnetic(:,:) + &
+                                 deltatsquareover2 * accel_electromagnetic(:,:)
+    veloc_electromagnetic(:,:) = veloc_electromagnetic(:,:) + deltatover2 * accel_electromagnetic(:,:)
+    accel_electromagnetic(:,:) = 0._CUSTOM_REAL
+
+  end subroutine update_displacement_newmark_electromagnetic
 
 !
 !------------------------------------------------------------------------------------------------
@@ -731,3 +792,23 @@
 
   end subroutine update_veloc_poroelastic_Newmark_backward
 
+!------------------------------------------------------------------------------------------------
+!
+! electromagnetic domains
+!
+!------------------------------------------------------------------------------------------------
+
+  subroutine update_veloc_electromagnetic_Newmark()
+
+! updates velocity vector (corrector)
+
+  use specfem_par
+
+  implicit none
+
+  ! local parameters
+  !integer :: iglob
+
+    veloc_electromagnetic(:,:) = veloc_electromagnetic(:,:) + deltatover2 * accel_electromagnetic(:,:)
+
+  end subroutine update_veloc_electromagnetic_Newmark

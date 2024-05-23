@@ -169,6 +169,18 @@
                 endif
               endif
 
+            case (7)
+              ! Electric field
+              if (ispec_is_electromagnetic(ispec)) then
+                do j = 1,NGLLZ
+                 do i = 1,NGLLX
+                   iglob = ibool(i,j,ispec)
+                   vector_field_element(1,i,j) = displ_electromagnetic(1,iglob)
+                   vector_field_element(2,i,j) = displ_electromagnetic(2,iglob)
+                 enddo
+                enddo
+              endif
+
             case default
               call stop_the_code('Invalid seismotype for writing seismograms')
             end select
@@ -311,6 +323,8 @@
     component = 'x'
   else if (seismotype_l == 5) then
     component = 'c'
+  else if (seismotype_l == 7) then
+    component = 'e'
   else
     call exit_MPI(myrank,'wrong component to save for seismograms')
   endif

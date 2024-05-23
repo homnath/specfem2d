@@ -80,7 +80,7 @@
 
   use specfem_par, only: NSOURCES,initialfield,source_type, &
                          coord,ibool,nglob,nspec,nelem_acoustic_surface,acoustic_surface, &
-                         ispec_is_elastic,ispec_is_poroelastic, &
+                         ispec_is_elastic,ispec_is_poroelastic,ispec_is_electromagnetic, &
                          x_source,z_source,vx_source,vz_source,ispec_selected_source, &
                          xi_source,gamma_source,sourcearrays, &
                          islice_selected_source,iglob_source, &
@@ -219,7 +219,7 @@
           izmin = acoustic_surface(4,ispec_acoustic_surface)
           izmax = acoustic_surface(5,ispec_acoustic_surface)
           if (.not. ispec_is_elastic(ispec) .and. .not. ispec_is_poroelastic(ispec) .and. &
-            ispec == ispec_selected_source(i_source)) then
+            .not. ispec_is_electromagnetic(ispec) .and. ispec == ispec_selected_source(i_source)) then
             if ((izmin == 1 .and. izmax == 1 .and. ixmin == 1 .and. ixmax == NGLLX .and. &
                 gamma_source(i_source) < -0.99d0) .or. &
                 (izmin == NGLLZ .and. izmax == NGLLZ .and. ixmin == 1 .and. ixmax == NGLLX .and. &
@@ -928,7 +928,7 @@
 
   use specfem_par, only: myrank,nspec,NSOURCES,initialfield,source_type,anglesource,P_SV, &
     sourcearrays,Mxx,Mxz,Mzz, &
-    ispec_is_acoustic,ispec_is_elastic,ispec_is_poroelastic, &
+    ispec_is_acoustic,ispec_is_elastic,ispec_is_poroelastic,ispec_is_electromagnetic, &
     ispec_selected_source,islice_selected_source, &
     xi_source,gamma_source, &
     xix,xiz,gammax,gammaz,xigll,zigll, &
@@ -1039,6 +1039,18 @@
               sourcearray(2,i,j) = - cos(anglesource(i_source)) * hlagrange
             endif
 
+            ! source element is electromagnetic
+            if (ispec_is_electromagnetic(ispec)) then
+              if (P_SV) then
+                ! P_SV case = TM case (surface GPR)
+                sourcearray(1,i,j) = + sin(anglesource(i_source)) * hlagrange
+                sourcearray(2,i,j) = - cos(anglesource(i_source)) * hlagrange
+              else
+                ! SH case (membrane) = TE (crosshole GPR)
+                sourcearray(:,i,j) = hlagrange
+              endif
+            endif
+
           enddo
         enddo
 
@@ -1056,11 +1068,14 @@
           if (.not. P_SV ) call exit_MPI(myrank,'cannot have moment tensor source in SH (membrane) waves calculation')
         endif
 
+        if (ispec_is_electromagnetic(ispec)) then
+          if (.not. P_SV ) call exit_MPI(myrank,'cannot have moment tensor source in SH (membrane) waves calculation')
+        endif
+
       end select
 
       ! stores sourcearray for all sources
       sourcearrays(:,:,:,i_source) = sourcearray(:,:,:)
-
     endif
   enddo
 

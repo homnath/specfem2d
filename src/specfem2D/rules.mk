@@ -67,9 +67,11 @@ specfem2D_OBJECTS = \
 	$O/compute_add_sources_acoustic.spec.o \
 	$O/compute_add_sources_poro.spec.o \
 	$O/compute_add_sources_viscoelastic.spec.o \
+	$O/compute_add_sources_electromagnetic.spec.o \
 	$O/compute_arrays_source.spec.o \
 	$O/compute_attenuation_poro_fluid_part.spec.o \
 	$O/compute_attenuation_viscoelastic.spec.o \
+	$O/compute_attenuation_electromagnetic.spec.o \
 	$O/compute_Bielak_conditions.spec.o \
 	$O/compute_coupling_acoustic_el.spec.o \
 	$O/compute_coupling_acoustic_po.spec.o \
@@ -88,6 +90,9 @@ specfem2D_OBJECTS = \
 	$O/compute_forces_poro_viscous_damping.spec.o \
 	$O/compute_forces_viscoelastic.spec.o \
 	$O/compute_forces_viscoelastic_calling_routine.spec.o \
+	$O/compute_forces_electromagnetic_conduction.spec.o \
+	$O/compute_forces_electromagnetic.spec.o \
+	$O/compute_forces_electromagnetic_calling_routine.spec.o \
 	$O/compute_gpu_acoustic.spec.o \
 	$O/compute_gpu_elastic.spec.o \
 	$O/compute_gradient_attenuation.spec.o \
@@ -97,6 +102,7 @@ specfem2D_OBJECTS = \
 	$O/compute_stacey_acoustic.spec.o \
 	$O/compute_stacey_elastic.spec.o \
 	$O/compute_stacey_poroelastic.spec.o \
+	$O/compute_stacey_electromagnetic.spec.o \
 	$O/compute_vector_field.spec.o \
 	$O/construct_acoustic_surface.spec.o \
 	$O/convert_time.spec.o \
@@ -115,6 +121,7 @@ specfem2D_OBJECTS = \
 	$O/get_MPI.spec.o \
 	$O/get_global.spec.o \
 	$O/get_poroelastic_velocities.spec.o \
+	$O/get_electromagnetic_velocities.spec.o \
 	$O/get_simulation_domains.spec.o \
 	$O/initialize_simulation.spec.o \
 	$O/invert_mass_matrix.spec.o \

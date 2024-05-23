@@ -169,12 +169,14 @@
   ! domain flags
   allocate(ispec_is_elastic(nspec), &
            ispec_is_acoustic(nspec), &
+           ispec_is_electromagnetic(nspec), &
            ispec_is_poroelastic(nspec),stat=ier)
   if (ier /= 0) call stop_the_code('Error allocating domain flag arrays')
 
   ispec_is_elastic(:) = .false.
   ispec_is_acoustic(:) = .false.
   ispec_is_poroelastic(:) = .false.
+  ispec_is_electromagnetic(:) = .false.
 
   ! element property flags
   allocate(ispec_is_anisotropic(nspec), &
@@ -311,9 +313,10 @@
 
   ! seismogram output
   do i_sig = 1,NSIGTYPE
-    if (seismotypeVec(i_sig) < 1 .or. seismotypeVec(i_sig) > 6) & ! TODO
+    if (seismotypeVec(i_sig) < 1 .or. seismotypeVec(i_sig) > 7) & ! TODO
       call stop_the_code( &
-      'seismotype should be 1(=displ), 2(=veloc), 3(=accel), 4(=pressure), 5(=curl of displ) or 6(=the fluid potential)')
+      'seismotype should be 1(=displ), 2(=veloc), 3(=accel), 4(=pressure), 5(=curl of displ), 6(=the fluid potential) &
+              & or 7(=electric field)')
   enddo
 
   if (SAVE_FORWARD .and. (NSIGTYPE > 1)) &

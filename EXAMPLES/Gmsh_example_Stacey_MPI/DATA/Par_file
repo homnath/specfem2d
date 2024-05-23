@@ -93,6 +93,11 @@ ATTENUATION_PORO_FLUID_PART     = .false.        # turn viscous attenuation on o
 Q0_poroelastic                  = 1              # quality factor for viscous attenuation (ignore it if you are not using a poroelastic material)
 freq0_poroelastic               = 10             # frequency for viscous attenuation (ignore it if you are not using a poroelastic material)
 
+# for electromagnetic attenuation
+ATTENUATION_PERMITTIVITY        = .false.        # turn permittivity (Zener model) attenuation on or off for electromagnetic material
+ATTENUATION_CONDUCTIVITY        = .false.        # turn conductivity (Kelvin-Voigt model) attenuation on or off for electromagnetic material
+f0_electromagnetic              = 1d9            # (Hz) relevant only if source is a Dirac or a Heaviside, otherwise it is f0 the dominant frequency of the source in the DATA/SOURCE file
+
 # to undo attenuation and/or PMLs for sensitivity kernel calculations or forward runs with SAVE_FORWARD
 # use the flag below. It performs undoing of attenuation and/or of PMLs in an exact way for sensitivity kernel calculations
 # but requires disk space for temporary storage, and uses a significant amount of memory used as buffers for temporary storage.
@@ -144,7 +149,7 @@ write_moving_sources_database   = .false.
 #-----------------------------------------------------------
 
 # receiver set parameters for recording stations (i.e. recording points)
-# seismotype : record 1=displ 2=veloc 3=accel 4=pressure 5=curl of displ 6=the fluid potential
+# seismotype : record 1=displ 2=veloc 3=accel 4=pressure 5=curl of displ 6=the fluid potential 7=electric field
 seismotype                      = 4              # several values can be chosen. For example : 1,2,4
 
 # interval in time steps for writing of seismograms

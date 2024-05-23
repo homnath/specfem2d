@@ -463,6 +463,41 @@
   elastic_iglob_is_forced(:) = .false.
   modeAmplitude(:) = 0.0d0
 
+!
+! electromagnetic material 
+!
+  if (ELECTROMAGNETIC_SIMULATION) then
+    if (myrank == 0) then
+      write(IMAIN,*) '  arrays for electromagnetic domains'
+      call flush_IMAIN()
+    endif
+  endif
+
+  ! sets global points in this slice
+  if (any_electromagnetic) then
+    nglob_electromagnetic = nglob
+  else
+    ! dummy allocate unused arrays with fictitious size
+    nglob_electromagnetic = 1
+  endif
+  
+  allocate(displ_electromagnetic(NDIM,nglob_electromagnetic), &
+           veloc_electromagnetic(NDIM,nglob_electromagnetic), &
+           accel_electromagnetic(NDIM,nglob_electromagnetic),stat=ier)
+  if (ier /= 0) stop 'Error allocating electromagnetic wavefield arrays'
+
+!  ! PML
+!  allocate(displ_electromagnetic_old(NDIM,nglob_elastic),stat=ier)
+!  if (ier /= 0) stop 'Error allocating old electromagnetic wavefield arrays'
+
+  allocate(rmass_inverse_electromagnetic(NDIM,nglob_electromagnetic),stat=ier)
+  if (ier /= 0) stop 'Error allocating electromagnetic mass matrix array'
+
+  displ_electromagnetic(:,:) = 0._CUSTOM_REAL
+  veloc_electromagnetic(:,:) = 0._CUSTOM_REAL
+  accel_electromagnetic(:,:) = 0._CUSTOM_REAL
+
+
   ! synchronizes all processes
   call synchronize_all()
 

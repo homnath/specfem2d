@@ -44,6 +44,7 @@
                          POROELASTIC_SIMULATION,any_poroelastic, &
                          displs_poroelastic,displw_poroelastic, &
                          ACOUSTIC_SIMULATION,any_acoustic,potential_acoustic,b_potential_acoustic, &
+                         ELECTROMAGNETIC_SIMULATION,any_electromagnetic,displ_electromagnetic, &
                          timestamp_seconds_start, &
                          NOISE_TOMOGRAPHY
 
@@ -223,6 +224,31 @@
         ! this trick checks for NaN (Not a Number), which is not even equal to itself
         potential_acoustic(1) /= potential_acoustic(1)) &
       call exit_MPI(myrank,'code became unstable and blew up in fluid (acoustic)')
+  endif
+
+  ! electromagnatic wavefield
+  if (ELECTROMAGNETIC_SIMULATION) then
+    if (any_electromagnetic) then
+      displnorm_all = maxval(sqrt(displ_electromagnetic(1,:)**2 + displ_electromagnetic(2,:)**2))
+    else
+      displnorm_all = 0._CUSTOM_REAL
+    endif
+
+    ! master collects norm from all processes
+    call max_all_cr(displnorm_all, displnorm_all_glob)
+    if (myrank == 0) &
+      write(IMAIN,*) 'Max norm of vector E field (electromagnetic) = ', displnorm_all_glob
+
+    ! check stability of the code in solid, exit if unstable
+    ! negative values can occur with some compilers when the unstable value is
+    ! greater
+    ! than the greatest possible floating-point number of the machine
+    ! (is-not-a-number check is more robust when done on actual array values
+    ! rather than return values from sqrt and amxval)
+    if (displnorm_all > STABILITY_THRESHOLD .or. displnorm_all < 0._CUSTOM_REAL .or. &
+! this trick checks for NaN (Not a Number), which is not even equal to itself
+        displ_electromagnetic(1,1) /= displ_electromagnetic(1,1)) &
+      call exit_MPI(myrank,'code became unstable and blew up in solid (electromagnetic)')
   endif
 
   ! count elapsed wall-clock time

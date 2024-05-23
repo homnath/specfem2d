@@ -46,9 +46,9 @@
   use constants, only: NDIM,NGLLX,NGLLZ,MAX_LENGTH_STATION_NAME,MAX_LENGTH_NETWORK_NAME, &
     IIN,IOUT,IMAIN,HUGEVAL,TINYVAL,NUM_ITER,mygroup,MAX_STRING_LEN, &
     IN_DATA_FILES,OUTPUT_FILES, &
-    IDOMAIN_ACOUSTIC,IDOMAIN_ELASTIC,IDOMAIN_POROELASTIC
+    IDOMAIN_ACOUSTIC,IDOMAIN_ELASTIC,IDOMAIN_POROELASTIC,IDOMAIN_ELECTROMAGNETIC
 
-  use specfem_par, only: ispec_is_acoustic,ispec_is_elastic,ispec_is_poroelastic
+  use specfem_par, only: ispec_is_acoustic,ispec_is_elastic,ispec_is_poroelastic,ispec_is_electromagnetic
 
   use specfem_par, only: AXISYM,is_on_the_axis,xiglj
 
@@ -347,6 +347,8 @@
           idomain_rec(irec) = IDOMAIN_ELASTIC
         else if (ispec_is_poroelastic(ispec)) then
           idomain_rec(irec) = IDOMAIN_POROELASTIC
+        else if (ispec_is_electromagnetic(ispec)) then
+          idomain_rec(irec) = IDOMAIN_ELECTROMAGNETIC
         else
           call stop_the_code('Invalid element type in locating receiver found!')
         endif

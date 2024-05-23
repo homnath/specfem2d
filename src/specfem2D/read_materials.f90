@@ -37,10 +37,14 @@
 
   use constants, only: IIN,IMAIN,ZERO,FOUR_THIRDS,TWO_THIRDS,HALF,TINYVAL, &
                        ISOTROPIC_MATERIAL,ANISOTROPIC_MATERIAL,POROELASTIC_MATERIAL, &
-                       ATTENUATION_COMP_MAXIMUM
+                       ATTENUATION_COMP_MAXIMUM,ELECTROMAGNETIC_MATERIAL
 
   use specfem_par, only: AXISYM,density,porosity,tortuosity,anisotropycoef,permeability,poroelastcoef, &
                           numat,myrank,QKappa_attenuationcoef,Qmu_attenuationcoef, &
+                          USE_CONDUCTIVE_DIFFUSION,ATTENUATION_CONDUCTIVITY, &
+                          ATTENUATION_PERMITTIVITY,f0_electromagnetic,&
+                          Qe11_electromagnetic,Qe33_electromagnetic,Qs11_electromagnetic,Qs33_electromagnetic,&
+                          spermittivity,sconductivity,inv_magpermeability,&
                           freq0_poroelastic,Q0_poroelastic,ATTENUATION_PORO_FLUID_PART, &
                           use_external_velocity_model,tomo_material,myrank
 
@@ -60,6 +64,12 @@
 
   double precision :: D_biot,H_biot,C_biot,M_biot
 
+  double precision :: condlxx,condlzz
+  double precision :: permlxx,permlzz
+  double precision :: two_inv_magpermeability
+  double precision :: cpxsquare,cpzsquare
+  double precision, dimension(2):: econdl,eperml
+
   double precision :: w_c
   integer :: imat,n,indic
 
@@ -76,6 +86,17 @@
 
   QKappa_attenuationcoef(:) = ATTENUATION_COMP_MAXIMUM
   Qmu_attenuationcoef(:) = ATTENUATION_COMP_MAXIMUM
+
+  spermittivity(:,:) = ZERO
+  sconductivity(:,:) = ZERO
+  inv_magpermeability(:) = ZERO
+
+  Qe11_electromagnetic(:) = 9999.
+  Qe33_electromagnetic(:) = 9999.
+  Qs11_electromagnetic(:) = 9999.
+  Qs33_electromagnetic(:) = 9999.
+
+  USE_CONDUCTIVE_DIFFUSION = .false.  ! for conduction diffusion in electromagnetic material. 
 
   ! Index of the material that will be defined by an external tomo file if needed (TOMOGRAPHY_FILE)
   tomo_material = 0
@@ -108,6 +129,7 @@
     !  anisotropic             - model_number  2 rho   c11 c13 c15 c33    c35 c55 c12 c23 c25    0 QKappa Qmu
     !  anisotropic (in AXISYM) - model_number  2 rho   c11 c13 c15 c33    c35 c55 c12 c23 c25  c22 QKappa Qmu
     !  poroelastic             - model_number  3 rhos rhof phi   c kxx    kxz kzz  Ks  Kf Kfr etaf   mufr Qmu
+    !  electromagnetic         - model_number  4 mu0 e0 e11(e0) e33(e0) sig11 sig33 Qe11 Qe33 Qs11 Qs33 0 0 0
     !  tomo                    - model_number -1 0       0   A   0   0      0   0   0   0   0    0      0   0
     read(IIN) n,indic,val0,val1,val2,val3,val4,val5,val6,val7,val8,val9,val10,val11,val12
 
@@ -298,6 +320,22 @@
 
       ! Poisson's ratio must be between -1 and +1/2
       if (poisson_s < -1.d0 .or. poisson_s > 0.5d0) call stop_the_code('Poisson''s ratio for the solid phase out of range')
+    
+    else if (indic == ELECTROMAGNETIC_MATERIAL ) then
+      !  model_number 4 mu0 e0 e11(e0) e33(e0) sig11 sig33 Qe11 Qe33 Qs11 Qs33 0 0 0
+      spermittivity(1,n) = val1 * val2        !e11
+      spermittivity(2,n) = val1 * val3        !e33
+      inv_magpermeability(n) = 1.d0/val0  !mu0^-1
+      sconductivity(1,n) = val4       !sig11
+      sconductivity(2,n) = val5       !sig33
+      porosity(n) = 2.d0 ! to differentiate from elastic, poro and acoustic !!!
+
+      USE_CONDUCTIVE_DIFFUSION = .true.
+
+      Qe11_electromagnetic(n) = val6
+      Qe33_electromagnetic(n) = val7
+      Qs11_electromagnetic(n) = val8
+      Qs33_electromagnetic(n) = val9
 
     else if (indic <= 0) then
       ! external, tomo material (material properties will be assigned later)
@@ -385,6 +423,22 @@
 
       Qmu_attenuationcoef(n) = Qmu
 
+    else if (indic == ELECTROMAGNETIC_MATERIAL ) then
+      !  model_number 4 mu0 e0 e11(e0) e33(e0) sig11 sig33 Qe11 Qe33 Qs11 Qs33 0 0 0
+      permlxx = spermittivity(1,n)            !e11
+      permlzz = spermittivity(2,n)            !e33
+      condlxx = sconductivity(1,n)            !sig11
+      condlzz = sconductivity(2,n)            !sig33 
+      two_inv_magpermeability = 2.d0 * inv_magpermeability(n) !2mu0^-1
+
+      call get_electromagnetic_velocities(cpxsquare,cpzsquare,econdl,eperml,ATTENUATION_CONDUCTIVITY, &
+         ATTENUATION_PERMITTIVITY,f0_electromagnetic,Qe11_electromagnetic(n),Qe33_electromagnetic(n),&
+         Qs11_electromagnetic(n),Qs33_electromagnetic(n), &
+         permlxx,permlzz,condlxx,condlzz,two_inv_magpermeability)
+
+       cp=sqrt(cpxsquare)
+       cs=sqrt(cpzsquare)
+
     else if (indic <= 0) then
       ! external, tomo material
       ! assign dummy values for now (for acoustic medium vs must be 0 anyway), these values will be read in read_external_model
@@ -460,6 +514,10 @@
         write(IMAIN,800) lambda_fr,mu_fr,kappa_fr,porosity(n),tortuosity(n), &
                          permeability(1,n),permeability(2,n),permeability(3,n),Qmu
         write(IMAIN,900) D_biot,H_biot,C_biot,M_biot,w_c
+
+      else if (indic == ELECTROMAGNETIC_MATERIAL) then
+        ! material is EM
+        write(IMAIN,1001) n,val0,val1,val2,val3,val4,val5,val6,val7,val8,val9,cp,cs
 
       else if (indic <= 0) then
         ! external, tomo material
@@ -590,5 +648,23 @@
        '----------------------------------------------------',/5x, &
        'Material set number. . . . . . . . (jmat) =',i6,/5x)
 
+1001 format(//5x,'-------------------------------',/5x, &
+       '-- Electromagnetic material --',/5x, &
+       '-------------------------------',/5x, &
+       'Material set number. . . . . . . . (jmat) =',i6,/5x, &
+       'magnetic permeability (free space). . . . . (mu0=4xpix10-7 H.m^-1) =',1pe15.8,/5x, &
+       'permittivity (free space). . . . . . . (e0=8.85x10-12 F.m^-1) =',1pe15.8,/5x, &
+       'permittivity xx component. . . (e11(e0)) =',1pe15.8,/5x, &
+       'permittivity zz component. . . (e33(e0)) =',1pe15.8,/5x, &
+       'conductivity xx component. . . (sig11) =',1pe15.8,/5x, &
+       'conductivity zz component. . . (sig33) =',1pe15.8,/5x, &
+       '-------------------------------',/5x, &
+       'Qe11_electromagnetic . . . . . (Qe11) =',1pe15.8,/5x, &
+       'Qe33_electromagnetic . . . . . (Qe33) =',1pe15.8,/5x, &
+       'Qs11_electromagnetic . . . . . (Qs11) =',1pe15.8,/5x, &
+       'Qs33_electromagnetic . . . . . (Qs33) =',1pe15.8,/5x, &
+       '-------------------------------',/5x, &
+       'cp xx component unrelaxed velocity. . . . . . . .(cp11) =',1pe15.8,/5x, &
+       'cp zz compoment unrelaxed velocity. . . . . . .(cp33) =',1pe15.8,/5x)
   end subroutine read_materials
 

@@ -50,19 +50,19 @@
   use constants, only: NGLLX,NGLLZ
 
   use specfem_par, only: ibool, knods, NGNOD, nglob, &
-    ispec_is_elastic, ispec_is_poroelastic, ispec_is_acoustic
+    ispec_is_elastic, ispec_is_poroelastic, ispec_is_acoustic, ispec_is_electromagnetic
 
   use specfem_par, only: ninterface, my_nelmnts_neighbors, my_interfaces, &
     nibool_interfaces_ext_mesh, ibool_interfaces_ext_mesh_init
 
   use specfem_par, only: NPROC, &
     ibool_interfaces_acoustic, ibool_interfaces_elastic, &
-    ibool_interfaces_poroelastic, &
+    ibool_interfaces_poroelastic, ibool_interfaces_electromagnetic, &
     nibool_interfaces_acoustic, nibool_interfaces_elastic, &
-    nibool_interfaces_poroelastic, &
+    nibool_interfaces_poroelastic, nibool_interfaces_electromagnetic, &
     inum_interfaces_acoustic, inum_interfaces_elastic, &
-    inum_interfaces_poroelastic, &
-    ninterface_acoustic, ninterface_elastic, ninterface_poroelastic
+    inum_interfaces_poroelastic, inum_interfaces_electromagnetic, &
+    ninterface_acoustic, ninterface_elastic, ninterface_poroelastic, ninterface_electromagnetic
 
   implicit none
 
@@ -73,6 +73,7 @@
   logical, dimension(nglob)  :: mask_ibool_acoustic
   logical, dimension(nglob)  :: mask_ibool_elastic
   logical, dimension(nglob)  :: mask_ibool_poroelastic
+  logical, dimension(nglob)  :: mask_ibool_electromagnetic
   logical, dimension(nglob)  :: mask_ibool_ext_mesh
 
   integer  :: ixmin, ixmax, izmin, izmax, ix, iz
@@ -81,6 +82,7 @@
   integer  :: nglob_interface_acoustic
   integer  :: nglob_interface_elastic
   integer  :: nglob_interface_poroelastic
+  integer  :: nglob_interface_electromagnetic
   integer :: npoin_interface_ext_mesh
 
   ! checks if anything to do
@@ -101,6 +103,9 @@
   ibool_interfaces_poroelastic(:,:) = 0
   nibool_interfaces_poroelastic(:) = 0
 
+  ibool_interfaces_electromagnetic(:,:) = 0
+  nibool_interfaces_electromagnetic(:) = 0
+
   do iinterface = 1, ninterface
     ! initializes interface point counters
     npoin_interface_ext_mesh = 0
@@ -109,10 +114,12 @@
     nglob_interface_acoustic = 0
     nglob_interface_elastic = 0
     nglob_interface_poroelastic = 0
+    nglob_interface_electromagnetic = 0
 
     mask_ibool_acoustic(:) = .false.
     mask_ibool_elastic(:) = .false.
     mask_ibool_poroelastic(:) = .false.
+    mask_ibool_electromagnetic(:) = .false.
 
     do ispec_interface = 1, my_nelmnts_neighbors(iinterface)
       ! element id
@@ -179,6 +186,14 @@
               ibool_interfaces_acoustic(nglob_interface_acoustic,iinterface) = iglob
             endif
 
+          else if (ispec_is_electromagnetic(ispec)) then
+            ! electromagnetic element
+            if (.not. mask_ibool_electromagnetic(iglob)) then
+              mask_ibool_electromagnetic(iglob) = .true.
+              nglob_interface_electromagnetic = nglob_interface_electromagnetic + 1
+              ibool_interfaces_electromagnetic(nglob_interface_electromagnetic,iinterface) = iglob
+            endif
+
           else
             call stop_the_code('Invalid element type found in prepare_assemble_MPI() routine')
           endif
@@ -195,6 +210,7 @@
     nibool_interfaces_acoustic(iinterface) = nglob_interface_acoustic
     nibool_interfaces_elastic(iinterface) = nglob_interface_elastic
     nibool_interfaces_poroelastic(iinterface) = nglob_interface_poroelastic
+    nibool_interfaces_electromagnetic(iinterface) = nglob_interface_electromagnetic
 
   enddo
 
@@ -202,6 +218,7 @@
   ninterface_acoustic = 0
   ninterface_elastic =  0
   ninterface_poroelastic =  0
+  ninterface_electromagnetic =  0
 
   ! loops over all MPI interfaces
   do iinterface = 1, ninterface
@@ -219,6 +236,11 @@
     if (nibool_interfaces_poroelastic(iinterface) > 0) then
       ninterface_poroelastic = ninterface_poroelastic + 1
       inum_interfaces_poroelastic(ninterface_poroelastic) = iinterface
+    endif
+    ! electromagnetic
+    if (nibool_interfaces_electromagnetic(iinterface) > 0) then
+      ninterface_electromagnetic= ninterface_electromagnetic+ 1
+      inum_interfaces_electromagnetic(ninterface_electromagnetic) = iinterface
     endif
   enddo
 

@@ -40,6 +40,7 @@
                          potential_acoustic,potential_dot_acoustic,potential_dot_dot_acoustic, &
                          displ_elastic,veloc_elastic,accel_elastic, &
                          displs_poroelastic,velocs_poroelastic,accels_poroelastic, &
+                         displ_electromagnetic, &
                          b_potential_acoustic,b_potential_dot_acoustic,b_potential_dot_dot_acoustic, &
                          b_displ_elastic,b_veloc_elastic,b_accel_elastic, &
                          b_displs_poroelastic,b_velocs_poroelastic,b_accels_poroelastic,SIMULATION_TYPE, &
@@ -187,6 +188,19 @@
         enddo
       enddo
 
+    else if (imagetype_JPEG >= 17 .and. imagetype_JPEG <= 19) then
+    ! added entries for Ex, Ez, E norm
+      if (myrank == 0) write(IMAIN,*) 'drawing scalar image of part of the Electric vector...'
+      do ispec = 1,nspec
+        do j = 1,NGLLZ
+          do i = 1,NGLLX
+            iglob = ibool(i,j,ispec)
+            vector_field_display(1,iglob) = displ_electromagnetic(1,iglob)
+            vector_field_display(2,iglob) = displ_electromagnetic(2,iglob)
+          enddo
+        enddo
+      enddo
+
     else if (imagetype_JPEG == 10 .and. P_SV) then
 
       if (i_field == 1 .and. .not. plot_b_wavefield_only) then
@@ -242,17 +256,17 @@
         ! P-SV waves, plot a component of vector, its norm, or else pressure
         if (iglob_image_color(i,j) /= -1) then
           if (imagetype_JPEG == 1 .or. imagetype_JPEG == 4 .or. imagetype_JPEG == 7 .or. &
-              imagetype_JPEG == 11 .or. imagetype_JPEG == 14) then
+              imagetype_JPEG == 11 .or. imagetype_JPEG == 14 .or. imagetype_JPEG == 17) then
             ! draw the X component of the vector
             image_color_data(i,j) = vector_field_display(1,iglob_image_color(i,j))
 
           else if (imagetype_JPEG == 2 .or. imagetype_JPEG == 5 .or. imagetype_JPEG == 8 .or. &
-                  imagetype_JPEG == 12 .or. imagetype_JPEG == 15) then
+                  imagetype_JPEG == 12 .or. imagetype_JPEG == 15 .or.  imagetype_JPEG == 18) then
             ! draw the Z component of the vector
             image_color_data(i,j) = vector_field_display(2,iglob_image_color(i,j))
 
           else if (imagetype_JPEG == 3 .or. imagetype_JPEG == 6 .or. imagetype_JPEG == 9 .or. &
-                  imagetype_JPEG == 13 .or. imagetype_JPEG == 16) then
+                  imagetype_JPEG == 13 .or. imagetype_JPEG == 16 .or.  imagetype_JPEG == 19) then
             ! draw the norm of the vector
             image_color_data(i,j) = sqrt(vector_field_display(1,iglob_image_color(i,j))**2  &
                                        + vector_field_display(2,iglob_image_color(i,j))**2)
@@ -308,15 +322,15 @@
           if (P_SV) then ! P-SV waves, plot a component of vector, its norm, or else pressure
 
             if (imagetype_JPEG == 1 .or. imagetype_JPEG == 4 .or. imagetype_JPEG == 7 .or. &
-                imagetype_JPEG == 11 .or. imagetype_JPEG == 14) then
+                imagetype_JPEG == 11 .or. imagetype_JPEG == 14 .or. imagetype_JPEG == 17) then
                data_pixel_send(k) = vector_field_display(1,iglob_image_color(i,j))  ! draw the X component of the vector
 
             else if (imagetype_JPEG == 2 .or. imagetype_JPEG == 5 .or. imagetype_JPEG == 8 .or. &
-                    imagetype_JPEG == 12 .or. imagetype_JPEG == 15) then
+                    imagetype_JPEG == 12 .or. imagetype_JPEG == 15 .or. imagetype_JPEG == 18) then
                data_pixel_send(k) = vector_field_display(2,iglob_image_color(i,j))  ! draw the Z component of the vector
 
             else if (imagetype_JPEG == 3 .or. imagetype_JPEG == 6 .or. imagetype_JPEG == 9 .or. &
-                    imagetype_JPEG == 13 .or. imagetype_JPEG == 16) then
+                    imagetype_JPEG == 13 .or. imagetype_JPEG == 16 .or. imagetype_JPEG == 19) then
               data_pixel_send(k) = sqrt(vector_field_display(1,iglob_image_color(i,j))**2 + &
                                         vector_field_display(2,iglob_image_color(i,j))**2)  ! draw the norm of the vector
 

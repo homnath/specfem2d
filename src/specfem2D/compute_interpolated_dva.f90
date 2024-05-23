@@ -88,6 +88,14 @@
         vz = vz + dzd*hlagrange
         vcurl = vcurl + dcurld*hlagrange
 
+      case(7)
+        ! Electric field
+        dxd = vector_field_element(1,i,j)
+        dzd = vector_field_element(2,i,j)
+        ! computes interpolated field
+        vx = vx + dxd*hlagrange
+        vz = vz + dzd*hlagrange
+
       case default
         call stop_the_code('Invalid seismotype for writing seismograms')
       end select

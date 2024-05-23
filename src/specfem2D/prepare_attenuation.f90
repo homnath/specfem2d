@@ -500,6 +500,61 @@
     gammaval = DT / 2.d0 + DT**2 * thetainv / 6.d0 + DT**3 * thetainv**2 / 24.d0
   endif
 
+  ! allocate memory variables for permittivity attenuation (electromagnetic media)
+  if (ATTENUATION_PERMITTIVITY) then
+    allocate(rx_permattenuation(NGLLX,NGLLZ,nspec))
+    allocate(rz_permattenuation(NGLLX,NGLLZ,nspec))
+    allocate(permx(NGLLX,NGLLZ,nspec))
+    allocate(permz(NGLLX,NGLLZ,nspec))
+    allocate(tau_e(NGLLX,NGLLZ,nspec,2))
+    allocate(tau_d(NGLLX,NGLLZ,nspec,2))
+    allocate(tauinv(2))
+    allocate(alphavalem(NGLLX,NGLLZ,nspec,2))
+    allocate(betavalem(NGLLX,NGLLZ,nspec,2))
+    allocate(gammavalem(NGLLX,NGLLZ,nspec,2))
+
+    ! initialize memory variables for attenuation
+    rx_permattenuation(:,:,:) = 0.d0
+    rz_permattenuation(:,:,:) = 0.d0
+    permx(:,:,:) = 0.d0
+    permz(:,:,:) = 0.d0
+
+  ! if source is not a Dirac or Heavyside then f0_attenuation is f0 of the first
+  ! source
+  if (.not. (time_function_type(1) == 4 .or. time_function_type(1) == 5)) then
+    f0_electromagnetic = f0_source(1)
+  endif
+
+    ! precompute Runge Kutta coefficients if viscous attenuation
+    ! viscous attenuation is implemented following the memory variable
+    ! formulation of
+    ! J. M. Carcione Wave fields in real media: wave propagation in anisotropic,
+    ! anelastic and porous media, Elsevier, p. 304-305, 2007
+    do ispec = 1,nspec
+      do j = 1,NGLLZ
+        do i = 1,NGLLX
+
+    tau_e(i,j,ispec,1) = (sqrt(Qe11_electromagnetic(kmato(ispec))**2+1.d0) +1.d0)/ &
+                          (2.d0*pi*f0_electromagnetic*Qe11_electromagnetic(kmato(ispec)))
+    tau_e(i,j,ispec,2) = (sqrt(Qe33_electromagnetic(kmato(ispec))**2+1.d0) +1.d0)/ &
+                          (2.d0*pi*f0_electromagnetic*Qe33_electromagnetic(kmato(ispec)))
+    tau_d(i,j,ispec,1) = (sqrt(Qe11_electromagnetic(kmato(ispec))**2+1.d0) -1.d0)/ &
+                          (2.d0*pi*f0_electromagnetic*Qe11_electromagnetic(kmato(ispec)))
+    tau_d(i,j,ispec,2) = (sqrt(Qe33_electromagnetic(kmato(ispec))**2+1.d0) -1.d0)/ &
+                         (2.d0*pi*f0_electromagnetic*Qe33_electromagnetic(kmato(ispec)))
+
+    tauinv(:) = - 1.d0 / tau_d(i,j,ispec,:)
+    alphavalem(i,j,ispec,:) = 1.d0 + deltat*tauinv(:) + deltat**2*tauinv(:)**2 / 2.d0 &
+                    + deltat**3*tauinv(:)**3 / 6.d0 + deltat**4*tauinv(:)**4 / 24.d0
+    betavalem(i,j,ispec,:) = deltat / 2.d0 + deltat**2*tauinv(:) / 3.d0 + deltat**3*tauinv(:)**2 / 8.d0 &
+                    + deltat**4*tauinv(:)**3 / 24.d0
+    gammavalem(i,j,ispec,:) = deltat / 2.d0 + deltat**2*tauinv(:) / 6.d0 + deltat**3*tauinv(:)**2 / 24.d0
+
+        enddo
+      enddo
+    enddo
+  endif
+
   ! synchronizes all processes
   call synchronize_all()
 
