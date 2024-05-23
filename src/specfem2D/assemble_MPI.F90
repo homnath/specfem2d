@@ -47,7 +47,8 @@
   subroutine assemble_MPI_scalar(array_val1,npoin_val1, &
                                  array_e1,n_sls_loc, &
                                  array_val2,npoin_val2, &
-                                 array_val3,array_val4,npoin_val3)
+                                 array_val3,array_val4,npoin_val3, &
+                                 array_val5,npoin_val5)
 
   use constants, only: CUSTOM_REAL,NDIM,USE_A_STRONG_FORMULATION_FOR_E1
 
@@ -78,6 +79,10 @@
   ! poroelastic
   integer :: npoin_val3
   real(kind=CUSTOM_REAL), dimension(npoin_val3), intent(inout) :: array_val3,array_val4
+
+  ! electromagnetic
+  integer :: npoin_val5
+  real(kind=CUSTOM_REAL), dimension(NDIM,npoin_val5), intent(inout) :: array_val5
 
   ! local parameters
   integer :: ipoin,iglob,i,idim,iinterface
