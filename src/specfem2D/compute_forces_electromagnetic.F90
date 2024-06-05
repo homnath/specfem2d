@@ -31,14 +31,14 @@
 !========================================================================
 
 
-  subroutine compute_forces_electromagnetic(accel_electromagnetic,displ_electromagnetic,&
+  subroutine compute_forces_electromagnetic(accel_electromagnetic,displ_electromagnetic, &
                                             rx_permattenuation,rz_permattenuation,iphase)
 
   ! compute forces for the electromagnetic elements
   use constants, only: CUSTOM_REAL,NGLLX,NGLLZ,NGLJ,NDIM, &
     ONE,HALF,PI,TINYVAL,FOUR_THIRDS
 
-  use specfem_par, only: nglob,&
+  use specfem_par, only: nglob, &
                          ibool,kmato,ispec_is_electromagnetic, &
                          xix,xiz,gammax,gammaz,jacobian, &
                          hprime_xx,hprimewgll_xx,hprime_zz,hprimewgll_zz,wxgll,wzgll, &
@@ -177,7 +177,7 @@
         !--- if external medium, get electromagnetic parameters of current grid point
         inv_mag_permeability = inv_magpermeabilitystore(i,j,ispec)
 
-        if(P_SV) then
+        if (P_SV) then
         sigma_xx = inv_mag_permeability*(dux_dxl(i,j)+duz_dzl(i,j)) !
         sigma_zz = inv_mag_permeability*(dux_dxl(i,j)+duz_dzl(i,j)) !
         sigma_xz = inv_mag_permeability*(duz_dxl(i,j) - dux_dzl(i,j))  !  d_t \tilde{H}_xz = d_t H_y = mu^-1(dxEz-dzEx)
@@ -255,7 +255,7 @@
             accel_electromagnetic(1,iglob) = accel_electromagnetic(1,iglob) - (wzgll(j) * tempx1l + wxgll(i) * tempx2l) &
                               - wxgll(i) * wzgll(j) * jacobian(i,j,ispec) * rx_permattenuation(i,j,ispec)
             accel_electromagnetic(2,iglob) = 0.d0
-           endif 
+           endif
          else
            if (P_SV) then
             accel_electromagnetic(1,iglob) = accel_electromagnetic(1,iglob) - (wzgll(j) * tempx1l + wxgll(i) * tempx2l)

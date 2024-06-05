@@ -149,7 +149,7 @@
       deriv_mapping(4,INDEX_IJ,ispec) = gammaz(INDEX_IJ,ispec)
 
       deriv_mapping(5,INDEX_IJ,ispec) = jacobian(INDEX_IJ,ispec)
-      
+
       if (any_acoustic) then
       ! for acoustic elements
       ! density model

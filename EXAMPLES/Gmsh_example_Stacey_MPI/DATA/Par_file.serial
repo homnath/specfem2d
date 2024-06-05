@@ -30,7 +30,7 @@ DT                              = 5.d-7
 # 1 = Newmark (2nd order), 2 = LDDRK4-6 (4th-order 6-stage low storage Runge-Kutta), 3 = classical RK4 4th-order 4-stage Runge-Kutta
 time_stepping_scheme            = 1
 
-# set the type of calculation (P-SV or SH/membrane waves)
+# set the type of calculation (P-SV (EM TE) or SH/membrane waves (EM TM))
 P_SV                            = .true.
 
 # axisymmetric (2.5D) or Cartesian planar (2D) simulation
@@ -96,7 +96,7 @@ freq0_poroelastic               = 10             # frequency for viscous attenua
 # for electromagnetic attenuation
 ATTENUATION_PERMITTIVITY        = .false.        # turn permittivity (Zener model) attenuation on or off for electromagnetic material
 ATTENUATION_CONDUCTIVITY        = .false.        # turn conductivity (Kelvin-Voigt model) attenuation on or off for electromagnetic material
-f0_electromagnetic              = 1d9            # (Hz) relevant only if source is a Dirac or a Heaviside, otherwise it is f0 the dominant frequency of the source in the DATA/SOURCE file
+f0_electromagnetic              = 1.d9           # (Hz) relevant only if source is a Dirac or a Heaviside, otherwise it is f0 the dominant frequency of the source in the DATA/SOURCE file
 
 # to undo attenuation and/or PMLs for sensitivity kernel calculations or forward runs with SAVE_FORWARD
 # use the flag below. It performs undoing of attenuation and/or of PMLs in an exact way for sensitivity kernel calculations
@@ -280,6 +280,7 @@ nbmodels                        = 2
 #   anisotropic:           model_number 2 rho c11 c13 c15 c33 c35 c55 c12 c23 c25   0 QKappa Qmu
 #   anisotropic in AXISYM: model_number 2 rho c11 c13 c15 c33 c35 c55 c12 c23 c25 c22 QKappa Qmu
 #   poroelastic:           model_number 3 rhos rhof phi c kxx kxz kzz Ks Kf Kfr etaf mufr Qmu
+#   electromagnetic:       model_number 4 mu0 e0 e11(e0) e33(e0) sig11 sig33 Qe11 Qe33 Qs11 Qs33 0 0 0
 #   tomo:                  model_number -1 0 0 A 0 0 0 0 0 0 0 0 0 0
 #
 # note: When viscoelasticity or viscoacousticity is turned on,

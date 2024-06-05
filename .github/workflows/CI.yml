@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Check for changes
       id: diff
@@ -86,7 +86,7 @@ jobs:
     needs: changesCheck
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install dependencies
       run: |
@@ -104,9 +104,16 @@ jobs:
         echo ""
         ## avoids sed -i '' issue on MacOS, using gnu sed to have the same sed command lines as in linux
         brew install gnu-sed
-        echo "PATH=/usr/local/opt/gnu-sed/libexec/gnubin:$PATH" >> $GITHUB_ENV
+        echo "PATH=/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH" >> $GITHUB_ENV
         ## OpenMP
         echo "OMP_NUM_THREADS=2" >> $GITHUB_ENV
+        ## MPI
+        echo
+        echo "MPI environment:"
+        echo "mpif90 on path: $(which mpif90)"
+        echo
+        # add OpenMPI path to have ./configure detect mpi.h
+        echo "MPI_INC=/opt/homebrew/include" >> $GITHUB_ENV
         ## avoids MPI issue with number of slots
         echo "OMPI_MCA_rmaps_base_oversubscribe=1" >> $GITHUB_ENV
         echo "OMPI_MCA_rmaps_base_inherit=1" >> $GITHUB_ENV
@@ -139,7 +146,7 @@ jobs:
         os: [ubuntu-latest,ubuntu-20.04]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install packages
       run: ./.github/scripts/run_install.sh
@@ -158,7 +165,7 @@ jobs:
     needs: changesCheck
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Cache Intel oneapi packages
       id: cache-intel-oneapi
@@ -294,7 +301,7 @@ jobs:
     needs: [linuxCheck]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install packages
       run: ./.github/scripts/run_install.sh
@@ -312,7 +319,7 @@ jobs:
     needs: [linuxCheck]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install packages
       run: ./.github/scripts/run_install.sh
@@ -336,7 +343,7 @@ jobs:
     needs: [linuxCheck]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install packages
       run: ./.github/scripts/run_install.sh
@@ -361,7 +368,7 @@ jobs:
     needs: [linuxCheck]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install packages
       run: ./.github/scripts/run_install.sh
@@ -386,7 +393,7 @@ jobs:
     needs: [linuxCheck]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install packages
       run: ./.github/scripts/run_install.sh
@@ -410,7 +417,7 @@ jobs:
     needs: [linuxCheck]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install packages
       run: ./.github/scripts/run_install.sh
@@ -434,7 +441,7 @@ jobs:
     needs: [linuxCheck]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install packages
       run: ./.github/scripts/run_install.sh
@@ -459,7 +466,7 @@ jobs:
     needs: [linuxCheck]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install packages
       run: ./.github/scripts/run_install.sh
@@ -483,7 +490,7 @@ jobs:
     needs: [linuxCheck]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install packages
       run: ./.github/scripts/run_install.sh
@@ -507,7 +514,7 @@ jobs:
     needs: [linuxCheck]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install packages
       run: ./.github/scripts/run_install.sh
@@ -531,7 +538,7 @@ jobs:
     needs: [linuxCheck]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install packages
       run: ./.github/scripts/run_install.sh
@@ -556,7 +563,7 @@ jobs:
     needs: [linuxCheck]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install packages
       run: ./.github/scripts/run_install.sh
@@ -580,7 +587,7 @@ jobs:
     needs: [linuxCheck]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install packages
       run: ./.github/scripts/run_install.sh
@@ -598,4 +605,52 @@ jobs:
       run: ./.github/scripts/run_tests.sh
       shell: bash
 
+  linuxTest_13:
+    name: Test run example 13 - Gmsh w/ Stacey
+    runs-on: ubuntu-latest
+    needs: [linuxCheck]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install packages
+      run: ./.github/scripts/run_install.sh
+      shell: bash
+
+    - name: Run build
+      env:
+        TESTFLAGS: --with-mpi
+      run: ./.github/scripts/run_build.sh
+      shell: bash
+
+    - name: Run test
+      env:
+        TESTDIR: EXAMPLES/Gmsh_example_Stacey_MPI
+      run: ./.github/scripts/run_tests.sh
+      shell: bash
+
+  linuxTest_14:
+    name: Test run example 14 - EM
+    runs-on: ubuntu-latest
+    needs: [linuxCheck]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install packages
+      run: ./.github/scripts/run_install.sh
+      shell: bash
+
+    - name: Run build
+      env:
+        TESTFLAGS: --enable-debug
+      run: ./.github/scripts/run_build.sh
+      shell: bash
+
+    - name: Run test
+      env:
+        TESTDIR: EXAMPLES/electromagnetic_GPR_TM
+        DEBUG: true
+      run: ./.github/scripts/run_tests.sh
+      shell: bash
 

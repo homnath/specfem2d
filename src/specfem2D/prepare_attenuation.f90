@@ -53,6 +53,9 @@
                                                        phi_nu1_sent,phi_nu2_sent
   real(kind=CUSTOM_REAL), dimension(N_SLS) ::  phinu,tauinvnu,temp,coef
 
+  ! EM attenuation
+  double precision :: tauinv(2)
+
   ! attenuation
   ! user output
   call synchronize_all()
@@ -502,16 +505,16 @@
 
   ! allocate memory variables for permittivity attenuation (electromagnetic media)
   if (ATTENUATION_PERMITTIVITY) then
-    allocate(rx_permattenuation(NGLLX,NGLLZ,nspec))
-    allocate(rz_permattenuation(NGLLX,NGLLZ,nspec))
-    allocate(permx(NGLLX,NGLLZ,nspec))
-    allocate(permz(NGLLX,NGLLZ,nspec))
-    allocate(tau_e(NGLLX,NGLLZ,nspec,2))
-    allocate(tau_d(NGLLX,NGLLZ,nspec,2))
-    allocate(tauinv(2))
-    allocate(alphavalem(NGLLX,NGLLZ,nspec,2))
-    allocate(betavalem(NGLLX,NGLLZ,nspec,2))
-    allocate(gammavalem(NGLLX,NGLLZ,nspec,2))
+    allocate(rx_permattenuation(NGLLX,NGLLZ,nspec), &
+             rz_permattenuation(NGLLX,NGLLZ,nspec), &
+             permx(NGLLX,NGLLZ,nspec), &
+             permz(NGLLX,NGLLZ,nspec), &
+             tau_e(NGLLX,NGLLZ,nspec,2), &
+             tau_d(NGLLX,NGLLZ,nspec,2), &
+             alphaval_em(NGLLX,NGLLZ,nspec,2), &
+             betaval_em(NGLLX,NGLLZ,nspec,2), &
+             gammaval_em(NGLLX,NGLLZ,nspec,2),stat=ier)
+    if (ier /= 0) stop 'Error allocating rx_permattenuation,.. arrays'
 
     ! initialize memory variables for attenuation
     rx_permattenuation(:,:,:) = 0.d0
@@ -519,11 +522,11 @@
     permx(:,:,:) = 0.d0
     permz(:,:,:) = 0.d0
 
-  ! if source is not a Dirac or Heavyside then f0_attenuation is f0 of the first
-  ! source
-  if (.not. (time_function_type(1) == 4 .or. time_function_type(1) == 5)) then
-    f0_electromagnetic = f0_source(1)
-  endif
+    ! if source is not a Dirac or Heavyside then f0_attenuation is f0 of the first
+    ! source
+    if (.not. (time_function_type(1) == 4 .or. time_function_type(1) == 5)) then
+      f0_electromagnetic = f0_source(1)
+    endif
 
     ! precompute Runge Kutta coefficients if viscous attenuation
     ! viscous attenuation is implemented following the memory variable
@@ -534,25 +537,37 @@
       do j = 1,NGLLZ
         do i = 1,NGLLX
 
-    tau_e(i,j,ispec,1) = (sqrt(Qe11_electromagnetic(kmato(ispec))**2+1.d0) +1.d0)/ &
-                          (2.d0*pi*f0_electromagnetic*Qe11_electromagnetic(kmato(ispec)))
-    tau_e(i,j,ispec,2) = (sqrt(Qe33_electromagnetic(kmato(ispec))**2+1.d0) +1.d0)/ &
-                          (2.d0*pi*f0_electromagnetic*Qe33_electromagnetic(kmato(ispec)))
-    tau_d(i,j,ispec,1) = (sqrt(Qe11_electromagnetic(kmato(ispec))**2+1.d0) -1.d0)/ &
-                          (2.d0*pi*f0_electromagnetic*Qe11_electromagnetic(kmato(ispec)))
-    tau_d(i,j,ispec,2) = (sqrt(Qe33_electromagnetic(kmato(ispec))**2+1.d0) -1.d0)/ &
-                         (2.d0*pi*f0_electromagnetic*Qe33_electromagnetic(kmato(ispec)))
+          tau_e(i,j,ispec,1) = (sqrt(Qe11_electromagnetic(kmato(ispec))**2+1.d0) +1.d0)/ &
+                                (2.d0*pi*f0_electromagnetic*Qe11_electromagnetic(kmato(ispec)))
+          tau_e(i,j,ispec,2) = (sqrt(Qe33_electromagnetic(kmato(ispec))**2+1.d0) +1.d0)/ &
+                                (2.d0*pi*f0_electromagnetic*Qe33_electromagnetic(kmato(ispec)))
+          tau_d(i,j,ispec,1) = (sqrt(Qe11_electromagnetic(kmato(ispec))**2+1.d0) -1.d0)/ &
+                                (2.d0*pi*f0_electromagnetic*Qe11_electromagnetic(kmato(ispec)))
+          tau_d(i,j,ispec,2) = (sqrt(Qe33_electromagnetic(kmato(ispec))**2+1.d0) -1.d0)/ &
+                               (2.d0*pi*f0_electromagnetic*Qe33_electromagnetic(kmato(ispec)))
 
-    tauinv(:) = - 1.d0 / tau_d(i,j,ispec,:)
-    alphavalem(i,j,ispec,:) = 1.d0 + deltat*tauinv(:) + deltat**2*tauinv(:)**2 / 2.d0 &
-                    + deltat**3*tauinv(:)**3 / 6.d0 + deltat**4*tauinv(:)**4 / 24.d0
-    betavalem(i,j,ispec,:) = deltat / 2.d0 + deltat**2*tauinv(:) / 3.d0 + deltat**3*tauinv(:)**2 / 8.d0 &
-                    + deltat**4*tauinv(:)**3 / 24.d0
-    gammavalem(i,j,ispec,:) = deltat / 2.d0 + deltat**2*tauinv(:) / 6.d0 + deltat**3*tauinv(:)**2 / 24.d0
+          tauinv(:) = - 1.d0 / tau_d(i,j,ispec,:)
+          alphaval_em(i,j,ispec,:) = 1.d0 + deltat*tauinv(:) + deltat**2*tauinv(:)**2 / 2.d0 &
+                          + deltat**3*tauinv(:)**3 / 6.d0 + deltat**4*tauinv(:)**4 / 24.d0
+          betaval_em(i,j,ispec,:) = deltat / 2.d0 + deltat**2*tauinv(:) / 3.d0 + deltat**3*tauinv(:)**2 / 8.d0 &
+                          + deltat**4*tauinv(:)**3 / 24.d0
+          gammaval_em(i,j,ispec,:) = deltat / 2.d0 + deltat**2*tauinv(:) / 6.d0 + deltat**3*tauinv(:)**2 / 24.d0
 
         enddo
       enddo
     enddo
+  else
+    ! dummy allocation
+    ! (rx_permattenuation,rz_permattenuation allocation needed for subroutine call)
+    allocate(rx_permattenuation(1,1,1), &
+             rz_permattenuation(1,1,1), &
+             permx(1,1,1), &
+             permz(1,1,1), &
+             tau_e(1,1,1,1), &
+             tau_d(1,1,1,1), &
+             alphaval_em(1,1,1,1), &
+             betaval_em(1,1,1,1), &
+             gammaval_em(1,1,1,1))
   endif
 
   ! synchronizes all processes

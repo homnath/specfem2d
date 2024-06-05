@@ -38,7 +38,7 @@
   use constants, only: CUSTOM_REAL,NGLLX,NGLLZ,NDIM,HALF,myrank
 
   use specfem_par, only: P_SV,ispec_is_electromagnetic,nglob_electromagnetic, &
-                         NSOURCES,source_time_function,&
+                         NSOURCES,source_time_function, &
                          islice_selected_source,ispec_selected_source,sourcearrays, &
                          ibool
   implicit none
@@ -58,7 +58,7 @@
 
       ! element containing source
       ispec = ispec_selected_source(i_source)
-      
+
       ! source element is electromagnetic
       if (ispec_is_electromagnetic(ispec)) then
         ! source time function
@@ -83,7 +83,7 @@
            ! 2D: y-component uses array(1,..)
            accel_electromagnetic(1,iglob) = accel_electromagnetic(1,iglob) - sourcearrays(1,i,j,i_source) * stf_used
             enddo
-          enddo         
+          enddo
        endif
 
       endif ! source element is electromagnetic

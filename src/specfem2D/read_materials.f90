@@ -42,9 +42,9 @@
   use specfem_par, only: AXISYM,density,porosity,tortuosity,anisotropycoef,permeability,poroelastcoef, &
                           numat,myrank,QKappa_attenuationcoef,Qmu_attenuationcoef, &
                           USE_CONDUCTIVE_DIFFUSION,ATTENUATION_CONDUCTIVITY, &
-                          ATTENUATION_PERMITTIVITY,f0_electromagnetic,&
-                          Qe11_electromagnetic,Qe33_electromagnetic,Qs11_electromagnetic,Qs33_electromagnetic,&
-                          spermittivity,sconductivity,inv_magpermeability,&
+                          ATTENUATION_PERMITTIVITY,f0_electromagnetic, &
+                          Qe11_electromagnetic,Qe33_electromagnetic,Qs11_electromagnetic,Qs33_electromagnetic, &
+                          spermittivity,sconductivity,inv_magpermeability, &
                           freq0_poroelastic,Q0_poroelastic,ATTENUATION_PORO_FLUID_PART, &
                           use_external_velocity_model,tomo_material,myrank
 
@@ -96,7 +96,7 @@
   Qs11_electromagnetic(:) = 9999.
   Qs33_electromagnetic(:) = 9999.
 
-  USE_CONDUCTIVE_DIFFUSION = .false.  ! for conduction diffusion in electromagnetic material. 
+  USE_CONDUCTIVE_DIFFUSION = .false.  ! for conduction diffusion in electromagnetic material.
 
   ! Index of the material that will be defined by an external tomo file if needed (TOMOGRAPHY_FILE)
   tomo_material = 0
@@ -320,7 +320,7 @@
 
       ! Poisson's ratio must be between -1 and +1/2
       if (poisson_s < -1.d0 .or. poisson_s > 0.5d0) call stop_the_code('Poisson''s ratio for the solid phase out of range')
-    
+
     else if (indic == ELECTROMAGNETIC_MATERIAL ) then
       !  model_number 4 mu0 e0 e11(e0) e33(e0) sig11 sig33 Qe11 Qe33 Qs11 Qs33 0 0 0
       spermittivity(1,n) = val1 * val2        !e11
@@ -428,11 +428,11 @@
       permlxx = spermittivity(1,n)            !e11
       permlzz = spermittivity(2,n)            !e33
       condlxx = sconductivity(1,n)            !sig11
-      condlzz = sconductivity(2,n)            !sig33 
+      condlzz = sconductivity(2,n)            !sig33
       two_inv_magpermeability = 2.d0 * inv_magpermeability(n) !2mu0^-1
 
       call get_electromagnetic_velocities(cpxsquare,cpzsquare,econdl,eperml,ATTENUATION_CONDUCTIVITY, &
-         ATTENUATION_PERMITTIVITY,f0_electromagnetic,Qe11_electromagnetic(n),Qe33_electromagnetic(n),&
+         ATTENUATION_PERMITTIVITY,f0_electromagnetic,Qe11_electromagnetic(n),Qe33_electromagnetic(n), &
          Qs11_electromagnetic(n),Qs33_electromagnetic(n), &
          permlxx,permlzz,condlxx,condlzz,two_inv_magpermeability)
 
@@ -652,8 +652,8 @@
        '-- Electromagnetic material --',/5x, &
        '-------------------------------',/5x, &
        'Material set number. . . . . . . . (jmat) =',i6,/5x, &
-       'magnetic permeability (free space). . . . . (mu0=4xpix10-7 H.m^-1) =',1pe15.8,/5x, &
-       'permittivity (free space). . . . . . . (e0=8.85x10-12 F.m^-1) =',1pe15.8,/5x, &
+       'magnetic permeability (free space). . . . . (mu0 = 4xpix10-7 H.m^-1) =',1pe15.8,/5x, &
+       'permittivity (free space). . . . . . . (e0 = 8.85x10-12 F.m^-1) =',1pe15.8,/5x, &
        'permittivity xx component. . . (e11(e0)) =',1pe15.8,/5x, &
        'permittivity zz component. . . (e33(e0)) =',1pe15.8,/5x, &
        'conductivity xx component. . . (sig11) =',1pe15.8,/5x, &

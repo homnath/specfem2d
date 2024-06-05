@@ -544,7 +544,7 @@
                                                            c33ext,c35ext,c55ext
   real(kind=CUSTOM_REAL), dimension(:,:,:,:), allocatable :: spermittivityext,sconductivityext
   real(kind=CUSTOM_REAL), dimension(:,:,:), allocatable :: inv_magpermeabilityext
-  
+
   ! for shifting of velocities if needed in the case of viscoelasticity
   double precision :: vp,vs,rhol,mul,lambdal,kappal,qmul,qkappal
   double precision :: phi,tort,kappa_s,kappa_f,kappa_fr,mu_s,mu_fr
@@ -865,32 +865,32 @@
           permlxx = spermittivityext(1,i,j,ispec)  !e11
           permlzz = spermittivityext(2,i,j,ispec)  !e33
           condlxx = sconductivityext(1,i,j,ispec)  !sig11
-          condlzz = sconductivityext(2,i,j,ispec)  !sig33 
+          condlzz = sconductivityext(2,i,j,ispec)  !sig33
           two_inv_magpermeability = 2.d0 * inv_magpermeabilityext(i,j,ispec) !2mu0^-1
          else
          ! internal mesh
           permlxx = spermittivity(1,kmato(ispec))   !e11
           permlzz = spermittivity(2,kmato(ispec))   !e33
           condlxx = sconductivity(1,kmato(ispec))   !sig11
-          condlzz = sconductivity(2,kmato(ispec))   !sig33 
+          condlzz = sconductivity(2,kmato(ispec))   !sig33
           two_inv_magpermeability = 2.d0 * inv_magpermeability(kmato(ispec)) !2mu0^-1
          endif
 
          call get_electromagnetic_velocities(cpxsquare,cpzsquare,econdl,eperml,ATTENUATION_CONDUCTIVITY, &
-             ATTENUATION_PERMITTIVITY,f0_electromagnetic,Qe11_electromagnetic(kmato(ispec)),Qe33_electromagnetic(kmato(ispec)),&
+             ATTENUATION_PERMITTIVITY,f0_electromagnetic,Qe11_electromagnetic(kmato(ispec)),Qe33_electromagnetic(kmato(ispec)), &
              Qs11_electromagnetic(kmato(ispec)),Qs33_electromagnetic(kmato(ispec)), &
              permlxx,permlzz,condlxx,condlzz,two_inv_magpermeability)
 
-        ! stores 
-        vEstore(i,j,ispec)=max(sqrt(cpxsquare),sqrt(cpzsquare)) 
+        ! stores
+        vEstore(i,j,ispec)=max(sqrt(cpxsquare),sqrt(cpzsquare))
         spermittivitystore(1,i,j,ispec)=permlxx
         spermittivitystore(2,i,j,ispec)=permlzz
         sconductivitystore(1,i,j,ispec)=condlxx
         sconductivitystore(2,i,j,ispec)=condlzz
         inv_magpermeabilitystore(i,j,ispec)=two_inv_magpermeability/2.d0
 
-        vEmin_glob = min(vEmin_glob,max(sqrt(cpxsquare),sqrt(cpzsquare))) 
-        vEmax_glob = max(vEmax_glob,max(sqrt(cpxsquare),sqrt(cpzsquare)))  
+        vEmin_glob = min(vEmin_glob,max(sqrt(cpxsquare),sqrt(cpzsquare)))
+        vEmax_glob = max(vEmax_glob,max(sqrt(cpxsquare),sqrt(cpzsquare)))
        endif
       enddo
     enddo
@@ -985,7 +985,7 @@
   deallocate(spermittivityext,sconductivityext,inv_magpermeabilityext)
 
   ! stats
-  ! poroelasticity 
+  ! poroelasticity
   ! check if any poroelastic elements in domains
   call any_all_l(any_elastic,has_elasticity)
   if (has_elasticity) then

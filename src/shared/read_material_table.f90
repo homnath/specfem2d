@@ -45,7 +45,7 @@
                                rho_s_read,rho_f_read, &
                                phi_read,tortuosity_read, &
                                permxx_read,permxz_read,permzz_read,kappa_s_read,kappa_f_read,kappa_fr_read, &
-                               eta_f_read,mu_fr_read,mu0_read,e0_read,e11_read,e33_read,sig11_read,sig33_read,&
+                               eta_f_read,mu_fr_read,mu0_read,e0_read,e11_read,e33_read,sig11_read,sig33_read, &
                                Qe11_read,Qe33_read,Qs11_read,Qs33_read, &
                                compaction_grad
 
@@ -167,7 +167,7 @@
         call stop_the_code('Invalid poroelastic material: non-positive value of Qmu')
 
     else if (icodemat(i) == ELECTROMAGNETIC_MATERIAL) then
-      ! electromagnetic material 
+      ! electromagnetic material
       mu0_read(i) = val0read
       e0_read(i) = val1read
       e11_read(i) = val2read
@@ -248,7 +248,7 @@
                                eta_f_read,mu_fr_read
 
   ! electromagnetic
-  use shared_parameters, only: mu0_read,e0_read,e11_read,e33_read,sig11_read,sig33_read,&
+  use shared_parameters, only: mu0_read,e0_read,e11_read,e33_read,sig11_read,sig33_read, &
                                Qe11_read,Qe33_read,Qs11_read,Qs33_read
 
   implicit none
@@ -289,15 +289,15 @@
            eta_f_read(nbmodels), &
            mu_fr_read(nbmodels))
 
-  allocate( mu0_read(nbmodels),&
-            e0_read(nbmodels),&
-            e11_read(nbmodels),&
-            e33_read(nbmodels),&
-            sig11_read(nbmodels),&
-            sig33_read(nbmodels),&
-            Qe11_read(nbmodels),&
-            Qe33_read(nbmodels),&
-            Qs11_read(nbmodels),&
+  allocate( mu0_read(nbmodels), &
+            e0_read(nbmodels), &
+            e11_read(nbmodels), &
+            e33_read(nbmodels), &
+            sig11_read(nbmodels), &
+            sig33_read(nbmodels), &
+            Qe11_read(nbmodels), &
+            Qe33_read(nbmodels), &
+            Qs11_read(nbmodels), &
             Qs33_read(nbmodels))
 
   allocate(compaction_grad(nbmodels))
@@ -379,7 +379,7 @@
                                eta_f_read,mu_fr_read
 
   ! electromagnetic
-  use shared_parameters, only: mu0_read,e0_read,e11_read,e33_read,sig11_read,sig33_read,&
+  use shared_parameters, only: mu0_read,e0_read,e11_read,e33_read,sig11_read,sig33_read, &
                                Qe11_read,Qe33_read,Qs11_read,Qs33_read
 
   implicit none
