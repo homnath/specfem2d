@@ -519,7 +519,7 @@
                                    'on the free surface because pressure is zero there')
             else
               write(IMAIN,*) '**********************************************************************'
-              write(IMAIN,*) '*** Warning: the acoustic receivers located on the free surface    ***'
+              write(IMAIN,*) '*** Warning: acoustic receivers located on the free surface        ***'
               write(IMAIN,*) '*** Warning: will record 0 !!                                      ***'
               write(IMAIN,*) '**********************************************************************'
               write(IMAIN,*)

@@ -631,9 +631,7 @@ module specfem_par
   double precision, dimension(:), allocatable :: Qe11_electromagnetic,Qe33_electromagnetic
   double precision, dimension(:), allocatable :: Qs11_electromagnetic,Qs33_electromagnetic
   double precision, dimension(:,:,:,:), allocatable :: tau_e,tau_d,tau_s
-  double precision, dimension(:,:,:,:), allocatable :: alphavalem,betavalem,gammavalem
-  double precision, dimension(:), allocatable :: tauinv
-
+  double precision, dimension(:,:,:,:), allocatable :: alphaval_em,betaval_em,gammaval_em
   double precision, dimension(:,:,:), allocatable :: rx_permattenuation,rz_permattenuation,permx,permz
 
   !for backward simulation in adjoint inversion

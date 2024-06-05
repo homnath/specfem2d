@@ -40,7 +40,7 @@
   use specfem_par, only: nspec,ispec_is_electromagnetic,ibool, &
                          veloc_electromagnetic,time_stepping_scheme,time_stepping_scheme, &
                          permx,permz,spermittivitystore,rx_permattenuation,rz_permattenuation, &
-                         alphavalem,betavalem,gammavalem,tau_e,tau_d,ATTENUATION_PERMITTIVITY
+                         alphaval_em,betaval_em,gammaval_em,tau_e,tau_d,ATTENUATION_PERMITTIVITY
 
   implicit none
 
@@ -78,16 +78,16 @@
                         (tau_d(i,j,ispec,1)*tau_d(i,j,ispec,1))*permx(i,j,ispec)
             Snp1 = - (1.d0 - tau_e(i,j,ispec,1)/tau_d(i,j,ispec,1))/ &
                         (tau_d(i,j,ispec,1)*tau_d(i,j,ispec,1))*permx_loc(i,j)
-            rx_permattenuation(i,j,ispec) = alphavalem(i,j,ispec,1) * rx_permattenuation(i,j,ispec) &
-                   + betavalem(i,j,ispec,1) * Sn + gammavalem(i,j,ispec,1) * Snp1
+            rx_permattenuation(i,j,ispec) = alphaval_em(i,j,ispec,1) * rx_permattenuation(i,j,ispec) &
+                   + betaval_em(i,j,ispec,1) * Sn + gammaval_em(i,j,ispec,1) * Snp1
 
             ! evolution rz_permattenuation
             Sn   = - (1.d0 - tau_e(i,j,ispec,2)/tau_d(i,j,ispec,2))/ &
                         (tau_d(i,j,ispec,2)*tau_d(i,j,ispec,2))*permz(i,j,ispec)
             Snp1 = - (1.d0 - tau_e(i,j,ispec,2)/tau_d(i,j,ispec,2))/ &
                         (tau_d(i,j,ispec,2)*tau_d(i,j,ispec,2))*permz_loc(i,j)
-            rz_permattenuation(i,j,ispec) = alphavalem(i,j,ispec,2) * rz_permattenuation(i,j,ispec) &
-                   + betavalem(i,j,ispec,2) * Sn + gammavalem(i,j,ispec,2) * Snp1
+            rz_permattenuation(i,j,ispec) = alphaval_em(i,j,ispec,2) * rz_permattenuation(i,j,ispec) &
+                   + betaval_em(i,j,ispec,2) * Sn + gammaval_em(i,j,ispec,2) * Snp1
 
           case (2)
             ! LDDRK
