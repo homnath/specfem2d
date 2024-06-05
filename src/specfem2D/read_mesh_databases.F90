@@ -241,7 +241,7 @@
 
   read(IIN) local_dble,local_dble ! Q0_poroelastic,freq0_poroelastic
 
-  read(IIN) local_l1,local_l2,local_dble ! ATTENUATION_PERMITTIVITY,ATTENUATION_CONDUCTIVITY,f0_electromagnetic 
+  read(IIN) local_l1,local_l2,local_dble ! ATTENUATION_PERMITTIVITY,ATTENUATION_CONDUCTIVITY,f0_electromagnetic
 
   read(IIN) local_l ! AXISYM
   if (local_l .neqv. AXISYM) then

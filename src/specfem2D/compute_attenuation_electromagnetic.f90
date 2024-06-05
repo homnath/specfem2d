@@ -66,7 +66,7 @@
           permlxx = spermittivitystore(1,i,j,ispec)
           permlzz = spermittivitystore(2,i,j,ispec)
 
-          permx_loc(i,j) = veloc_electromagnetic(1,iglob) * permlxx 
+          permx_loc(i,j) = veloc_electromagnetic(1,iglob) * permlxx
           permz_loc(i,j) = veloc_electromagnetic(2,iglob) * permlzz
 
           ! time stepping

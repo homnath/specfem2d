@@ -272,7 +272,7 @@
       write(172) inv_magpermeability_save
       close(172)
       if (myrank == 0) write(IMAIN,*) '  written to file(s): ',trim(filename)
-     endif 
+     endif
   else
     call stop_the_code('Save Model not implemented for external and tomo')
   endif !Type of model

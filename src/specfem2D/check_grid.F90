@@ -218,7 +218,7 @@
            cpIIloc = 0.d0
          endif
          cEloc = 0.d0
- 
+
         else
          cpIloc = 0.d0
          cpIIloc = 0.d0
@@ -241,7 +241,7 @@
         ! ignore fluid regions with Vs = 0
         if (csloc > TINYVAL) vsmin = min(vsmin,csloc)
         vsmax = max(vsmax,csloc)
-        
+
         if (cEloc > TINYVAL) vEmin = min(vEmin,cEloc)
         vEmax = max(vEmax,cEloc)
 

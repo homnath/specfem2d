@@ -108,8 +108,8 @@ module specfem_par
 
   ! electromagnetic
   real(kind=CUSTOM_REAL), dimension(:,:,:,:), allocatable :: spermittivitystore,sconductivitystore
-  real(kind=CUSTOM_REAL), dimension(:,:,:), allocatable :: inv_magpermeabilitystore,vEstore 
-  
+  real(kind=CUSTOM_REAL), dimension(:,:,:), allocatable :: inv_magpermeabilitystore,vEstore
+
   ! resolution
   double precision :: mesh_T_min
 
@@ -614,20 +614,20 @@ module specfem_par
   ! global flag for electromagnetic simulations
   logical :: ELECTROMAGNETIC_SIMULATION
   logical :: USE_CONDUCTIVE_DIFFUSION
-    
+
   logical, dimension(:), allocatable :: ispec_is_electromagnetic
-  
+
   ! inverse mass matrices
   real(kind=CUSTOM_REAL), dimension(:,:), allocatable :: rmass_inverse_electromagnetic
 
-  ! material properties of the electromagnetic medium 
+  ! material properties of the electromagnetic medium
   real(kind=CUSTOM_REAL), dimension(:,:), allocatable :: &
     accel_electromagnetic,veloc_electromagnetic,displ_electromagnetic
-  
+
   double precision, dimension(:,:), allocatable :: spermittivity,sconductivity
   double precision, dimension(:), allocatable :: inv_magpermeability
 
-  ! for permittivity & conductivity attenuation 
+  ! for permittivity & conductivity attenuation
   double precision, dimension(:), allocatable :: Qe11_electromagnetic,Qe33_electromagnetic
   double precision, dimension(:), allocatable :: Qs11_electromagnetic,Qs33_electromagnetic
   double precision, dimension(:,:,:,:), allocatable :: tau_e,tau_d,tau_s
@@ -703,7 +703,7 @@ module specfem_par
   ! poroelastic fluid
   real(kind=CUSTOM_REAL), dimension(:,:,:,:), allocatable :: &
     b_absorb_poro_w_left,b_absorb_poro_w_right,b_absorb_poro_w_bottom,b_absorb_poro_w_top
-  ! electromagnetic 
+  ! electromagnetic
   real(kind=CUSTOM_REAL), dimension(:,:,:,:), allocatable :: &
     b_absorb_electromagnetic_left,b_absorb_electromagnetic_right,b_absorb_electromagnetic_bottom,b_absorb_electromagnetic_top
 

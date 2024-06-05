@@ -416,7 +416,7 @@ module shared_parameters
        permzz_read,kappa_s_read,kappa_f_read,kappa_fr_read,eta_f_read,mu_fr_read
 
   ! electromagnetic (EM)
-  double precision, dimension(:),allocatable :: mu0_read,e0_read,e11_read,e33_read,sig11_read,sig33_read,&
+  double precision, dimension(:),allocatable :: mu0_read,e0_read,e11_read,e33_read,sig11_read,sig33_read, &
                               Qe11_read,Qe33_read,Qs11_read,Qs33_read
 
   ! compaction gradient

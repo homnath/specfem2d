@@ -302,7 +302,7 @@
           if (any_electromagnetic) call exit_MPI(myrank,'electromagnetic not implemented in GPU MODE yet')
         endif
       endif
-   
+
       case (3)
         ! kernel simulations
         ! forward (adjoint) wavefields use switched update ordering

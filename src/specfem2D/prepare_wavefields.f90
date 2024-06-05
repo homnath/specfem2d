@@ -464,7 +464,7 @@
   modeAmplitude(:) = 0.0d0
 
 !
-! electromagnetic material 
+! electromagnetic material
 !
   if (ELECTROMAGNETIC_SIMULATION) then
     if (myrank == 0) then
@@ -480,7 +480,7 @@
     ! dummy allocate unused arrays with fictitious size
     nglob_electromagnetic = 1
   endif
-  
+
   allocate(displ_electromagnetic(NDIM,nglob_electromagnetic), &
            veloc_electromagnetic(NDIM,nglob_electromagnetic), &
            accel_electromagnetic(NDIM,nglob_electromagnetic),stat=ier)

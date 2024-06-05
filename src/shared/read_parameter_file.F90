@@ -564,14 +564,14 @@
     write(*,'(a)') 'ATTENUATION_PERMITTIVITY        = .false.'
     write(*,*)
   endif
-    
+
   call read_value_logical_p(ATTENUATION_CONDUCTIVITY, 'ATTENUATION_CONDUCTIVITY')
   if (err_occurred() /= 0) then
     some_parameters_missing_from_Par_file = .true.
     write(*,'(a)') 'ATTENUATION_CONDUCTIVITY       = .false.'
     write(*,*)
   endif
-    
+
   call read_value_double_precision_p(f0_electromagnetic, 'f0_electromagnetic')
   if (err_occurred() /= 0) then
     some_parameters_missing_from_Par_file = .true.

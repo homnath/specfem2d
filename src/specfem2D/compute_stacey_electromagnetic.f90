@@ -50,7 +50,7 @@
                          b_absorb_electromagnetic_left,b_absorb_electromagnetic_right, &
                          b_absorb_electromagnetic_bottom,b_absorb_electromagnetic_top, &
                          ib_left,ib_right,ib_bottom,ib_top, &
-                         anyabs,STACEY_ABSORBING_CONDITIONS,Qe11_electromagnetic,Qe33_electromagnetic,&
+                         anyabs,STACEY_ABSORBING_CONDITIONS,Qe11_electromagnetic,Qe33_electromagnetic, &
                          Qs11_electromagnetic,Qs33_electromagnetic,P_SV
 
   implicit none
@@ -101,14 +101,14 @@
         permlxx = spermittivitystore(1,i,j,ispec)  !e11
         permlzz = spermittivitystore(2,i,j,ispec)  !e33
         condlxx = sconductivitystore(1,i,j,ispec)  !sig11
-        condlzz = sconductivitystore(2,i,j,ispec)  !sig33 
+        condlzz = sconductivitystore(2,i,j,ispec)  !sig33
         two_inv_magpermeability = 2.d0 * inv_magpermeabilitystore(i,j,ispec) !2mu0^-1
-      
+
         call get_electromagnetic_velocities(cpxsquare,cpzsquare,econdl,eperml,ATTENUATION_CONDUCTIVITY, &
-         ATTENUATION_PERMITTIVITY,f0_electromagnetic,Qe11_electromagnetic(kmato(ispec)),Qe33_electromagnetic(kmato(ispec)),&
+         ATTENUATION_PERMITTIVITY,f0_electromagnetic,Qe11_electromagnetic(kmato(ispec)),Qe33_electromagnetic(kmato(ispec)), &
          Qs11_electromagnetic(kmato(ispec)),Qs33_electromagnetic(kmato(ispec)), &
          permlxx,permlzz,condlxx,condlzz,two_inv_magpermeability)
-  
+
         cpxl = sqrt(cpxsquare)
         cpzl = sqrt(cpzsquare)
 
@@ -117,7 +117,7 @@
 
         if (P_SV) then
           ! P_SV case
-          vx = veloc_electromagnetic(1,iglob) 
+          vx = veloc_electromagnetic(1,iglob)
           vz = veloc_electromagnetic(2,iglob)
           vn = nx*vx + nz*vz
 
@@ -128,7 +128,7 @@
           ! with velocity's tangential component: veloc_tangential = v - vn * normal
           ! total traction
           !    T = T_normal + T_tangential
-          tx = rho_cpx*vn*nx 
+          tx = rho_cpx*vn*nx
           tz = rho_cpz*vn*nz
 
         else
@@ -178,14 +178,14 @@
         permlxx = spermittivitystore(1,i,j,ispec)  !e11
         permlzz = spermittivitystore(2,i,j,ispec)  !e33
         condlxx = sconductivitystore(1,i,j,ispec)  !sig11
-        condlzz = sconductivitystore(2,i,j,ispec)  !sig33 
+        condlzz = sconductivitystore(2,i,j,ispec)  !sig33
         two_inv_magpermeability = 2.d0 * inv_magpermeabilitystore(i,j,ispec) !2mu0^-1
-      
+
         call get_electromagnetic_velocities(cpxsquare,cpzsquare,econdl,eperml,ATTENUATION_CONDUCTIVITY, &
-         ATTENUATION_PERMITTIVITY,f0_electromagnetic,Qe11_electromagnetic(kmato(ispec)),Qe33_electromagnetic(kmato(ispec)),&
+         ATTENUATION_PERMITTIVITY,f0_electromagnetic,Qe11_electromagnetic(kmato(ispec)),Qe33_electromagnetic(kmato(ispec)), &
          Qs11_electromagnetic(kmato(ispec)),Qs33_electromagnetic(kmato(ispec)), &
          permlxx,permlzz,condlxx,condlzz,two_inv_magpermeability)
-  
+
         cpxl = sqrt(cpxsquare)
         cpzl = sqrt(cpzsquare)
 
@@ -194,7 +194,7 @@
 
         if (P_SV) then
           ! P_SV case
-          vx = veloc_electromagnetic(1,iglob) 
+          vx = veloc_electromagnetic(1,iglob)
           vz = veloc_electromagnetic(2,iglob)
           vn = nx*vx + nz*vz
           tx = rho_cpx*vn*nx
@@ -215,7 +215,7 @@
           ! SH case
           accel_electromagnetic(1,iglob) = accel_electromagnetic(1,iglob) - ty*weight
         endif
- 
+
         if (SAVE_FORWARD .and. SIMULATION_TYPE == 1) then
          if (P_SV) then
           ! P_SV case
@@ -245,14 +245,14 @@
         permlxx = spermittivitystore(1,i,j,ispec)  !e11
         permlzz = spermittivitystore(2,i,j,ispec)  !e33
         condlxx = sconductivitystore(1,i,j,ispec)  !sig11
-        condlzz = sconductivitystore(2,i,j,ispec)  !sig33 
+        condlzz = sconductivitystore(2,i,j,ispec)  !sig33
         two_inv_magpermeability = 2.d0 * inv_magpermeabilitystore(i,j,ispec) !2mu0^-1
-      
+
         call get_electromagnetic_velocities(cpxsquare,cpzsquare,econdl,eperml,ATTENUATION_CONDUCTIVITY, &
-         ATTENUATION_PERMITTIVITY,f0_electromagnetic,Qe11_electromagnetic(kmato(ispec)),Qe33_electromagnetic(kmato(ispec)),&
+         ATTENUATION_PERMITTIVITY,f0_electromagnetic,Qe11_electromagnetic(kmato(ispec)),Qe33_electromagnetic(kmato(ispec)), &
          Qs11_electromagnetic(kmato(ispec)),Qs33_electromagnetic(kmato(ispec)), &
          permlxx,permlzz,condlxx,condlzz,two_inv_magpermeability)
-  
+
         cpxl = sqrt(cpxsquare)
         cpzl = sqrt(cpzsquare)
 
@@ -261,7 +261,7 @@
 
         if (P_SV) then
           ! P_SV case
-          vx = veloc_electromagnetic(1,iglob) 
+          vx = veloc_electromagnetic(1,iglob)
           vz = veloc_electromagnetic(2,iglob)
           vn = nx*vx+nz*vz
           tx = rho_cpx*vn*nx
@@ -326,14 +326,14 @@
         permlxx = spermittivitystore(1,i,j,ispec)  !e11
         permlzz = spermittivitystore(2,i,j,ispec)  !e33
         condlxx = sconductivitystore(1,i,j,ispec)  !sig11
-        condlzz = sconductivitystore(2,i,j,ispec)  !sig33 
+        condlzz = sconductivitystore(2,i,j,ispec)  !sig33
         two_inv_magpermeability = 2.d0 * inv_magpermeabilitystore(i,j,ispec) !2mu0^-1
-      
+
         call get_electromagnetic_velocities(cpxsquare,cpzsquare,econdl,eperml,ATTENUATION_CONDUCTIVITY, &
-         ATTENUATION_PERMITTIVITY,f0_electromagnetic,Qe11_electromagnetic(kmato(ispec)),Qe33_electromagnetic(kmato(ispec)),&
+         ATTENUATION_PERMITTIVITY,f0_electromagnetic,Qe11_electromagnetic(kmato(ispec)),Qe33_electromagnetic(kmato(ispec)), &
          Qs11_electromagnetic(kmato(ispec)),Qs33_electromagnetic(kmato(ispec)), &
          permlxx,permlzz,condlxx,condlzz,two_inv_magpermeability)
-  
+
         cpxl = sqrt(cpxsquare)
         cpzl = sqrt(cpzsquare)
 
@@ -342,7 +342,7 @@
 
         if (P_SV) then
           ! P_SV case
-          vx = veloc_electromagnetic(1,iglob) 
+          vx = veloc_electromagnetic(1,iglob)
           vz = veloc_electromagnetic(2,iglob)
           vn = nx*vx+nz*vz
           tx = rho_cpx*vn*nx

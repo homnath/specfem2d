@@ -43,7 +43,7 @@
                          rmass_inverse_elastic, &
                          rmass_inverse_acoustic,rmass_inverse_e1,ATTENUATION_VISCOACOUSTIC,phi_nu1,N_SLS, &
                          time_stepping_scheme,rmass_s_inverse_poroelastic,rmass_w_inverse_poroelastic, &
-                         rmass_inverse_electromagnetic, &    
+                         rmass_inverse_electromagnetic, &
                          nspec,ibool,wxgll,wzgll,jacobian, &
                          ispec_is_elastic,ispec_is_acoustic,ispec_is_poroelastic,ispec_is_electromagnetic, &
                          phistore,tortstore,rhoarraystore, &
@@ -457,19 +457,19 @@
           endif
 
         else if (ispec_is_electromagnetic(ispec)) then
-         ! electromagnetic medium 
+         ! electromagnetic medium
 
           !!! PML NOT WORKING YET !!!
           this_element_has_PML = .false.
           if (PML_BOUNDARY_CONDITIONS) then
             if (ispec_is_PML(ispec)) stop 'PML not implemented yet for electromagnetic case'
           endif
-  
+
           permlxx = spermittivitystore(1,i,j,ispec)  !e11
           permlzz = spermittivitystore(2,i,j,ispec)  !e33
           condlxx = sconductivitystore(1,i,j,ispec)  !sig11
-          condlzz = sconductivitystore(2,i,j,ispec)  !sig33 
-        
+          condlzz = sconductivitystore(2,i,j,ispec)  !sig33
+
           ! permittivity (Zener model)
           taud_x = (sqrt(Qe11_electromagnetic(kmato(ispec))**2+1.d0) +1.d0)/ &
                 (2.d0*pi*f0_electromagnetic*Qe11_electromagnetic(kmato(ispec)))
@@ -886,11 +886,11 @@
         permlxx = spermittivitystore(1,i,j,ispec)  !e11
         permlzz = spermittivitystore(2,i,j,ispec)  !e33
         condlxx = sconductivitystore(1,i,j,ispec)  !sig11
-        condlzz = sconductivitystore(2,i,j,ispec)  !sig33 
+        condlzz = sconductivitystore(2,i,j,ispec)  !sig33
         two_inv_magpermeability = 2.d0 * inv_magpermeabilitystore(i,j,ispec) !2mu0^-1
 
         call get_electromagnetic_velocities(cpxsquare,cpzsquare,econdl,eperml,ATTENUATION_CONDUCTIVITY, &
-         ATTENUATION_PERMITTIVITY,f0_electromagnetic,Qe11_electromagnetic(kmato(ispec)),Qe33_electromagnetic(kmato(ispec)),&
+         ATTENUATION_PERMITTIVITY,f0_electromagnetic,Qe11_electromagnetic(kmato(ispec)),Qe33_electromagnetic(kmato(ispec)), &
          Qs11_electromagnetic(kmato(ispec)),Qs33_electromagnetic(kmato(ispec)), &
          permlxx,permlzz,condlxx,condlzz,two_inv_magpermeability)
 
@@ -924,11 +924,11 @@
         permlxx = spermittivitystore(1,i,j,ispec)  !e11
         permlzz = spermittivitystore(2,i,j,ispec)  !e33
         condlxx = sconductivitystore(1,i,j,ispec)  !sig11
-        condlzz = sconductivitystore(2,i,j,ispec)  !sig33 
+        condlzz = sconductivitystore(2,i,j,ispec)  !sig33
         two_inv_magpermeability = 2.d0 * inv_magpermeabilitystore(i,j,ispec) !2mu0^-1
 
         call get_electromagnetic_velocities(cpxsquare,cpzsquare,econdl,eperml,ATTENUATION_CONDUCTIVITY, &
-         ATTENUATION_PERMITTIVITY,f0_electromagnetic,Qe11_electromagnetic(kmato(ispec)),Qe33_electromagnetic(kmato(ispec)),&
+         ATTENUATION_PERMITTIVITY,f0_electromagnetic,Qe11_electromagnetic(kmato(ispec)),Qe33_electromagnetic(kmato(ispec)), &
          Qs11_electromagnetic(kmato(ispec)),Qs33_electromagnetic(kmato(ispec)), &
          permlxx,permlzz,condlxx,condlzz,two_inv_magpermeability)
 
@@ -962,11 +962,11 @@
         permlxx = spermittivitystore(1,i,j,ispec)  !e11
         permlzz = spermittivitystore(2,i,j,ispec)  !e33
         condlxx = sconductivitystore(1,i,j,ispec)  !sig11
-        condlzz = sconductivitystore(2,i,j,ispec)  !sig33 
+        condlzz = sconductivitystore(2,i,j,ispec)  !sig33
         two_inv_magpermeability = 2.d0 * inv_magpermeabilitystore(i,j,ispec) !2mu0^-1
 
         call get_electromagnetic_velocities(cpxsquare,cpzsquare,econdl,eperml,ATTENUATION_CONDUCTIVITY, &
-         ATTENUATION_PERMITTIVITY,f0_electromagnetic,Qe11_electromagnetic(kmato(ispec)),Qe33_electromagnetic(kmato(ispec)),&
+         ATTENUATION_PERMITTIVITY,f0_electromagnetic,Qe11_electromagnetic(kmato(ispec)),Qe33_electromagnetic(kmato(ispec)), &
          Qs11_electromagnetic(kmato(ispec)),Qs33_electromagnetic(kmato(ispec)), &
          permlxx,permlzz,condlxx,condlzz,two_inv_magpermeability)
 
@@ -1007,11 +1007,11 @@
         permlxx = spermittivitystore(1,i,j,ispec)  !e11
         permlzz = spermittivitystore(2,i,j,ispec)  !e33
         condlxx = sconductivitystore(1,i,j,ispec)  !sig11
-        condlzz = sconductivitystore(2,i,j,ispec)  !sig33 
+        condlzz = sconductivitystore(2,i,j,ispec)  !sig33
         two_inv_magpermeability = 2.d0 * inv_magpermeabilitystore(i,j,ispec) !2mu0^-1
 
         call get_electromagnetic_velocities(cpxsquare,cpzsquare,econdl,eperml,ATTENUATION_CONDUCTIVITY, &
-         ATTENUATION_PERMITTIVITY,f0_electromagnetic,Qe11_electromagnetic(kmato(ispec)),Qe33_electromagnetic(kmato(ispec)),&
+         ATTENUATION_PERMITTIVITY,f0_electromagnetic,Qe11_electromagnetic(kmato(ispec)),Qe33_electromagnetic(kmato(ispec)), &
          Qs11_electromagnetic(kmato(ispec)),Qs33_electromagnetic(kmato(ispec)), &
          permlxx,permlzz,condlxx,condlzz,two_inv_magpermeability)
 
@@ -1041,7 +1041,7 @@
         rmass_inverse_electromagnetic(2,iglob) = rmass_inverse_electromagnetic(2,iglob) + tz*weight
       enddo
     endif  !  end of top absorbing boundary
-  
+
     enddo
 
   endif ! any_electromagnetic

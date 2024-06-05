@@ -55,7 +55,7 @@
 
     ! main solver for the electromagnetic elements
     ! electromagnetic term
-    call compute_forces_electromagnetic(accel_electromagnetic,displ_electromagnetic,&
+    call compute_forces_electromagnetic(accel_electromagnetic,displ_electromagnetic, &
                                         rx_permattenuation,rz_permattenuation,iphase)
     !                                 PML_BOUNDARY_CONDITIONS,e1,e11,e13,iphase)
 
@@ -73,7 +73,7 @@
 
 !      ! PML boundary
 !      if (PML_BOUNDARY_CONDITIONS) then
-!        call pml_boundary_electromagnetic(accel_electromagnetic,veloc_electromagnetic,displ_electromagnetic,&
+!        call pml_boundary_electromagnetic(accel_electromagnetic,veloc_electromagnetic,displ_electromagnetic, &
 !          displ_electromagnetic_old)
 !      endif
 
