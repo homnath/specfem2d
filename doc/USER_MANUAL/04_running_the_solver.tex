@@ -50,6 +50,7 @@ Replace \texttt{surange} with \texttt{suxwigb} to see wiggle plots for the seism
 
 \end{itemize}
 
+
 %------------------------------------------------------------------------------------------------%
 \section*{Notes about \texttt{DATA/Par\_file} parameters}
 %------------------------------------------------------------------------------------------------%
@@ -95,7 +96,6 @@ is accurate at second order and thus contains significantly less numerical noise
 %------------------------------------------------------------------------------------------------%
 \section*{Notes about \texttt{DATA/SOURCE} parameters}
 %------------------------------------------------------------------------------------------------%
-
 
 The \texttt{SOURCE} file located in the \texttt{DATA/} directory should be edited in the following way:
 %
@@ -230,7 +230,7 @@ surface waves).
 
 An optional useful Python script called \texttt{SEM\_save\_dir.py} is provided.
 It allows one to automatically save all the parameters and results of a given simulation.
-%------------------------------------------------------------------------------------------------%
+
 
 %------------------------------------------------------------------------------------------------%
 \section{How to run axisymmetric wave simulations}
@@ -312,7 +312,7 @@ A simplistic demo code is available in \newline
 This simple code is useful to learn how the spectral-element method works in both plane-strain and axisymmetric geometries.
 Have a look to it if interested. Once in its directory, type \texttt{./make\_Fortran\_2D\_axisymmetric.csh} and then \texttt{./xspecfem2D}
 to compile and run. The bug discussed above is not present in this small code.
-%------------------------------------------------------------------------------------------------%
+
 
 %------------------------------------------------------------------------------------------------%
 \section{How to run anisotropic wave simulations}
@@ -453,6 +453,7 @@ the source dominant frequency. Notice that for this calculation we use \texttt{p
 and the dominant frequency of the first source, f0(1). Caution if you use
 several sources with different frequencies and if you consider anistropic
 permeability.
+
 
 %------------------------------------------------------------------------------------------------%
 \section{How to run electromagnetic wave simulations}
@@ -610,6 +611,7 @@ Degree $N$ & Newmark & LDDRK4-6 & RK4 \\ [0.5ex]
 % is used to refer this table in the text
 \end{table}
 
+
 %------------------------------------------------------------------------------------------------%
 \section{How to set plane waves as initial conditions}
 %------------------------------------------------------------------------------------------------%
@@ -631,6 +633,7 @@ To simulate propagation of incoming plane waves in the simulation domain, initia
   \end{itemize}
 \end{description}
 
+
 %------------------------------------------------------------------------------------------------%
 \section{Note on the viscoelastic model used}
 %------------------------------------------------------------------------------------------------%
@@ -643,6 +646,7 @@ See e.g. \cite{BlKoChLoXi16}. \newline
 However in practice for technical reasons it is approximated based on the sum of different Generalized Zener body mechanisms
 and thus the code outputs the band in which the approximation is very good, outside of that range it can be less accurate.
 The logarithmic center of that frequency band is the \texttt{f0} parameter defined (in Hz) in input file \texttt{DATA/SOURCE}.
+
 
 %------------------------------------------------------------------------------------------------%
 \section{Note on viscoelasticity in the 2D plane strain approximation}

@@ -162,7 +162,9 @@ Note this only has an effect, if attenuation is turned on for the simulation, i.
 \end{figure}
 
 
+%------------------------------------------------------------------------------------------------%
 \section{How to use Gmsh to generate an external mesh}
+%------------------------------------------------------------------------------------------------%
 
 Gmsh%
 \footnote{freely available at the following address : \url{http://gmsh.info/}}
@@ -267,7 +269,10 @@ indicated in the previous section are :
 In addition, four files like \texttt{free\_surface\_file} corresponding
 to the sides of the model are generated.
 
+
+%------------------------------------------------------------------------------------------------%
 \section{How to use Cubit/Trelis to generate an external mesh}
+%------------------------------------------------------------------------------------------------%
 Trelis (that was known as Cubit)%
 \footnote{available at \url{http://www.csimsoft.com/}}
 is a 2D/3D finite element grid generator distributed by Csimsoft which can be
@@ -309,7 +314,9 @@ In the case of the Script tab is not visible in the command line panel (at the b
 This tab will allow you to play the scripts one line after another directly in Cubit/Trelis.
 With this you should be able to understand how to create meshes and export them under SPECFEM2D format.
 
+%------------------------------------------------------------------------------------------------%
 \subsection{Note about Cubit/Trelis built-in Python}
+%------------------------------------------------------------------------------------------------%
 Beware, there are some (annoying) differences between cubit built-in Python and the actual Python langage:
 \begin{itemize}
 \item \texttt{"aString" + 'anotherString'} can cause problems even after being stored: \newline
@@ -333,6 +340,7 @@ if True: # Just a dummy comment
 \item No comments \texttt{""" """} at the beginning of a script
 \end{itemize}
 And probably many others! Think about that before getting mad.
+
 
 %------------------------------------------------------------------------------------------------%
 \section{Notes about absorbing PMLs}
@@ -449,6 +457,7 @@ are significantly less efficient).}
 \end{figure}
 %%
 
+
 %------------------------------------------------------------------------------------------------%
 \section{Controlling the quality of an external mesh}
 %------------------------------------------------------------------------------------------------%
@@ -470,6 +479,7 @@ The code also shows a histogram of 20 classes of skewness which tells how many e
 \end{verbatim}
 %
 This tool is useful to estimate the mesh quality and to see it evolve along the successive corrections.
+
 
 %------------------------------------------------------------------------------------------------%
 \section{Controlling how the mesh samples the wave field}
