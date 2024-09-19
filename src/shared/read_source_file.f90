@@ -52,6 +52,7 @@
   character(len=256) string_read
   character(len=MAX_STRING_LEN) :: source_filename,path_to_add
   integer, parameter :: IIN_SOURCE = 22
+  logical :: stf_exists
 
   ! user output
   if (myrank == 0) then
@@ -314,6 +315,17 @@
       end select
       write(IMAIN,*) '  Multiplying factor  = ',factor(i_source)
       write(IMAIN,*)
+
+      ! check if external stf file exists
+      if (time_function_type(i_source) == 8) then
+        inquire(file=trim(name_of_source_file(i_source)),exist=stf_exists)
+        if (.not. stf_exists) then
+          write(*,*) ''
+          write(*,*) 'Error external source time function file: ',trim(name_of_source_file(i_source)),' not found.'
+          write(*,*) ''
+          call stop_the_code('Error reading SOURCE file: could not find specified external source time function file')
+        endif
+      endif
 
     enddo ! do i_source= 1,NSOURCES
     close(IIN_SOURCE)

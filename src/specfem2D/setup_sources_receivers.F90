@@ -140,10 +140,12 @@
 
         ! user output
         if (not_in_mesh_domain) then
-          write(IMAIN,*) 'Source ',i
-          write(IMAIN,*) '  Position (x,z) of the source = ',x_source(i),z_source(i)
-          write(IMAIN,*) 'Invalid position, mesh dimensions are: xmin/max = ',xmin,xmax,'zmin/zmax',zmin,zmax
-          write(IMAIN,*) 'Please fix source location, exiting...'
+          write(IMAIN,*) 'Error: Source ',i
+          write(IMAIN,*) '       Position (x,z) of the source = ',x_source(i),z_source(i)
+          write(IMAIN,*)
+          write(IMAIN,*) '       Invalid position, mesh dimensions are: xmin/max = ',xmin,xmax,'zmin/zmax',zmin,zmax
+          write(IMAIN,*) '       Please fix source location, exiting...'
+          write(IMAIN,*)
           if (x_source(i) < xmin) call stop_the_code('Error: at least one source has x < xmin of the mesh')
           if (x_source(i) > xmax) call stop_the_code('Error: at least one source has x > xmax of the mesh')
           if (z_source(i) < zmin) call stop_the_code('Error: at least one source has z < zmin of the mesh')
