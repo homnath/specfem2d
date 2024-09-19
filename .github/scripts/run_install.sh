@@ -24,7 +24,6 @@ echo
 #sudo apt-get install -qq python-matplotlib
 
 pip install --user --upgrade pip setuptools wheel
-pip install --use  --upgrade importlib-resources
 pip install --user --upgrade matplotlib
 pip install --user --only-binary=numpy numpy
 
