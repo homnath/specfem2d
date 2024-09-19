@@ -197,7 +197,7 @@
 
   call param_read(string_read, len(string_read), name, len(name), ierr)
   if (ierr /= 0) return
-  read(string_read,*) value_to_read
+  read(string_read,*,iostat=ierr) value_to_read
 
   end subroutine read_value_integer_p
 
@@ -217,7 +217,7 @@
 
   call param_read(string_read, len(string_read), name, len(name), ierr)
   if (ierr /= 0) return
-  read(string_read,*) value_to_read
+  read(string_read,*,iostat=ierr) value_to_read
 
   end subroutine read_value_double_precision_p
 
@@ -237,7 +237,7 @@
 
   call param_read(string_read, len(string_read), name, len(name), ierr)
   if (ierr /= 0) return
-  read(string_read,*) value_to_read
+  read(string_read,*,iostat=ierr) value_to_read
 
   end subroutine read_value_logical_p
 
@@ -277,7 +277,7 @@
 
   call param_read_nextparam(string_read, len(string_read), name, len(name), ierr)
   if (ierr /= 0) return
-  read(string_read,*) value_to_read
+  read(string_read,*,iostat=ierr) value_to_read
 
   end subroutine read_value_integer_next_p
 
@@ -297,7 +297,7 @@
 
   call param_read_nextparam(string_read, len(string_read), name, len(name), ierr)
   if (ierr /= 0) return
-  read(string_read,*) value_to_read
+  read(string_read,*,iostat=ierr) value_to_read
 
   end subroutine read_value_double_prec_next_p
 
@@ -317,7 +317,7 @@
 
   call param_read_nextparam(string_read, len(string_read), name, len(name), ierr)
   if (ierr /= 0) return
-  read(string_read,*) value_to_read
+  read(string_read,*,iostat=ierr) value_to_read
 
   end subroutine read_value_logical_next_p
 

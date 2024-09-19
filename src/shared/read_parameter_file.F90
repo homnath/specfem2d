@@ -1395,8 +1395,8 @@
 
   if (some_parameters_missing_from_Par_file) then
     write(*,*)
-    write(*,*) 'All the above parameters are missing from your Par_file.'
-    write(*,*) 'Please cut and paste them somewhere in your Par_file (any place is fine), change their values if needed'
+    write(*,*) 'All the above parameters are either in a wrong number format or missing from your Par_file.'
+    write(*,*) 'Please correct or cut&paste them somewhere in your Par_file (any place is fine), change their values if needed'
     write(*,*) '(the above values are just default values), and restart your run.'
     write(*,*)
     call stop_the_code('Error: some parameters are missing in your Par_file, it is incomplete or in an older format, &
