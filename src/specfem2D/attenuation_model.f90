@@ -567,6 +567,10 @@
 
   end subroutine decomposition_LU
 
+!
+!--------------------------------------------------------------------------------
+!
+
   subroutine LUbksb(a,i_min,n,indx,b,m)
 
   implicit none
@@ -608,6 +612,10 @@
 
   end subroutine LUbksb
 
+!
+!--------------------------------------------------------------------------------
+!
+
   subroutine syst_LU(a,i_min,n,b,m)
 
   implicit none
@@ -632,6 +640,10 @@
   call LUbksb(aux,i_min,n,indx,b,m)
 
   end subroutine syst_LU
+
+!
+!--------------------------------------------------------------------------------
+!
 
   subroutine lfit_zener(x,y,sig,ndat,poids,ia,covar,chisq,ma,Qref,point)
 ! ma = nombre de variable diffusive
@@ -715,6 +727,10 @@
 
   end subroutine lfit_zener
 
+!
+!--------------------------------------------------------------------------------
+!
+
   subroutine func_zener(x,afunc,N,Qref,point)
 
   implicit none
@@ -734,6 +750,10 @@
   enddo
 
   end subroutine func_zener
+
+!
+!--------------------------------------------------------------------------------
+!
 
   subroutine remplit_point(fmin,fmax,N,point)
 
@@ -758,6 +778,10 @@
   endif
 
   end subroutine remplit_point
+
+!
+!--------------------------------------------------------------------------------
+!
 
   subroutine classical_linear_least_squares(Qref,poids,point,N,fmin,fmax)
 
@@ -797,6 +821,10 @@
   call lfit_zener(x,y_ref,sig,m,poids,ia,covar,chi2,N,Qref,point)
 
   end subroutine classical_linear_least_squares
+
+!
+!--------------------------------------------------------------------------------
+!
 
 ! Calcul des coefficients par optimization non-lineaire avec contraintes
 
@@ -2052,6 +2080,10 @@
 
   end subroutine solvopt
 
+!
+!--------------------------------------------------------------------------------
+!
+
   subroutine soptions(default)
 ! SOPTIONS returns the default values for the optional parameters
 ! used by SolvOpt.
@@ -2076,6 +2108,10 @@
 
   end subroutine soptions
 
+!
+!--------------------------------------------------------------------------------
+!
+
   subroutine func_objective(x,res,freq,Qref,N,Nopt)
 
   implicit none
@@ -2096,6 +2132,10 @@
   enddo
 
   end subroutine func_objective
+
+!
+!--------------------------------------------------------------------------------
+!
 
   subroutine func_mini(x,res,Qref,N,Nopt,K,f_min,f_max)
 
@@ -2123,6 +2163,10 @@
   enddo
 
   end subroutine func_mini
+
+!
+!--------------------------------------------------------------------------------
+!
 
   subroutine grad_func_mini(x,grad,Qref,N,Nopt,K,f_min,f_max)
 
@@ -2180,6 +2224,10 @@
 
   end subroutine grad_func_mini
 
+!
+!--------------------------------------------------------------------------------
+!
+
   subroutine max_residu(x,res,N,Nopt,theta_min,theta_max)
 
   implicit none
@@ -2202,6 +2250,10 @@
   enddo
 
   end subroutine max_residu
+
+!
+!--------------------------------------------------------------------------------
+!
 
   subroutine grad_max_residu(x,grad,N,Nopt,theta_min,theta_max)
 
@@ -2248,6 +2300,10 @@
   enddo
 
   end subroutine grad_max_residu
+
+!
+!--------------------------------------------------------------------------------
+!
 
   subroutine nonlinear_optimization(N,Qref,f0,point,poids,f_min,f_max)
 
